@@ -9,13 +9,12 @@ public class BrakeSystem : MonoBehaviour
     public LEDController ledController;
     private ILightBehavior standard, frequency, brightness, area;
     public float brakeIntensity = 0f; // 브레이크 강도 값 (0~1)
-    
-    [Header("Properties")]
-    public float frequencyValue;
+
+    [Header("Properties")] public float frequencyValue;
 
     private void Awake()
     {
-        if(instance == null) instance = this;
+        if (instance == null) instance = this;
     }
 
     void Start()
@@ -33,6 +32,7 @@ public class BrakeSystem : MonoBehaviour
         {
             brakeIntensity += Time.deltaTime;
         }
+
         if (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S))
         {
             brakeIntensity -= Time.deltaTime;
@@ -41,25 +41,41 @@ public class BrakeSystem : MonoBehaviour
         brakeIntensity = Mathf.Clamp(brakeIntensity, 0f, 1f); // 🚗 0~1 범위로 제한
 
         // 🚗 키보드 입력으로 제동등 모드 변경
-        if (Input.GetKeyDown(KeyCode.Alpha1))
+        if (Input.GetKeyDown(KeyCode.Alpha0))
         {
+            ledController.ResetBrakeLight();
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            ledController.ResetBrakeLight();
             ledController.SetLightBehavior(standard);
             ledController.ApplyBrakeLight(brakeIntensity);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
+            ledController.ResetBrakeLight();
             ledController.SetLightBehavior(frequency);
             ledController.ApplyBrakeLight(brakeIntensity);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha3))
         {
+            ledController.ResetBrakeLight();
             ledController.SetLightBehavior(brightness);
             ledController.ApplyBrakeLight(brakeIntensity);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha4))
         {
+            ledController.ResetBrakeLight();
             ledController.SetLightBehavior(area);
             ledController.ApplyBrakeLight(brakeIntensity);
         }
     }
+}
+
+public enum BrakeType
+{
+    standard,
+    frequency,
+    brightness,
+    area
 }

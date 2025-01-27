@@ -36,4 +36,13 @@ public class LEDController : MonoBehaviour
             activeCoroutine = StartCoroutine(_currentLightBehavior.ApplyLighting(ledCubes, intensity));
         }
     }
+
+    public void ResetBrakeLight()
+    {
+        foreach (var led in ledCubes)
+        {
+            led.SetActive(true);
+            led.GetComponent<Renderer>().material.color = Color.black;
+        }
+    }
 }
