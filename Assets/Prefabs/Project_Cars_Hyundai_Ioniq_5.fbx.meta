@@ -3,7 +3,32 @@ guid: a7fd8b2249fe30f4aa6d48858c95a0a9
 ModelImporter:
   serializedVersion: 21300
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_Black_Dark
+    second: {fileID: 2100000, guid: 69d4accddb5a11b4e93f0d55604ec855, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_Emission
+    second: {fileID: 2100000, guid: 73881a8eb49d58548ac32374b2e3b307, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_Gravity_Gold_Matte
+    second: {fileID: 2100000, guid: 62070c02c58c19f4d9d74abcbb5b8f97, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_Ioniq
+    second: {fileID: 2100000, guid: cdbb63de66dc756448e76846038fd7ca, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_Tires
+    second: {fileID: 2100000, guid: 22ef6f035cbbf38469e1666b1886980a, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

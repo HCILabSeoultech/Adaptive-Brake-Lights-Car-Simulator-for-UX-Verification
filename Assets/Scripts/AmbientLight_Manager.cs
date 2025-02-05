@@ -68,6 +68,7 @@ public class AmbientLight_Manager : MonoBehaviour
         if (rainlight == null)
         {
             Debug.LogError("빛이 없으랴...");
+            Debug.Log(gameObject.name);
         }
 
 

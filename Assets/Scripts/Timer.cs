@@ -28,12 +28,11 @@ public class Timer : MonoBehaviour
     void Start()
     {
         InitializeTimer();
-        Debug.Log("event1 start");
     }
 
     public void InitializeTimer()
     {
-        //Debug.Log("Initialize Timer");
+        Debug.Log("Initialize Timer");
         _remainingTime = timeLimit * 60; // 분을 초로 변환
         UpdateTimerText(); // 처음 텍스트를 업데이트
     }
@@ -57,10 +56,11 @@ public class Timer : MonoBehaviour
             UpdateTimerText();
         }
 
+        /*
         if(Paused == true && controller.speedValue > 0)
         {
             Paused = false;
-        }
+        }*/
 
 
         if (!Paused)
