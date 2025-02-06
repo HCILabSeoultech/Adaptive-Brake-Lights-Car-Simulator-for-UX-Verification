@@ -19,7 +19,8 @@ public class PlayerCarController : MonoBehaviour
     internal enum driver
     {
         Logiwheel,
-        moblie
+        keyboard,
+        automatic
     }
 
     [SerializeField] driver driveContreller;
@@ -128,8 +129,11 @@ public class PlayerCarController : MonoBehaviour
             case driver.Logiwheel:
                 LogitechDrive();
                 break;
-            case driver.moblie:
-                mobileDrive();
+            case driver.keyboard:
+                MobileDrive();
+                break;
+            case driver.automatic:
+                AutomaticDrive();
                 break;
         }
 
@@ -300,10 +304,15 @@ public class PlayerCarController : MonoBehaviour
         }
     }
 
-    private void mobileDrive()
+    private void MobileDrive()
     {
         rawSteeringInput = Input.GetAxis("Horizontal");
         rawForwardInput = Input.GetAxis("Vertical");
         parkInput = Input.GetAxis("Jump");
+    }
+
+    private void AutomaticDrive()
+    {
+        
     }
 }
