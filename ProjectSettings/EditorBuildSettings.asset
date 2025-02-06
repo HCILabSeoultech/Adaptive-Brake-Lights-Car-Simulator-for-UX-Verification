@@ -9,9 +9,9 @@ EditorBuildSettings:
     path: Assets/Scenes/SampleScene.unity
     guid: add28dc6a2eb8974f91a6e416d3d1c6f
   - enabled: 0
-    path: Assets/Scenes/Mobis Scene/Road.unity
+    path: Assets/0000000 Scenes/Mobis Scene/Road.unity
     guid: a31a7845feb557840b9e7d180c819785
   - enabled: 1
-    path: Assets/Scenes/Mobis Scene/map_test_Mobis.unity
+    path: Assets/0000000 Scenes/Mobis Scene/map_test_Mobis.unity
     guid: 60f098f6d369f2640b5fc3e0a8bc1ca8
   m_configObjects: {}
