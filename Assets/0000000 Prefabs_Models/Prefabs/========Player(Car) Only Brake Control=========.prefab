@@ -365,6 +365,7 @@ GameObject:
   - component: {fileID: 4243288848394050549}
   - component: {fileID: 4243288848394050548}
   - component: {fileID: 4243288848394050547}
+  - component: {fileID: 214841475}
   m_Layer: 12
   m_Name: Volvo XC40 Recharge
   m_TagString: Player
@@ -449,7 +450,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 525892619351223430}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a4fac9e10a0ddbd44beea06ee4be8f63, type: 3}
   m_Name: 
@@ -574,6 +575,99 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ebfad8609d3a814aa82f0a0479af90b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &214841475
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 525892619351223430}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e7dbae3db3726a4ca6e82153f73fdfa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serialController: {fileID: 4243288849048812813}
+  driveContreller: 1
+  rawSteeringInput: 0
+  rawForwardInput: 0
+  parkInput: 0
+  backwardgear: 0
+  info:
+    text: This demo controller lets you control the car using the axes named Horizontal,
+      Vertical and Jump. If you are using keyboard and standard Unity settings, this
+      means either arrow keys or WASD together with Space.
+    messageType: 0
+    show: 1
+  brakeToReverse: 1
+  infoAboutCurves:
+    text: The curves below describe available total wheel torque (Nm, y axis) vs
+      vehicle speed (m/s, x axis).
+    messageType: 0
+    show: 1
+  availableForwardTorque:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 2700
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 50
+      value: 2700
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  availableReverseTorque:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 2700
+      inSlope: 0
+      outSlope: -180
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 15
+      value: 0
+      inSlope: -180
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  consoleMessages: 1
+  propulsiveDirection: {fileID: 11400000, guid: ec657b40a47804e52a3ff5aa4c54eafd, type: 2}
+  wheelTorque: {fileID: 11400000, guid: c19ad5bcab1794b5b9ebad99c1d35465, type: 2}
+  userSteeringInput: {fileID: 11400000, guid: 7722cf0e279a85c4f989ccf7d925d2ab, type: 2}
+  velocity: {fileID: 11400000, guid: 3aab31d7b50b44db0b672cf402eaeb4d, type: 2}
+  gearLeverIndication: {fileID: 11400000, guid: 1e51a78e2736840a0a0af75032f52d05, type: 2}
+  doorIsOpenR1L: {fileID: 11400000, guid: 267135e217489402d89b265d58408cda, type: 2}
+  lampBrake: {fileID: 11400000, guid: 0063ec1d5b4c9465090e5f3d541e8e80, type: 2}
+  waypoints: {fileID: 0}
+  currentWaypoint: {fileID: 0}
+  nodes: []
+  distanceOffset: 1
+  sterrForce: 1.54
+  status: off
+  Timer: {fileID: 0}
 --- !u!1 &664590519248823897
 GameObject:
   m_ObjectHideFlags: 0
@@ -7640,7 +7734,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8310564038211314709}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c8534e17a0f90604c9afd4f5c73d829f, type: 3}
   m_Name: 
@@ -8332,6 +8426,19 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 4806326817016233155, guid: 2f63e10f9ab57db47bf1baac1af0c078, type: 3}
   m_PrefabInstance: {fileID: 3769339090212781880}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &4243288848394050545
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8573975356490367995}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8534e17a0f90604c9afd4f5c73d829f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Id: 93a8bc26-0d5f-4292-9c3f-a7f26ff68ebc
 --- !u!114 &4243288848394050546
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8344,19 +8451,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3047a8618a80261439a21993d26653a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &4243288848394050545
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8573975356490367995}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c8534e17a0f90604c9afd4f5c73d829f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Id: 93a8bc26-0d5f-4292-9c3f-a7f26ff68ebc
 --- !u!1001 &4243288848545651095
 PrefabInstance:
   m_ObjectHideFlags: 0
