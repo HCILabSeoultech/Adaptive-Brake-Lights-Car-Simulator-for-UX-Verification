@@ -221,8 +221,8 @@ MonoBehaviour:
   corotatorGameObj: {fileID: 0}
   corotatorOpenRotation: {x: 0, y: 45, z: 0}
   corotatorOpenDelay: 0
-  doorIsOpen: {fileID: 11400000, guid: c9053cb6516cb4fcb9b93db8c2c146f2, type: 2}
-  cameraIsInsideCar: {fileID: 11400000, guid: ded86fcf5ba828d439a23bf8f8084451, type: 2}
+  doorIsOpen: {fileID: 11400000, guid: 96b298a692db4184388482123e228d5f, type: 2}
+  cameraIsInsideCar: {fileID: 11400000, guid: 01734424c8ce3a449a16fe8ca8d591b7, type: 2}
 --- !u!1 &364021201788329678
 GameObject:
   m_ObjectHideFlags: 0
@@ -365,7 +365,6 @@ GameObject:
   - component: {fileID: 4243288848394050549}
   - component: {fileID: 4243288848394050548}
   - component: {fileID: 4243288848394050547}
-  - component: {fileID: 214841475}
   - component: {fileID: 2730986109965293079}
   m_Layer: 12
   m_Name: Volvo XC40 Recharge
@@ -575,99 +574,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ebfad8609d3a814aa82f0a0479af90b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &214841475
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 525892619351223430}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e7dbae3db3726a4ca6e82153f73fdfa, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  serialController: {fileID: 4243288849048812813}
-  driveContreller: 1
-  rawSteeringInput: 0
-  rawForwardInput: 0
-  parkInput: 0
-  backwardgear: 0
-  info:
-    text: This demo controller lets you control the car using the axes named Horizontal,
-      Vertical and Jump. If you are using keyboard and standard Unity settings, this
-      means either arrow keys or WASD together with Space.
-    messageType: 0
-    show: 1
-  brakeToReverse: 1
-  infoAboutCurves:
-    text: The curves below describe available total wheel torque (Nm, y axis) vs
-      vehicle speed (m/s, x axis).
-    messageType: 0
-    show: 1
-  availableForwardTorque:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 2700
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 50
-      value: 2700
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  availableReverseTorque:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 2700
-      inSlope: 0
-      outSlope: -180
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 15
-      value: 0
-      inSlope: -180
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  consoleMessages: 1
-  propulsiveDirection: {fileID: 11400000, guid: ec657b40a47804e52a3ff5aa4c54eafd, type: 2}
-  wheelTorque: {fileID: 11400000, guid: c19ad5bcab1794b5b9ebad99c1d35465, type: 2}
-  userSteeringInput: {fileID: 11400000, guid: 7722cf0e279a85c4f989ccf7d925d2ab, type: 2}
-  velocity: {fileID: 11400000, guid: 3aab31d7b50b44db0b672cf402eaeb4d, type: 2}
-  gearLeverIndication: {fileID: 11400000, guid: 1e51a78e2736840a0a0af75032f52d05, type: 2}
-  doorIsOpenR1L: {fileID: 11400000, guid: 267135e217489402d89b265d58408cda, type: 2}
-  lampBrake: {fileID: 11400000, guid: 0063ec1d5b4c9465090e5f3d541e8e80, type: 2}
-  waypoints: {fileID: 0}
-  currentWaypoint: {fileID: 0}
-  nodes: []
-  distanceOffset: 1
-  sterrForce: 1.54
-  status: off
-  Timer: {fileID: 0}
 --- !u!114 &2730986109965293079
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -745,13 +651,13 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   consoleMessages: 1
-  propulsiveDirection: {fileID: 11400000, guid: ec657b40a47804e52a3ff5aa4c54eafd, type: 2}
-  wheelTorque: {fileID: 11400000, guid: c19ad5bcab1794b5b9ebad99c1d35465, type: 2}
-  userSteeringInput: {fileID: 11400000, guid: 7722cf0e279a85c4f989ccf7d925d2ab, type: 2}
-  velocity: {fileID: 11400000, guid: 3aab31d7b50b44db0b672cf402eaeb4d, type: 2}
-  gearLeverIndication: {fileID: 11400000, guid: 1e51a78e2736840a0a0af75032f52d05, type: 2}
-  doorIsOpenR1L: {fileID: 11400000, guid: 267135e217489402d89b265d58408cda, type: 2}
-  lampBrake: {fileID: 11400000, guid: 0063ec1d5b4c9465090e5f3d541e8e80, type: 2}
+  propulsiveDirection: {fileID: 11400000, guid: 1598fee887706694c9b7f0a7349d6b91, type: 2}
+  wheelTorque: {fileID: 11400000, guid: 0aee397cf66b5db4393280a20526b97a, type: 2}
+  userSteeringInput: {fileID: 11400000, guid: 9fc4e757f416262439fac9c392f215a9, type: 2}
+  velocity: {fileID: 11400000, guid: cc384c9ed1fc94b4d958b9efa8c0c27b, type: 2}
+  gearLeverIndication: {fileID: 11400000, guid: 3550861fdf712714a83a58f13eb4ce96, type: 2}
+  doorIsOpenR1L: {fileID: 11400000, guid: 2999df405ada51544903e6797449c1f9, type: 2}
+  lampBrake: {fileID: 11400000, guid: ae342d59ff37af845904859e596fff10, type: 2}
   waypoints: {fileID: 0}
   currentWaypoint: {fileID: 0}
   nodes: []
@@ -867,8 +773,8 @@ MonoBehaviour:
   corotatorGameObj: {fileID: 0}
   corotatorOpenRotation: {x: 0, y: 45, z: 0}
   corotatorOpenDelay: 0
-  doorIsOpen: {fileID: 11400000, guid: a1c0ef1522f2a41caa289af7a884c45c, type: 2}
-  cameraIsInsideCar: {fileID: 11400000, guid: ded86fcf5ba828d439a23bf8f8084451, type: 2}
+  doorIsOpen: {fileID: 11400000, guid: 753a0ca4887fb744a9e43dab024215fd, type: 2}
+  cameraIsInsideCar: {fileID: 11400000, guid: 01734424c8ce3a449a16fe8ca8d591b7, type: 2}
 --- !u!1 &1568887103145642820
 GameObject:
   m_ObjectHideFlags: 0
@@ -4841,8 +4747,8 @@ MonoBehaviour:
   corotatorGameObj: {fileID: 0}
   corotatorOpenRotation: {x: 0, y: 45, z: 0}
   corotatorOpenDelay: 0
-  doorIsOpen: {fileID: 11400000, guid: f2194821f38654d65adea9d652f10707, type: 2}
-  cameraIsInsideCar: {fileID: 11400000, guid: ded86fcf5ba828d439a23bf8f8084451, type: 2}
+  doorIsOpen: {fileID: 11400000, guid: 48546b645b378074fb4e8d7c38b88069, type: 2}
+  cameraIsInsideCar: {fileID: 11400000, guid: 01734424c8ce3a449a16fe8ca8d591b7, type: 2}
 --- !u!1 &5378385048684106668
 GameObject:
   m_ObjectHideFlags: 0
@@ -5028,8 +4934,8 @@ MonoBehaviour:
   corotatorGameObj: {fileID: 0}
   corotatorOpenRotation: {x: 0, y: 45, z: 0}
   corotatorOpenDelay: 0
-  doorIsOpen: {fileID: 11400000, guid: 267135e217489402d89b265d58408cda, type: 2}
-  cameraIsInsideCar: {fileID: 11400000, guid: ded86fcf5ba828d439a23bf8f8084451, type: 2}
+  doorIsOpen: {fileID: 11400000, guid: 2999df405ada51544903e6797449c1f9, type: 2}
+  cameraIsInsideCar: {fileID: 11400000, guid: 01734424c8ce3a449a16fe8ca8d591b7, type: 2}
 --- !u!1 &5410015287803852645
 GameObject:
   m_ObjectHideFlags: 0
@@ -5884,7 +5790,7 @@ MonoBehaviour:
   - {fileID: 1031762785732291545}
   emissiveColor: {r: 0.99999994, g: 0, b: 0, a: 1}
   litMultiplier: 16
-  lampData: {fileID: 11400000, guid: 0063ec1d5b4c9465090e5f3d541e8e80, type: 2}
+  lampData: {fileID: 11400000, guid: ae342d59ff37af845904859e596fff10, type: 2}
 --- !u!1 &7618973200393171549
 GameObject:
   m_ObjectHideFlags: 0
@@ -6016,7 +5922,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_audioSourceTemplate: {fileID: 3017325440358956607}
-  m_wheelVelocity: {fileID: 11400000, guid: 27a149954fc075f4893e55f2d55bec28, type: 2}
+  m_wheelVelocity: {fileID: 11400000, guid: 0f435c773a2fe5a4f91741139f7a6663, type: 2}
   m_volumeAt0WheelVelocity: 46
   m_volumeAt100WheelVelocity: 920
 --- !u!1 &8290916963307012082
@@ -6070,8 +5976,8 @@ MonoBehaviour:
     show: 1
   rigidBody: {fileID: 4839968796178135700}
   rigidBodyExtension: {fileID: 5554268282665305855}
-  velocityData: {fileID: 11400000, guid: 3aab31d7b50b44db0b672cf402eaeb4d, type: 2}
-  accelerationData: {fileID: 11400000, guid: 4c89368de3727497fa00d049a0fe4958, type: 2}
+  velocityData: {fileID: 11400000, guid: cc384c9ed1fc94b4d958b9efa8c0c27b, type: 2}
+  accelerationData: {fileID: 11400000, guid: cb5e82e120d4a7c4484a3f59f80cd4ee, type: 2}
   velocityKPH: 0
   acceleration: 0
   last0To100Time: 0
@@ -6195,14 +6101,14 @@ MonoBehaviour:
     collider: {fileID: 3112078596541226744}
     originalRotation: {x: 0, y: 0, z: 0, w: 0}
     originalPosition: {x: 0, y: 0, z: 0}
-  steeringWheelAngleData: {fileID: 11400000, guid: 3e23c42b8bfe24ef0a39cb0da6a172bd, type: 2}
-  whlTqData: {fileID: 11400000, guid: c19ad5bcab1794b5b9ebad99c1d35465, type: 2}
-  propulsiveDirData: {fileID: 11400000, guid: ec657b40a47804e52a3ff5aa4c54eafd, type: 2}
-  rackForceData: {fileID: 11400000, guid: 6c69f3f77ccf9482f8865f1beeeed14a, type: 2}
-  virtualDriverSteeringData: {fileID: 11400000, guid: 77b6e828ee91343518fc3a0bb79a843d, type: 2}
-  userSteeringInputData: {fileID: 11400000, guid: 7722cf0e279a85c4f989ccf7d925d2ab, type: 2}
-  velocity: {fileID: 11400000, guid: 3aab31d7b50b44db0b672cf402eaeb4d, type: 2}
-  wheelVelocityData: {fileID: 11400000, guid: 27a149954fc075f4893e55f2d55bec28, type: 2}
+  steeringWheelAngleData: {fileID: 11400000, guid: 213cd517ab24e2d428b88ccbf19d1ed6, type: 2}
+  whlTqData: {fileID: 11400000, guid: 0aee397cf66b5db4393280a20526b97a, type: 2}
+  propulsiveDirData: {fileID: 11400000, guid: 1598fee887706694c9b7f0a7349d6b91, type: 2}
+  rackForceData: {fileID: 11400000, guid: f47ffb8dd418ba24f85bd968840802d5, type: 2}
+  virtualDriverSteeringData: {fileID: 11400000, guid: 73c5d0f99c531f149b719b91b382171b, type: 2}
+  userSteeringInputData: {fileID: 11400000, guid: 9fc4e757f416262439fac9c392f215a9, type: 2}
+  velocity: {fileID: 11400000, guid: cc384c9ed1fc94b4d958b9efa8c0c27b, type: 2}
+  wheelVelocityData: {fileID: 11400000, guid: 0f435c773a2fe5a4f91741139f7a6663, type: 2}
   ABSActive: 0
 --- !u!114 &4243288848789371459
 MonoBehaviour:
@@ -6389,8 +6295,8 @@ MonoBehaviour:
   corotatorGameObj: {fileID: 0}
   corotatorOpenRotation: {x: 0, y: 45, z: 0}
   corotatorOpenDelay: 0
-  doorIsOpen: {fileID: 11400000, guid: 6221b6e329252478390ab9097bd97753, type: 2}
-  cameraIsInsideCar: {fileID: 11400000, guid: ded86fcf5ba828d439a23bf8f8084451, type: 2}
+  doorIsOpen: {fileID: 11400000, guid: 60d594205be55424d8c3d0525a8384f6, type: 2}
+  cameraIsInsideCar: {fileID: 11400000, guid: 01734424c8ce3a449a16fe8ca8d591b7, type: 2}
 --- !u!1 &8721007012842503732
 GameObject:
   m_ObjectHideFlags: 0
@@ -6487,7 +6393,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   steeringWheelTransform: {fileID: 6976371863140684837}
-  steeringWheelAngle: {fileID: 11400000, guid: 3e23c42b8bfe24ef0a39cb0da6a172bd, type: 2}
+  steeringWheelAngle: {fileID: 11400000, guid: 213cd517ab24e2d428b88ccbf19d1ed6, type: 2}
 --- !u!1 &8886732274583199153
 GameObject:
   m_ObjectHideFlags: 0
@@ -6701,13 +6607,41 @@ PrefabInstance:
     m_TransformParent: {fileID: 5581002519244185390}
     m_Modifications:
     - target: {fileID: 4806326817016233152, guid: 2f63e10f9ab57db47bf1baac1af0c078, type: 3}
+      propertyPath: velocity
+      value: 
+      objectReference: {fileID: 11400000, guid: cc384c9ed1fc94b4d958b9efa8c0c27b, type: 2}
+    - target: {fileID: 4806326817016233152, guid: 2f63e10f9ab57db47bf1baac1af0c078, type: 3}
+      propertyPath: lampBrake
+      value: 
+      objectReference: {fileID: 11400000, guid: ae342d59ff37af845904859e596fff10, type: 2}
+    - target: {fileID: 4806326817016233152, guid: 2f63e10f9ab57db47bf1baac1af0c078, type: 3}
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4806326817016233152, guid: 2f63e10f9ab57db47bf1baac1af0c078, type: 3}
+      propertyPath: wheelTorque
+      value: 
+      objectReference: {fileID: 11400000, guid: 0aee397cf66b5db4393280a20526b97a, type: 2}
+    - target: {fileID: 4806326817016233152, guid: 2f63e10f9ab57db47bf1baac1af0c078, type: 3}
+      propertyPath: doorIsOpenR1L
+      value: 
+      objectReference: {fileID: 11400000, guid: 2999df405ada51544903e6797449c1f9, type: 2}
+    - target: {fileID: 4806326817016233152, guid: 2f63e10f9ab57db47bf1baac1af0c078, type: 3}
       propertyPath: driveContreller
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 4806326817016233152, guid: 2f63e10f9ab57db47bf1baac1af0c078, type: 3}
+      propertyPath: userSteeringInput
+      value: 
+      objectReference: {fileID: 11400000, guid: 9fc4e757f416262439fac9c392f215a9, type: 2}
+    - target: {fileID: 4806326817016233152, guid: 2f63e10f9ab57db47bf1baac1af0c078, type: 3}
+      propertyPath: gearLeverIndication
+      value: 
+      objectReference: {fileID: 11400000, guid: 3550861fdf712714a83a58f13eb4ce96, type: 2}
+    - target: {fileID: 4806326817016233152, guid: 2f63e10f9ab57db47bf1baac1af0c078, type: 3}
+      propertyPath: propulsiveDirection
+      value: 
+      objectReference: {fileID: 11400000, guid: 1598fee887706694c9b7f0a7349d6b91, type: 2}
     - target: {fileID: 4806326817016233153, guid: 2f63e10f9ab57db47bf1baac1af0c078, type: 3}
       propertyPath: m_RootOrder
       value: 1

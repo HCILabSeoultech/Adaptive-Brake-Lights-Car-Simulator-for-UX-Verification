@@ -19,7 +19,7 @@ public class PlayerCarController : MonoBehaviour
     internal enum driver
     {
         Logiwheel,
-        keyboard,
+        keyboard_Player,
         automatic
     }
 
@@ -129,7 +129,7 @@ public class PlayerCarController : MonoBehaviour
             case driver.Logiwheel:
                 LogitechDrive();
                 break;
-            case driver.keyboard:
+            case driver.keyboard_Player:
                 MobileDrive();
                 break;
             case driver.automatic:

@@ -367,7 +367,7 @@ GameObject:
   - component: {fileID: 4243288848394050547}
   - component: {fileID: 214841475}
   m_Layer: 12
-  m_Name: Volvo XC40 Recharge
+  m_Name: Player Volvo XC40 Recharge
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
