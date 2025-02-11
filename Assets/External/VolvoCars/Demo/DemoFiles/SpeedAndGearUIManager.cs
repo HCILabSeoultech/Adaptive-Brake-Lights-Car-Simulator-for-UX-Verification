@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using UnityEngine.Serialization;
 
-public class SpeedAndGear : MonoBehaviour
+public class SpeedAndGearUIManager : MonoBehaviour
 {
     [Header("Settings")]
     [SerializeField] private bool mph = false;
@@ -11,14 +12,17 @@ public class SpeedAndGear : MonoBehaviour
     [Header("References")]
     [SerializeField] private VolvoCars.Data.GearLeverIndication gear = default;
     [SerializeField] private VolvoCars.Data.Velocity velocity = default;
+    [SerializeField] private VolvoCars.Data.Velocity aheadVelocity = default;
     [SerializeField] private TMPro.TMP_Text gearText;
-    [SerializeField] private TMPro.TMP_Text speedText;
+    [SerializeField] private TMPro.TMP_Text playerCarSpeedText;
+    [SerializeField] private TMPro.TMP_Text aheadCarSpeedText;
     [SerializeField] private TMPro.TMP_Text unityScreenText;
     //private UnityEngine.UI.Text text;
 
     private string gearString = "";
     Action<int> gearAction;
     Action<float> velocityAction;
+    Action<float> aheadVelocityAction;
 
     // Start is called before the first frame update
     void Start()
@@ -48,18 +52,31 @@ public class SpeedAndGear : MonoBehaviour
 
         velocityAction = v =>
         {
-            if (speedText == null)
+            if (playerCarSpeedText == null)
                 return;
 
             if (mph) {
-                speedText.text = ((int)(2.23694f * Mathf.Abs(v) + 0.9f)).ToString();
+                playerCarSpeedText.text = ((int)(2.23694f * Mathf.Abs(v) + 0.9f)).ToString();
             } else {
-                speedText.text = ((int)(3.6f * Mathf.Abs(v) + 0.9f)).ToString();
+                playerCarSpeedText.text = ((int)(3.6f * Mathf.Abs(v) + 0.9f)).ToString();
             }
         };
         velocity.Subscribe(velocityAction);
+        
+        velocityAction = v =>
+        {
+            if (aheadCarSpeedText == null)
+                return;
 
-
+            if (mph) {
+                aheadCarSpeedText.text = ((int)(2.23694f * Mathf.Abs(v) + 0.9f)).ToString();
+            } else {
+                aheadCarSpeedText.text = ((int)(3.6f * Mathf.Abs(v) + 0.9f)).ToString();
+            }
+        };
+        
+        aheadVelocity.Subscribe(aheadVelocityAction);
+    
     }
 
     void Update()

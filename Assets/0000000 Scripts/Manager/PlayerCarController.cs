@@ -20,7 +20,8 @@ public class PlayerCarController : MonoBehaviour
     {
         Logiwheel,
         keyboard_Player,
-        automatic
+        automatic,
+        None
     }
 
     [SerializeField] driver driveContreller;
