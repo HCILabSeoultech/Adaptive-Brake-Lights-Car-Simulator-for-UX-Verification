@@ -63,7 +63,7 @@ public class SpeedAndGearUIManager : MonoBehaviour
         };
         velocity.Subscribe(velocityAction);
         
-        velocityAction = v =>
+        aheadVelocityAction = v =>
         {
             if (aheadCarSpeedText == null)
                 return;
@@ -76,7 +76,6 @@ public class SpeedAndGearUIManager : MonoBehaviour
         };
         
         aheadVelocity.Subscribe(aheadVelocityAction);
-    
     }
 
     void Update()

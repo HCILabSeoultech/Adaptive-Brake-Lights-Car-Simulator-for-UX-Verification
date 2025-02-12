@@ -97,6 +97,18 @@ public class VehiclesAheadController : MonoBehaviour
         // doorIsOpenR1L.Value = true;
 
         parkInput = 0;
+
+        StartCoroutine(VehiclesAheadRoutine());
+    }
+
+    public IEnumerator VehiclesAheadRoutine()
+    {
+        Debug.Log("루틴 1");
+        StartCoroutine(AdjustSpeedOverTime(50, 10f)); // 5초 동안 60km/h로 가속
+        // Debug.Log("루틴 2");
+        yield return new WaitForSeconds(5f); // 5초 유지
+        // Debug.Log("루틴 3");
+        // StartCoroutine(AdjustSpeedOverTime(40, 3f)); // 3초 동안 40km/h로 감귀
     }
 
     private void FixedUpdate()
@@ -110,9 +122,7 @@ public class VehiclesAheadController : MonoBehaviour
             doorIsOpenR1L.Value = !doorIsOpenR1L.Value;
         }
 
-        AutomaticDrive();
-
-
+        // low 값에 따라 토크 적용
         if (LogitechGSDK.LogiUpdate() && LogitechGSDK.LogiIsConnected((int)LogitechKeyCode.FirstIndex))
         {
             //������ �ǵ�� ����
@@ -139,6 +149,36 @@ public class VehiclesAheadController : MonoBehaviour
     {
         doorIsOpenR1L.Unsubscribe(doorIsOpenR1LAction);
     }
+
+    public IEnumerator AdjustSpeedOverTime(float targetSpeed, float duration)
+    {
+        float startSimulatedSpeed = 3.6f * Mathf.Abs(velocity.Value) + 0.9f; // 현재 속도 변환
+        
+        float startTime = Time.time; // 시작 시간 기록
+        float endTime = startTime + duration; // 종료 시간 설정
+
+        while (Time.time < endTime)
+        {
+            float elapsedTime = Time.time - startTime; // 경과 시간 계산
+            float t = elapsedTime / duration; // 0 ~ 1 보간 비율
+
+            // 현재 속도를 계속 업데이트하여 반영
+            float currentSpeed = 3.6f * Mathf.Abs(velocity.Value) + 0.9f;
+
+            // 목표 속도로 선형 보간
+            float newSpeed = Mathf.Lerp(startSimulatedSpeed, targetSpeed, t);
+
+            // 현재 속도와 목표 속도를 비교하여 rawForwardInput 조정
+            rawForwardInput = Mathf.Clamp((newSpeed - currentSpeed) / (targetSpeed - startSimulatedSpeed), -1f, 1f);
+
+            yield return null; // 다음 프레임까지 대기
+        }
+        
+        // rawForwardInput = 0; // 감속이 완료되면 입력값을 0으로 설정하여 정속 주행
+        Debug.Log($"속도 증가가 끝났습니다. 최종 속도: {3.6f * Mathf.Abs(velocity.Value) + 0.9f}km/h, duration: {duration}");
+        Debug.Log("정속 주행 시작합니다.(정속 주행 루틴 시작해야 함)");
+    }
+
 
     private void ApplyWheelTorques(float totalWheelTorque)
     {
