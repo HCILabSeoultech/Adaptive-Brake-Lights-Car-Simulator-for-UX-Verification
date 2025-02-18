@@ -360,12 +360,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7174904329237048299}
-  - component: {fileID: 4839968796178135700}
   - component: {fileID: 5554268282665305855}
   - component: {fileID: 4243288848394050549}
   - component: {fileID: 4243288848394050548}
   - component: {fileID: 4243288848394050547}
   - component: {fileID: 2730986109965293079}
+  - component: {fileID: 7310992516492650419}
+  - component: {fileID: 4839968796178135700}
   m_Layer: 12
   m_Name: Volvo XC40 Recharge
   m_TagString: Player
@@ -400,22 +401,6 @@ Transform:
   m_Father: {fileID: 5581002519244185390}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!54 &4839968796178135700
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 525892619351223430}
-  serializedVersion: 2
-  m_Mass: 2030
-  m_Drag: 0.1
-  m_AngularDrag: 0.05
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 1
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!114 &5554268282665305855
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -590,6 +575,12 @@ MonoBehaviour:
   rawForwardInput: 0
   parkInput: 0
   backwardgear: 0
+  totalTorque: 0
+  currentAcceleration: 0
+  currentVelocity: 0
+  currentTime: 0
+  targetSpeedFirst: 0
+  targetTimeFirst: 0
   info:
     text: This demo controller lets you control the car using the axes named Horizontal,
       Vertical and Jump. If you are using keyboard and standard Unity settings, this
@@ -665,6 +656,36 @@ MonoBehaviour:
   sterrForce: 1.54
   status: off
   Timer: {fileID: 0}
+--- !u!114 &7310992516492650419
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 525892619351223430}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 524d9bc79b5b82b49a0cc3e5f3180be8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetSpeed: 5
+  duration: 3
+--- !u!54 &4839968796178135700
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 525892619351223430}
+  serializedVersion: 2
+  m_Mass: 2030
+  m_Drag: 0.1
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 1
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &1302688126670674560
 GameObject:
   m_ObjectHideFlags: 0
@@ -6122,7 +6143,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8534e17a0f90604c9afd4f5c73d829f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Id: ff2eb66b-1c19-4786-87a7-f6482c1523ff
+  m_Id: 61fa4592-3015-48b8-a7d0-70b2a03d9fd7
 --- !u!1 &8316707064876348841
 GameObject:
   m_ObjectHideFlags: 0
@@ -6714,7 +6735,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8534e17a0f90604c9afd4f5c73d829f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Id: 27f1ef82-b333-4c39-b6ad-2b8e6b96b707
+  m_Id: 4cb459ac-5188-43cc-8b2e-982b97cc46ec
 --- !u!114 &4243288848394050546
 MonoBehaviour:
   m_ObjectHideFlags: 0
