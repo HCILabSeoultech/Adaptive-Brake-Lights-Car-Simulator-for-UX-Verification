@@ -10,7 +10,8 @@ public class OtherCarController : MonoBehaviour
     public Rigidbody rb; // Rigidbody 참조
     public float targetSpeed_KmPerHour; // 목표 속도 (km/h)
     public float targetAcceleration; // 목표 가속도 (m/s²)
-    public float duration; // 목표 시간 (s)
+    public float durationSpeedUp; // 목표 가속 시간 (s)
+    public float durationSpeedDown; // 목표 시간 (s)
 
     private Coroutine currentCoroutine; // 현재 실행 중인 코루틴 저장
 
@@ -23,9 +24,13 @@ public class OtherCarController : MonoBehaviour
 
     public IEnumerator TestRoutine()
     {
-        yield return AccelerateToTargetSpeed(CarUtils.ConvertKmHToMS(targetSpeed_KmPerHour), duration);
-        yield return AccelerateWithFixedAcceleration(targetAcceleration, duration);
+        float targetSpeedMS = CarUtils.ConvertKmHToMS(targetSpeed_KmPerHour);
+        yield return AccelerateToTargetSpeed(targetSpeedMS, durationSpeedUp);
+        yield return WaitAtTargetSpeed(5);
+        yield return AccelerateWithFixedAcceleration(targetAcceleration, durationSpeedDown);
+        yield return WaitAtTargetSpeed(5);
     }
+
     
     /// <summary>
     /// 목표 속도와 목표 시간이 주어지면, Lerp를 활용하여 등가속도 운동을 수행합니다.
@@ -102,5 +107,25 @@ public class OtherCarController : MonoBehaviour
         float averageAcceleration = accelerations.Sum() / accelerations.Count;
         rb.velocity = targetVelocity;
         Debug.Log($"✅ 목표 가속도 적용 완료. 최종 속도: {rb.velocity.z} m/s, 목표 가속도: {targetAcceleration}, 평균 가속도 : {averageAcceleration}, 가속도 오차: {Math.Abs(targetAcceleration-averageAcceleration)/targetAcceleration* 100:F2}% ");
+    }
+    
+    /// <summary>
+    /// 현재 속도를 유지한 채 일정 시간 동안 대기합니다.
+    /// </summary>
+    public IEnumerator WaitAtTargetSpeed(float waitTime)
+    {
+        float elapsedTime = 0f;
+        Vector3 constantVelocity = rb.velocity; // 현재 속도 저장
+
+        Debug.Log($"⏳ {waitTime}s 동안 속도 유지: {constantVelocity.z:F3} m/s");
+
+        while (elapsedTime < waitTime)
+        {
+            rb.velocity = constantVelocity; // 속도 유지
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        Debug.Log($"✅ {waitTime}s 대기 완료. 속도 유지 후 다음 동작 진행.");
     }
 }
