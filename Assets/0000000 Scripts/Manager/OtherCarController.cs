@@ -3,43 +3,28 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class OtherCarController : MonoBehaviour
 {
     public Rigidbody rb; // Rigidbody 참조
-    public float targetSpeed; // 목표 속도 (m/s)
+    public float targetSpeed_KmPerHour; // 목표 속도 (km/h)
     public float targetAcceleration; // 목표 가속도 (m/s²)
     public float duration; // 목표 시간 (s)
-    public float timeStep = 0.02f; // 시간 간격 (FixedUpdate와 유사)
 
     private Coroutine currentCoroutine; // 현재 실행 중인 코루틴 저장
 
     void Start()
     {
         // 원하는 코루틴 실행 (테스트할 방식 선택)
-        // StartCoroutine(AccelerateToTargetSpeed(targetSpeed, duration));
-        StartCoroutine(AccelerateWithFixedAcceleration(targetAcceleration, duration));
+        StartCoroutine(TestRoutine());
+        // StartCoroutine(AccelerateWithFixedAcceleration(targetAcceleration, duration));
     }
-    
-    private IEnumerator SmoothVelocityChange(Vector3 targetVelocity, float duration)
+
+    public IEnumerator TestRoutine()
     {
-        Vector3 startVelocity = rb.velocity;
-        float elapsedTime = 0f;
-
-        Debug.Log($"🚀 속도 변경 시작! 초기 속도: {startVelocity}, 목표 속도: {targetVelocity}, 지속 시간: {duration}s");
-
-        while (elapsedTime < duration)
-        {
-            elapsedTime += Time.deltaTime;
-            rb.velocity = Vector3.Lerp(startVelocity, targetVelocity, elapsedTime / duration);
-
-            Debug.Log($"⏳ 진행 시간: {elapsedTime:F2}s / {duration}s, 현재 속도: {rb.velocity}");
-
-            yield return null;
-        }
-
-        rb.velocity = targetVelocity; // 최종 속도로 설정
-        Debug.Log($"✅ 속도 변경 완료! 최종 속도: {rb.velocity}");
+        yield return AccelerateToTargetSpeed(CarUtils.ConvertKmHToMS(targetSpeed_KmPerHour), duration);
+        yield return AccelerateWithFixedAcceleration(targetAcceleration, duration);
     }
     
     /// <summary>
