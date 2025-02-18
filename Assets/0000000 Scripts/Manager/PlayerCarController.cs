@@ -118,7 +118,7 @@ public class PlayerCarController : MonoBehaviour
     }
     private void FixedUpdate()
     {
-        TestMovement();
+        // TestMovement();
         /*LogitechGSDK.DIJOYSTATE2ENGINES rec;
         rec = LogitechGSDK.LogiGetStateUnity(0);*/
 
