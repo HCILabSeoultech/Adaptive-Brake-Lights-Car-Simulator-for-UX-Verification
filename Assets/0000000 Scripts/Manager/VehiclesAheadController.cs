@@ -17,9 +17,21 @@ public class VehiclesAheadController : MonoBehaviour
     // 로지텍 관련 키 인풋
     public float rawSteeringInput;
     public float rawForwardInput;
-
     [HideInInspector] public float parkInput = 0;
     public float backwardgear; // 후진
+
+    [Header("주행 Test")]
+    /// <summary>
+    /// The total torque requested by the user, will be split between the four wheels
+    /// </summary>
+    public float totalTorque;
+
+    public float currentAcceleration;
+    [Space] public float currentVelocity;
+    public float currentTime;
+    [Space] public float targetSpeedFirst;
+    public float targetTimeFirst;
+
 
     [Header("Information")] [SerializeField]
     private InfoText info = new InfoText(
@@ -58,7 +70,6 @@ public class VehiclesAheadController : MonoBehaviour
     private VolvoCars.Data.Value.Public.LampGeneral
         lampValue = new VolvoCars.Data.Value.Public.LampGeneral(); // This is the value type used by lights/lamps
 
-    private float totalTorque; // The total torque requested by the user, will be split between the four wheels
     private float steeringReduction; // Used to make it easier to drive with keyboard in higher speeds
     public const float MAX_BRAKE_TORQUE = 6000; // [Nm] 초기값 8000
     private bool brakeLightIsOn = false;
@@ -104,15 +115,34 @@ public class VehiclesAheadController : MonoBehaviour
     public IEnumerator VehiclesAheadRoutine()
     {
         Debug.Log("루틴 1");
-        StartCoroutine(AdjustSpeedOverTime(50, 10f)); // 5초 동안 60km/h로 가속
+        StartCoroutine(AdjustSpeedOverTime(targetSpeedFirst, targetTimeFirst)); // 5초 동안 60km/h로 가속
+        // StartCoroutine(AdjustSameAccelerationOverTime(targetSpeedFirst, targetTimeFirst)); // 5초 동안 60km/h로 가속
         // Debug.Log("루틴 2");
         yield return new WaitForSeconds(5f); // 5초 유지
         // Debug.Log("루틴 3");
         // StartCoroutine(AdjustSpeedOverTime(40, 3f)); // 3초 동안 40km/h로 감귀
     }
 
+    private float lastSpeed = 0f; // 이전 프레임의 속도
+    private float lastTime = 0f; // 이전 프레임의 시간
+
     private void FixedUpdate()
     {
+        float currentSpeed = 3.6f * Mathf.Abs(velocity.Value) + 0.9f; // 현재 속도를 km/h 단위로 변환
+        float currentVelocityMS = Mathf.Abs(velocity.Value); // 속도를 m/s 단위로 유지
+        currentVelocity = currentSpeed;
+        
+        // 가속도 a = (v - v0) / (t - t0)  (m/s 단위 사용)
+        float currentTime = Time.time; // 현재 시간
+        float acceleration = (currentVelocityMS - lastSpeed) / (currentTime - lastTime);
+        currentAcceleration = acceleration;
+        
+        Debug.Log($"| 가속도: {acceleration:F3} m/s² | rawForwardInput: {rawForwardInput:F3} | 속도: {currentSpeed:F2} km/h | ");
+
+        // 현재 속도를 다음 프레임을 위한 기준 값으로 저장
+        lastSpeed = currentVelocityMS; // m/s 단위로 저장
+        lastTime = currentTime;
+
         /*LogitechGSDK.DIJOYSTATE2ENGINES rec;
         rec = LogitechGSDK.LogiGetStateUnity(0);*/
 
@@ -152,31 +182,68 @@ public class VehiclesAheadController : MonoBehaviour
 
     public IEnumerator AdjustSpeedOverTime(float targetSpeed, float duration)
     {
-        float startSimulatedSpeed = 3.6f * Mathf.Abs(velocity.Value) + 0.9f; // 현재 속도 변환
-        
-        float startTime = Time.time; // 시작 시간 기록
-        float endTime = startTime + duration; // 종료 시간 설정
+        float startTime = Time.time;
+        float endTime = startTime + duration;
 
         while (Time.time < endTime)
         {
-            float elapsedTime = Time.time - startTime; // 경과 시간 계산
-            float t = elapsedTime / duration; // 0 ~ 1 보간 비율
+            float elapsedTime = Time.time - startTime;
+            float timeRemaining = endTime - Time.time; // 남은 시간 계산
 
-            // 현재 속도를 계속 업데이트하여 반영
+            // 현재 속도 업데이트
+            float currentSpeed = 3.6f * Mathf.Abs(velocity.Value) + 0.9f;
+            float speedDifference = targetSpeed + 1 - currentSpeed;
+
+            // 🔹 남은 시간 보정값 추가 (남은 시간이 적을수록 속도를 더 빠르게 보정)
+            float timeFactor = Mathf.Clamp01(timeRemaining / duration); // 0 ~ 1 사이 값 유지
+            float adjustmentFactor = Mathf.Lerp(50f, 100f, 1 - timeFactor); // 점점 더 강하게 보정
+
+            // 🔹 속도 차이를 고려한 `rawForwardInput` 조정 (가속이 필요할 때 더 강하게)
+            rawForwardInput = Mathf.Clamp((speedDifference / (targetSpeed + 1)) * adjustmentFactor, 0f, 1f);
+
+            // Debug.Log($"현재 속도: {currentSpeed} km/h | 목표 속도: {targetSpeed} km/h | rawForwardInput: {rawForwardInput} | 남은 시간: {timeRemaining:F2}s");
+
+            yield return null;
+        }
+
+        // 도달 후 정속 주행 유지
+        rawForwardInput = 0.5f; // 정속 주행 유지 (필요시 수정 가능)
+        Debug.Log($"속도 증가 완료. 최종 속도: {3.6f * Mathf.Abs(velocity.Value) + 0.9f} km/h, 목표 속도: {targetSpeed} km/h");
+    }
+
+    public IEnumerator AdjustSameAccelerationOverTime(float targetSpeed, float duration)
+    {
+        float startTime = Time.time;
+        float startSpeed = 3.6f * Mathf.Abs(velocity.Value) + 0.9f; // 현재 속도 변환
+        float acceleration = (targetSpeed - startSpeed) / duration; // 등가속도 계산
+
+        bool isAccelerating = targetSpeed > startSpeed; // 🚗 가속 여부 판별
+
+        while (Time.time - startTime < duration)
+        {
+            float elapsedTime = Time.time - startTime;
+
+            // 등가속도 공식 적용: v = v0 + at
+            float expectedSpeed = startSpeed + acceleration * elapsedTime;
             float currentSpeed = 3.6f * Mathf.Abs(velocity.Value) + 0.9f;
 
-            // 목표 속도로 선형 보간
-            float newSpeed = Mathf.Lerp(startSimulatedSpeed, targetSpeed, t);
+            // 가속/감속에 따라 rawForwardInput 조정
+            rawForwardInput = Mathf.Clamp((expectedSpeed - currentSpeed) / targetSpeed, isAccelerating ? 0f : -1f,
+                isAccelerating ? 1f : 0f);
 
-            // 현재 속도와 목표 속도를 비교하여 rawForwardInput 조정
-            rawForwardInput = Mathf.Clamp((newSpeed - currentSpeed) / (targetSpeed - startSimulatedSpeed), -1f, 1f);
+            Debug.Log(
+                $"현재 속도: {currentSpeed:F2} km/h | 목표 속도: {targetSpeed} km/h | rawForwardInput: {rawForwardInput:F3} | 남은 시간: {duration - elapsedTime:F2}s");
 
-            yield return null; // 다음 프레임까지 대기
+            // 디버깅
+            currentVelocity = currentSpeed;
+            currentTime = elapsedTime;
+
+            yield return null;
         }
-        
-        // rawForwardInput = 0; // 감속이 완료되면 입력값을 0으로 설정하여 정속 주행
-        Debug.Log($"속도 증가가 끝났습니다. 최종 속도: {3.6f * Mathf.Abs(velocity.Value) + 0.9f}km/h, duration: {duration}");
-        Debug.Log("정속 주행 시작합니다.(정속 주행 루틴 시작해야 함)");
+
+        // 목표 속도 도달 후 정속 주행 유지
+        rawForwardInput = isAccelerating ? 0.5f : 0f; // 감속 후 0, 가속 후 정속 주행 유지
+        Debug.Log($"속도 조정 완료. 최종 속도: {3.6f * Mathf.Abs(velocity.Value) + 0.9f} km/h, 목표 속도: {targetSpeed} km/h");
     }
 
 
@@ -219,9 +286,18 @@ public class VehiclesAheadController : MonoBehaviour
 
             if (rawForwardInput >= 0 && velocity.Value > -1.5f)
             {
-                totalTorque = Mathf.Min(availableForwardTorque.Evaluate(Mathf.Abs(velocity.Value)),
-                    -1800 + 7900 * rawForwardInput - 9500 * rawForwardInput * rawForwardInput +
-                    9200 * rawForwardInput * rawForwardInput * rawForwardInput);
+                // 🔹 속도 증가 시 토크 감소를 방지하기 위해 보정 계수 추가
+                float speedFactor = 1.0f - (Mathf.Abs(velocity.Value) / 100f);
+                speedFactor = Mathf.Clamp(speedFactor, 0.5f, 1f); // 최소 50% 보장
+
+                // 🔹 기존 totalTorque 연산에 speedFactor 적용하여 일정한 토크 유지
+                totalTorque = Mathf.Min(
+                    availableForwardTorque.Evaluate(Mathf.Abs(velocity.Value)) / speedFactor, // 보정된 최대 토크
+                    (-1800
+                     + 7900 * rawForwardInput
+                     - 9500 * rawForwardInput * rawForwardInput
+                     + 9200 * rawForwardInput * rawForwardInput * rawForwardInput) * speedFactor
+                );
             }
             else
             {
