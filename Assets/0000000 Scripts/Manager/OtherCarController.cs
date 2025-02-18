@@ -28,9 +28,34 @@ public class OtherCarController : MonoBehaviour
         while (true)
         {
             yield return AccelerateToTargetSpeed(targetSpeedMS, durationSpeedUp);
+            yield return WaitAtTargetSpeed(5); 
+            
+            BrakePatternManager.instance.ActiveStandardBrakeLight();
+            yield return AccelerateWithFixedAcceleration(targetAcceleration, BrakeSystem.instance.durationSpeedDown);
+            
+            //
+            
+            yield return AccelerateToTargetSpeed(targetSpeedMS, durationSpeedUp);
             yield return WaitAtTargetSpeed(5);
-            yield return AccelerateWithFixedAcceleration(targetAcceleration, durationSpeedDown);
+            
+            BrakePatternManager.instance.ActiveFrequencyBrakeLight();
+            yield return AccelerateWithFixedAcceleration(targetAcceleration, BrakeSystem.instance.durationSpeedDown);
+            
+            //
+            
+            yield return AccelerateToTargetSpeed(targetSpeedMS, durationSpeedUp);
             yield return WaitAtTargetSpeed(5);
+            
+            BrakePatternManager.instance.ActiveAreaBrakeLight();
+            yield return AccelerateWithFixedAcceleration(targetAcceleration, BrakeSystem.instance.durationSpeedDown);
+                
+            // 
+            
+            yield return AccelerateToTargetSpeed(targetSpeedMS, durationSpeedUp);
+            yield return WaitAtTargetSpeed(5);    
+            
+            BrakePatternManager.instance.ActiveBrightnessBrakeLight();
+            yield return AccelerateWithFixedAcceleration(targetAcceleration, BrakeSystem.instance.durationSpeedDown);
         }
     }
 
@@ -60,7 +85,7 @@ public class OtherCarController : MonoBehaviour
             measuredAcceleration = (rb.velocity.z - previousVelocityZ) / Time.deltaTime;
             previousVelocityZ = rb.velocity.z; // 현재 속도를 이전 속도로 저장
 
-            Debug.Log($"⏳ 시간: {elapsedTime:F2}/{duration}s | 속도: {rb.velocity.z:F3} m/s | 목표 속도: {targetSpeed} m/s | 측정 가속도: {measuredAcceleration:F3} m/s²");
+            // Debug.Log($"⏳ 시간: {elapsedTime:F2}/{duration}s | 속도: {rb.velocity.z:F3} m/s | 목표 속도: {targetSpeed} m/s | 측정 가속도: {measuredAcceleration:F3} m/s²");
 
             elapsedTime += Time.deltaTime;
             count++;
@@ -99,7 +124,7 @@ public class OtherCarController : MonoBehaviour
             measuredAcceleration = (rb.velocity.z - previousVelocityZ) / Time.deltaTime;
             previousVelocityZ = rb.velocity.z; // 현재 속도를 이전 속도로 저장
             
-            Debug.Log($"⏳ 시간: {elapsedTime:F2}/{duration}s | 속도: {rb.velocity.z:F3} m/s | 측정 가속도: {measuredAcceleration:F3} m/s² | 목표 가속도: {targetAcceleration} m/s²");
+            // Debug.Log($"⏳ 시간: {elapsedTime:F2}/{duration}s | 속도: {rb.velocity.z:F3} m/s | 측정 가속도: {measuredAcceleration:F3} m/s² | 목표 가속도: {targetAcceleration} m/s²");
 
             elapsedTime += Time.deltaTime;
             count++;

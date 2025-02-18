@@ -6,11 +6,11 @@ using UnityEngine.Serialization;
 
 public class SpeedAndGearUIManager : MonoBehaviour
 {
-    [Header("Settings")]
-    [SerializeField] private bool mph = false;
+    [Header("Settings")] [SerializeField] private bool mph = false;
 
-    [Header("References")]
-    [SerializeField] private VolvoCars.Data.GearLeverIndication gear = default;
+    [Header("References")] [SerializeField]
+    private VolvoCars.Data.GearLeverIndication gear = default;
+
     [SerializeField] private VolvoCars.Data.Velocity velocity = default;
     [SerializeField] private VolvoCars.Data.Velocity aheadVelocity = default;
     [SerializeField] private TMPro.TMP_Text gearText;
@@ -27,10 +27,10 @@ public class SpeedAndGearUIManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
         gearAction = gearInt =>
         {
-            switch (gearInt) {
+            switch (gearInt)
+            {
                 case 0:
                     gearString = "P";
                     break;
@@ -44,9 +44,9 @@ public class SpeedAndGearUIManager : MonoBehaviour
                     gearString = "D";
                     break;
             }
+
             if (gearText != null)
                 gearText.text = gearString;
-
         };
         gear.Subscribe(gearAction);
 
@@ -55,41 +55,45 @@ public class SpeedAndGearUIManager : MonoBehaviour
             if (playerCarSpeedText == null)
                 return;
 
-            if (mph) {
+            if (mph)
+            {
                 playerCarSpeedText.text = ((int)(2.23694f * Mathf.Abs(v) + 0.9f)).ToString();
-            } else {
+            }
+            else
+            {
                 playerCarSpeedText.text = ((int)(3.6f * Mathf.Abs(v) + 0.9f)).ToString();
             }
         };
         velocity.Subscribe(velocityAction);
 
-        if (aheadVelocityAction != null)
+        if (aheadVelocity != null)
         {
-        aheadVelocityAction = v =>
-        {
-            if (aheadCarSpeedText == null)
-                return;
+            aheadVelocityAction = v =>
+            {
+                if (aheadCarSpeedText == null)
+                    return;
 
-            if (mph) {
-                aheadCarSpeedText.text = ((int)(2.23694f * Mathf.Abs(v) + 0.9f)).ToString();
-            } else {
-                aheadCarSpeedText.text = ((int)(3.6f * Mathf.Abs(v) + 0.9f)).ToString();
-            }
-        };
-        
-        aheadVelocity.Subscribe(aheadVelocityAction);
+                if (mph)
+                {
+                    aheadCarSpeedText.text = ((int)(2.23694f * Mathf.Abs(v) + 0.9f)).ToString();
+                }
+                else
+                {
+                    aheadCarSpeedText.text = ((int)(3.6f * Mathf.Abs(v) + 0.9f)).ToString();
+                }
+            };
 
+            aheadVelocity.Subscribe(aheadVelocityAction);
         }
     }
 
     void Update()
     {
-        
-        if(unityScreenText != null) {
+        if (unityScreenText != null)
+        {
             float speed = Mathf.Abs(velocity.Value);
             unityScreenText.text = mph ? "mph" : "km"; //km/h
         }
-            
     }
 
     private void OnDestroy()
@@ -97,5 +101,4 @@ public class SpeedAndGearUIManager : MonoBehaviour
         gear.Unsubscribe(gearAction);
         velocity.Unsubscribe(velocityAction);
     }
-
 }

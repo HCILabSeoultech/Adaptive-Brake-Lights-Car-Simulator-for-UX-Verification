@@ -4,21 +4,53 @@ using UnityEngine;
 
 public class AreaBrakeLight : ILightBehavior
 {
-    public IEnumerator ApplyLighting(MeshRenderer mainBrakeRenderer, List<MeshRenderer> subBrakeRenderers, float intensity)
+    public IEnumerator ApplyLighting(MeshRenderer mainBrakeRenderer, List<MeshRenderer> subBrakeRenderers,
+        float intensity, float duration)
     {
-        
         int activeLEDs = Mathf.RoundToInt(1 * subBrakeRenderers.Count);
         DeActivateLighting(subBrakeRenderers, mainBrakeRenderer);
         mainBrakeRenderer.material.color = Color.red;
-        
-        for (int i = 0; i < subBrakeRenderers.Count; i++)
+
+        // TODO: intensity(브레이크 강도)에 따른 범위 변화로 변경
+        if (intensity < 0.3)
         {
-            subBrakeRenderers[i].gameObject.SetActive(i < activeLEDs);
-            subBrakeRenderers[i].material.color = Color.red;
-            yield return new WaitForSeconds(0.1f);
+            for (int i = 0; i < 2; i++)
+            {
+                // subBrakeRenderers[i].gameObject.SetActive(true);
+                subBrakeRenderers[i].material.color = Color.red;
+            }
+                Debug.Log("2개 켬");
+        }else if (intensity < 0.6)
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                // subBrakeRenderers[i].gameObject.SetActive(true);
+                subBrakeRenderers[i].material.color = Color.red;
+            }
+                Debug.Log("3개 켬");
         }
-        
-        yield break; // 단발성 동작이므로 즉시 종료
+        else
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                // subBrakeRenderers[i].gameObject.SetActive(true);
+                subBrakeRenderers[i].material.color = Color.red;
+            }
+            Debug.Log("5개 켬");
+        }
+        /*for (int j = 0; j < 3; j++)
+        {
+            for (int i = 0; i < subBrakeRenderers.Count; i++)
+            {
+                subBrakeRenderers[i].gameObject.SetActive(i < activeLEDs);
+                subBrakeRenderers[i].material.color = Color.red;
+                yield return new WaitForSeconds(0.1f);
+            }
+        }
+        */
+
+        yield return new WaitForSeconds(duration);
+        DeActivateLighting(subBrakeRenderers, mainBrakeRenderer);
     }
 
     void DeActivateLighting(List<MeshRenderer> leds, MeshRenderer mainBrakeRenderer)
@@ -27,6 +59,7 @@ public class AreaBrakeLight : ILightBehavior
         {
             leds[i].material.color = Color.black;
         }
+
         mainBrakeRenderer.material.color = Color.black;
     }
 }

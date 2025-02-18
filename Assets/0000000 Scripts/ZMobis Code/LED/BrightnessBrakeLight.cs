@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class BrightnessBrakeLight : ILightBehavior
 {
-    public IEnumerator ApplyLighting(MeshRenderer mainBrakeRenderer, List<MeshRenderer> subBrakeRenderers, float intensity)
+    public IEnumerator ApplyLighting(MeshRenderer mainBrakeRenderer, List<MeshRenderer> subBrakeRenderers, float intensity, float duration)
     {
         mainBrakeRenderer.material.color = Color.red;
         
@@ -25,7 +25,15 @@ public class BrightnessBrakeLight : ILightBehavior
         {
             led.material.color = lightColor;
         }
-        yield break; // 단발성 동작이므로 즉시 종료
+        yield return new WaitForSeconds(duration);
+        DeActivateLighting(subBrakeRenderers, mainBrakeRenderer);
     }
-
+    void DeActivateLighting(List<MeshRenderer> leds, MeshRenderer mainBrakeRenderer)
+    {
+        for (int i = 0; i < leds.Count; i++)
+        {
+            leds[i].material.color = Color.black;
+        }
+        mainBrakeRenderer.material.color = Color.black;
+    }
 }

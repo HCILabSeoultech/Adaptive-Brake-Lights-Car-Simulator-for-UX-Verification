@@ -18,7 +18,7 @@ public class LEDController : MonoBehaviour
     public List<MeshRenderer> subBrakeRenderers; // LED 역할을 하는 Cube 오브젝트
     private ILightBehavior _currentLightBehavior;
     private Coroutine activeCoroutine; // 현재 실행 중인 코루틴 저장
-
+    
     public void SetLightBehavior(ILightBehavior newBehavior)
     {
         // 기존 코루틴이 실행 중이면 중지
@@ -31,7 +31,7 @@ public class LEDController : MonoBehaviour
         _currentLightBehavior = newBehavior;
     }
 
-    public void ApplyBrakeLight(float intensity)
+    public void ApplyBrakeLight(float intensity, float duration)
     {
         if (_currentLightBehavior != null)
         {
@@ -42,8 +42,7 @@ public class LEDController : MonoBehaviour
                 activeCoroutine = null;
             }
 
-            activeCoroutine = StartCoroutine(_currentLightBehavior.ApplyLighting(mainBrakeRenderer, subBrakeRenderers, intensity));
-            
+            activeCoroutine = StartCoroutine(_currentLightBehavior.ApplyLighting(mainBrakeRenderer, subBrakeRenderers, intensity, duration));
         }
     }
 

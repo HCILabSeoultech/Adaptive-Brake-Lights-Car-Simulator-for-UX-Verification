@@ -4,5 +4,5 @@ using UnityEngine;
 
 public interface ILightBehavior
 {
-    IEnumerator ApplyLighting(MeshRenderer mainBrakeRenderer, List<MeshRenderer> subBrakeRenderers, float intensity);
+    IEnumerator ApplyLighting(MeshRenderer mainBrakeRenderer, List<MeshRenderer> subBrakeRenderers, float intensity, float duration);
 }
