@@ -6,17 +6,19 @@ public class FrequencyBrakeLight : ILightBehavior
 {
     private const float FIXED_FREQUENCY = 0.2f; // 🔥 고정 주파수 (Hz) - 1초에 0.2번 깜빡임 (5초 주기)
 
-    public IEnumerator ApplyLighting(List<GameObject> leds, float intensity)
+    public IEnumerator ApplyLighting(MeshRenderer mainBrakeRenderer, List<MeshRenderer> subBrakeRenderers, float intensity)
     {
-        float blinkInterval = 1 / BrakeSystem.instance.frequencyValue; //FIXED_FREQUENCY; // 🔥 5초마다 한 번씩 깜빡이도록 설정
+        mainBrakeRenderer.material.color = Color.red;
+        
+        float blinkInterval = 1 / BrakeSystem.instance.frequencyValue;
         Debug.Log(1/ blinkInterval + " 초 주기로 blink");
         while (true) // 새로운 상태가 설정되면 LEDController에서 종료됨
         {
-            foreach (var led in leds)
+            foreach (var led in subBrakeRenderers)
             {
                 RevertColor(led); // 현재 상태 반전 (ON/OFF)
             }
-            yield return new WaitForSeconds(BrakeSystem.instance.frequencyValue); // 🔥 5초 대기 후 반복
+            yield return new WaitForSeconds(BrakeSystem.instance.frequencyValue);
         }
     }
 
@@ -30,10 +32,10 @@ public class FrequencyBrakeLight : ILightBehavior
         }   
     }
 
-    public void RevertColor(GameObject led)
+    public void RevertColor(MeshRenderer led)
     {
-        Material material = led.GetComponent<MeshRenderer>().material;
+        Material material = led.material;
         Color color = material.color;
-        led.GetComponent<MeshRenderer>().material.color = color == Color.black ? Color.red : Color.black;
+        led.material.color = color == Color.black ? Color.red : Color.black;
     }
 }

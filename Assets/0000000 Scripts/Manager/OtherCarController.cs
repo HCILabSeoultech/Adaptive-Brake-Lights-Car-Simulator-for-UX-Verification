@@ -11,7 +11,7 @@ public class OtherCarController : MonoBehaviour
     public float targetSpeed_KmPerHour; // 목표 속도 (km/h)
     public float targetAcceleration; // 목표 가속도 (m/s²)
     public float durationSpeedUp; // 목표 가속 시간 (s)
-    public float durationSpeedDown; // 목표 시간 (s)
+    public const float durationSpeedDown = 3f; // 목표 시간 (s)
 
     private Coroutine currentCoroutine; // 현재 실행 중인 코루틴 저장
 
@@ -25,10 +25,13 @@ public class OtherCarController : MonoBehaviour
     public IEnumerator TestRoutine()
     {
         float targetSpeedMS = CarUtils.ConvertKmHToMS(targetSpeed_KmPerHour);
-        yield return AccelerateToTargetSpeed(targetSpeedMS, durationSpeedUp);
-        yield return WaitAtTargetSpeed(5);
-        yield return AccelerateWithFixedAcceleration(targetAcceleration, durationSpeedDown);
-        yield return WaitAtTargetSpeed(5);
+        while (true)
+        {
+            yield return AccelerateToTargetSpeed(targetSpeedMS, durationSpeedUp);
+            yield return WaitAtTargetSpeed(5);
+            yield return AccelerateWithFixedAcceleration(targetAcceleration, durationSpeedDown);
+            yield return WaitAtTargetSpeed(5);
+        }
     }
 
     

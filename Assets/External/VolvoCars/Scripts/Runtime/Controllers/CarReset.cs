@@ -16,6 +16,7 @@ public class CarReset : MonoBehaviour
     private void Start()
     {
         RecordInitialTransform();
+        Debug.Log(gameObject.name);
     }
 
     private void Update()

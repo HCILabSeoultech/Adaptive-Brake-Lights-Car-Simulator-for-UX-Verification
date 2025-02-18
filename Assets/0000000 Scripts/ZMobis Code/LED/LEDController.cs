@@ -1,12 +1,21 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class LEDController : MonoBehaviour
 {
+    public static LEDController instance;
+
+    private void Awake()
+    {
+        if (instance == null) instance = this;
+    }
     // 제동등 동작 방식 4가지: 기존 제동등, 주파수, 밝기, 면적 변화
 
-    public List<GameObject> ledCubes; // LED 역할을 하는 Cube 오브젝트
+    public MeshRenderer mainBrakeRenderer;
+    public List<MeshRenderer> subBrakeRenderers; // LED 역할을 하는 Cube 오브젝트
     private ILightBehavior _currentLightBehavior;
     private Coroutine activeCoroutine; // 현재 실행 중인 코루틴 저장
 
@@ -33,16 +42,25 @@ public class LEDController : MonoBehaviour
                 activeCoroutine = null;
             }
 
-            activeCoroutine = StartCoroutine(_currentLightBehavior.ApplyLighting(ledCubes, intensity));
+            activeCoroutine = StartCoroutine(_currentLightBehavior.ApplyLighting(mainBrakeRenderer, subBrakeRenderers, intensity));
+            
         }
     }
 
     public void ResetBrakeLight()
     {
-        foreach (var led in ledCubes)
+        // 기존 코루틴이 실행 중이면 중지
+        if (activeCoroutine != null)
         {
-            led.SetActive(true);
-            led.GetComponent<Renderer>().material.color = Color.black;
+            StopCoroutine(activeCoroutine);
+            activeCoroutine = null;
         }
+        
+        foreach (var led in subBrakeRenderers)
+        {
+            led.gameObject.SetActive(true);
+            led.material.color = Color.black;
+        }
+        mainBrakeRenderer.material.color = Color.black;
     }
 }

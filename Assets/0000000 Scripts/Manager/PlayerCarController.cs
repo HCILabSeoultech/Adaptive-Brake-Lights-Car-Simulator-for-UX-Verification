@@ -89,7 +89,8 @@ public class PlayerCarController : MonoBehaviour
 
 
     public GameObject Timer;
-
+    public GameObject otherCar;
+    public Rigidbody rb; 
     private void Start()
     {
         // Subscribe to data items this way. (There is also a SubscribeImmediate method if you don't need to be on the main thread / game loop.)
@@ -110,9 +111,14 @@ public class PlayerCarController : MonoBehaviour
 
         parkInput = 0;
     }
-
+    
+    void TestMovement()
+    {
+        rb.position = otherCar.transform.position - new Vector3(0, 0, distanceOffset);
+    }
     private void FixedUpdate()
     {
+        TestMovement();
         /*LogitechGSDK.DIJOYSTATE2ENGINES rec;
         rec = LogitechGSDK.LogiGetStateUnity(0);*/
 
