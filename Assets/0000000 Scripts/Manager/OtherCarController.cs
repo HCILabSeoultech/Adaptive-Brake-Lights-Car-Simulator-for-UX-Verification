@@ -33,7 +33,7 @@ public class OtherCarController : MonoBehaviour
             BrakePatternManager.instance.ActiveStandardBrakeLight();
             yield return AccelerateWithFixedAcceleration(targetAcceleration, BrakeSystem.instance.durationSpeedDown);
             
-            //
+            yield return WaitAtTargetSpeed(5); 
             
             yield return AccelerateToTargetSpeed(targetSpeedMS, durationSpeedUp);
             yield return WaitAtTargetSpeed(5);
@@ -104,6 +104,7 @@ public class OtherCarController : MonoBehaviour
     /// </summary>
     public IEnumerator AccelerateWithFixedAcceleration(float targetAcceleration, float duration)
     {
+        Debug.Log($"선두 차량 감속 시작, {targetAcceleration} m/s²");
         float elapsedTime = 0f;
         Vector3 initialVelocity = rb.velocity;
         Vector3 targetVelocity = initialVelocity + new Vector3(0, 0, targetAcceleration * duration); // v = v0 + at

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem.XInput;
 using static PlayerCarController;
@@ -30,7 +31,8 @@ public class PlayerCarController : MonoBehaviour
     public float rawSteeringInput;
     public float rawForwardInput;
 
-    [HideInInspector] public float parkInput = 0;
+    public float parkInput = 0;
+    public float totalTorque; // The total torque requested by the user, will be split between the four wheels
     public float backwardgear; // 후진
 
     [Header("Information")] [SerializeField]
@@ -70,105 +72,161 @@ public class PlayerCarController : MonoBehaviour
     private VolvoCars.Data.Value.Public.LampGeneral
         lampValue = new VolvoCars.Data.Value.Public.LampGeneral(); // This is the value type used by lights/lamps
 
-    public float totalTorque; // The total torque requested by the user, will be split between the four wheels
     private float steeringReduction; // Used to make it easier to drive with keyboard in higher speeds
-    public const float MAX_BRAKE_TORQUE = 6000; // [Nm] 초기값 8000
+    private const float MAX_BRAKE_TORQUE = 6000; // [Nm] 초기값 8000
     private bool brakeLightIsOn = false;
     Action<bool> doorIsOpenR1LAction; // Described more in Start()
 
     #endregion
 
-
-    //자율주행 모드를 위한 트랙생성 및 자율주행모드 거리 및 핸들조절
-    public trackWaypoints waypoints;
-    public Transform currentWaypoint;
-    public List<Transform> nodes = new List<Transform>();
-    public int distanceOffset = 1;
-    public float sterrForce = 1.54f;
-    public string status = "off"; // 주행모드 선택 디폴트 off
-
-
     public GameObject Timer;
     public GameObject otherCar;
-    public Rigidbody rb; 
+    public Rigidbody rb;
+    
+    public enum DrivingMode {Autonomous, BrakeControl}
+    public DrivingMode driveMode;
     private void Start()
     {
-        // Subscribe to data items this way. (There is also a SubscribeImmediate method if you don't need to be on the main thread / game loop.)
-        // First define the action, i.e. what should happen when an updated value comes in:
-        doorIsOpenR1LAction = isOpen =>
-        {
-            if (consoleMessages && Application.isPlaying)
-                Debug.Log(
-                    "This debug message is an example action triggered by a subscription to DoorIsOpenR1L in DemoCarController. Value: " +
-                    isOpen +
-                    "\nYou can turn off this message by unchecking Console Messages in the inspector.");
-        };
-        // Then, add it to the subscription. In this script's OnDestroy() method we are also referencing this action when unsubscribing.
-        doorIsOpenR1L.Subscribe(doorIsOpenR1LAction);
-
-        // How to publish, example:
-        // doorIsOpenR1L.Value = true;
-
         parkInput = 0;
+        StartCoroutine(TestRoutine());
+
+    }
+    public float targetSpeed_KmPerHour; // 목표 속도 (km/h)
+    public float targetAcceleration; // 목표 가속도 (m/s²)
+    public float durationSpeedUp; // 목표 가속 시간 (s)
+    public const float durationSpeedDown = 3f; // 목표 시간 (s)
+
+    private Coroutine currentCoroutine; // 현재 실행 중인 코루틴 저장
+
+    public IEnumerator TestRoutine()
+    {
+        SetDriveMode(DrivingMode.Autonomous);
+        float targetSpeedMS = CarUtils.ConvertKmHToMS(targetSpeed_KmPerHour);
+        yield return AccelerateToTargetSpeed(targetSpeedMS, durationSpeedUp);
+        yield return StartCoroutine(WaitAtTargetSpeed(5));
+        yield return StartCoroutine(WaitAtTargetSpeedUntilBrake());
+        SetDriveMode(DrivingMode.BrakeControl);
+    }
+
+    public void SetDriveMode(DrivingMode mode)
+    {
+        driveMode = mode;
     }
     
-    void TestMovement()
+    /// <summary>
+    /// 목표 속도와 목표 시간이 주어지면, Lerp를 활용하여 등가속도 운동을 수행합니다.
+    /// </summary>
+    public IEnumerator AccelerateToTargetSpeed(float targetSpeed, float duration)
     {
-        rb.position = otherCar.transform.position - new Vector3(0, 0, distanceOffset);
+        float elapsedTime = 0f;
+        Vector3 initialVelocity = rb.velocity; // 초기 속도 저장
+        Vector3 targetVelocity = new Vector3(0, 0, targetSpeed);
+        float calculatedAcceleration = (targetSpeed - initialVelocity.z) / duration;
+    
+        float previousVelocityZ = initialVelocity.z; // 이전 속도 저장
+        float measuredAcceleration = 0f; // 실제 측정된 가속도
+
+        Debug.Log($"🚀 목표 속도 설정: {targetSpeed} m/s | 목표 시간: {duration}s | 계산된 가속도: {calculatedAcceleration}");
+        int count = 0;
+        List<float> accelerations = new List<float>();
+        while (elapsedTime < duration)
+        {
+            float t = Mathf.Clamp01(elapsedTime / duration); // 0~1 보간 비율 유지
+            rb.velocity = Vector3.Lerp(initialVelocity, targetVelocity, t);
+
+            // 실제 측정된 가속도 계산 (Δv / Δt)
+            measuredAcceleration = (rb.velocity.z - previousVelocityZ) / Time.deltaTime;
+            previousVelocityZ = rb.velocity.z; // 현재 속도를 이전 속도로 저장
+
+            // Debug.Log($"⏳ 시간: {elapsedTime:F2}/{duration}s | 속도: {rb.velocity.z:F3} m/s | 목표 속도: {targetSpeed} m/s | 측정 가속도: {measuredAcceleration:F3} m/s²");
+
+            elapsedTime += Time.deltaTime;
+            count++;
+            accelerations.Add(measuredAcceleration);
+            yield return null; // 다음 프레임까지 대기
+        }
+
+        float averageAcceleration = accelerations.Sum() / accelerations.Count;
+        rb.velocity = targetVelocity; // 최종 속도 보정
+        Debug.Log($"✅ 목표 속도 도달: {rb.velocity.z} m/s, 계산된 가속도: {calculatedAcceleration}, 평균 가속도 : {averageAcceleration}, 가속도 오차: {Math.Abs(calculatedAcceleration-averageAcceleration)/calculatedAcceleration* 100:F2}% ");
+    }
+    /// <summary>
+    /// 현재 속도를 유지한 채 일정 시간 동안 대기합니다.
+    /// </summary>
+    public IEnumerator WaitAtTargetSpeed(float waitTime)
+    {
+        float elapsedTime = 0f;
+        Vector3 constantVelocity = rb.velocity; // 현재 속도 저장
+
+        Debug.Log($"⏳ {waitTime}s 동안 속도 유지: {constantVelocity.z:F3} m/s");
+
+        while (elapsedTime < waitTime)
+        {
+            rb.velocity = constantVelocity; // 속도 유지
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        Debug.Log($"✅ {waitTime}s 대기 완료. 속도 유지 후 다음 동작 진행.");
+    }
+    /// <summary>
+    /// 현재 속도를 유지한 채 브레이크 입력값이 들어올 때 까지 속도를 유지합니다.
+    /// </summary>
+    public IEnumerator WaitAtTargetSpeedUntilBrake()
+    {
+        Vector3 constantVelocity = rb.velocity; // 현재 속도 저장
+
+        Debug.Log($"현재 속도를 유지한 채 브레이크 입력값이 들어올 때 까지 속도를 유지합니다. {constantVelocity.z:F3} m/s");
+
+        if (driveContreller == driver.keyboard_Player)
+        {
+            while (Input.GetAxis("Jump") <= 0)
+            {
+                rb.velocity = constantVelocity; // 속도 유지
+                yield return null;
+            }
+        }
+        else if (driveContreller == driver.Logiwheel)
+        {
+            while (LogitechInput.GetAxis("Brake Vertical") <= 0)
+            {
+                rb.velocity = constantVelocity; // 속도 유지
+                yield return null;
+            }    
+        }
+        
+        Debug.Log($"실험자 브레이크 밟음. 속도 유지 로직 탈출.");
     }
     private void FixedUpdate()
     {
-        // TestMovement();
-        /*LogitechGSDK.DIJOYSTATE2ENGINES rec;
-        rec = LogitechGSDK.LogiGetStateUnity(0);*/
-
-        // If Enter is pressed, toggle the value of doorIsOpenR1L (toggle the state of the front left door).
-        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+        if (driveMode == DrivingMode.BrakeControl)
         {
-            doorIsOpenR1L.Value = !doorIsOpenR1L.Value;
+            switch (driveContreller)
+            {
+                case driver.Logiwheel:
+                    GetLogitechInput();
+                    break;
+                case driver.keyboard_Player:
+                    GetKeyboardInput();
+                    break;
+                case driver.automatic:
+                    AutomaticDrive();
+                    break;
+            }
+
+            if (LogitechGSDK.LogiUpdate() && LogitechGSDK.LogiIsConnected((int)LogitechKeyCode.FirstIndex))
+            {
+                //������ �ǵ�� ����
+                LogitechGSDK.LogiPlaySpringForce(0, 0, 50, 50); //핸들포스 중앙으로!!
+                MoveWheelTorques();
+            }
+            else
+            {
+                // Editor 
+                MoveWheelTorques();
+            }
+            
         }
-
-        // Driving inputs 
-        /* LogitechGSDK.DIJOYSTATE2ENGINES rec;
-         rec = LogitechGSDK.LogiGetStateUnity(0);*/
-        switch (driveContreller)
-        {
-            case driver.Logiwheel:
-                LogitechDrive();
-                break;
-            case driver.keyboard_Player:
-                KeyboardDrive();
-                break;
-            case driver.automatic:
-                AutomaticDrive();
-                break;
-        }
-
-        if (LogitechGSDK.LogiUpdate() && LogitechGSDK.LogiIsConnected((int)LogitechKeyCode.FirstIndex))
-        {
-            //������ �ǵ�� ����
-            LogitechGSDK.LogiPlaySpringForce(0, 0, 50, 50); //핸들포스 중앙으로!!
-
-            #region
-
-            //float rawSteeringInput = LogitechInput.GetAxis("Steering Horizontal");
-            //float rawForwardInput = LogitechInput.GetAxis("Gas Vertical");
-            //float parkInput = LogitechInput.GetAxis("Brake Vertical");
-
-            #endregion
-
-            MoveWheelTorques();
-        }
-        else
-        {
-            // Editor 
-            MoveWheelTorques();
-        }
-    }
-
-    private void OnDestroy()
-    {
-        doorIsOpenR1L.Unsubscribe(doorIsOpenR1LAction);
     }
 
     private void ApplyWheelTorques(float totalWheelTorque)
@@ -184,6 +242,106 @@ public class PlayerCarController : MonoBehaviour
     }
 
     public void MoveWheelTorques()
+    {
+        steeringReduction = 1 - Mathf.Min(Mathf.Abs(velocity.Value) / 30f, 0.85f);
+        userSteeringInput.Value = rawSteeringInput * steeringReduction;
+
+        #region Wheel torques
+
+        if (driveMode == DrivingMode.BrakeControl)
+        {
+            if (parkInput > 0)
+            {
+                // 사용자가 브레이크를 밟았을 경우 (Hand Brake)
+                if (Mathf.Abs(velocity.Value) > 5f / 3.6f)
+                {
+                    totalTorque = -MAX_BRAKE_TORQUE; // 일반 제동
+                }
+                else
+                {
+                    totalTorque = -9000; // P모드 제동
+                    propulsiveDirection.Value = 0;
+                    gearLeverIndication.Value = 0;
+                }
+                //Debug.Log($"🛑 Brake Applied - totalTorque: {totalTorque}");
+            }
+            else
+            {
+                // 🚗 브레이크를 밟지 않은 경우, 새로운 토크 계산식 적용
+                totalTorque = Mathf.Min(
+                    availableForwardTorque.Evaluate(Mathf.Abs(velocity.Value)),
+                    0 + 7900 * rawForwardInput - 9500 * rawForwardInput * rawForwardInput +
+                    9200 * rawForwardInput * rawForwardInput * rawForwardInput
+                );
+
+                //Debug.Log($"🚗 BrakeControl Mode - totalTorque: {totalTorque}");
+            }
+        }
+
+        ApplyWheelTorques(totalTorque);
+
+        #endregion
+
+        #region Lights
+
+        bool userBraking = (rawForwardInput < 0 && propulsiveDirection.Value == 1) ||
+                           (rawForwardInput > 0 && propulsiveDirection.Value == -1);
+        if (userBraking && !brakeLightIsOn)
+        {
+            lampValue.r = 1;
+            lampValue.g = 0;
+            lampValue.b = 0;
+            lampValue.intensity = 1;
+            lampBrake.Value = lampValue;
+            brakeLightIsOn = true;
+        }
+        else if (!userBraking && brakeLightIsOn)
+        {
+            lampValue.intensity = 0;
+            lampBrake.Value = lampValue;
+            brakeLightIsOn = false;
+        }
+
+        #endregion
+    }
+
+    private void GetLogitechInput()
+    {
+        rawSteeringInput = LogitechInput.GetAxis("Steering Horizontal");
+        rawForwardInput = LogitechInput.GetAxis("Gas Vertical");
+        parkInput = LogitechInput.GetAxis("Brake Vertical");
+        // SteeringInput = LogitechInput.GetAxis("Steering Horizontal");
+        backwardgear = LogitechInput.GetAxis("Clutch Vertical");
+
+        if (backwardgear > 0)
+        {
+            rawForwardInput = -1 * rawForwardInput;
+        }
+        else
+        {
+            rawForwardInput = LogitechInput.GetAxis("Gas Vertical");
+        }
+    }
+
+    /// <summary>
+    /// W(Vertical): 전진, A, B(Horizontal): 핸들 좌우, Space bar(Jump): 브레이크
+    /// </summary>
+    private void GetKeyboardInput()
+    {
+        rawSteeringInput = Input.GetAxis("Horizontal");
+        rawForwardInput = Input.GetAxis("Vertical");
+        parkInput = Input.GetAxis("Jump");
+    }
+
+    private void AutomaticDrive()
+    {
+        
+    }
+    
+    /// <summary>
+    /// 기존 제어 코드
+    /// </summary>
+    public void MoveWheelTorquesOrigin()
     {
         steeringReduction = 1 - Mathf.Min(Mathf.Abs(velocity.Value) / 30f, 0.85f);
         userSteeringInput.Value = rawSteeringInput * steeringReduction;
@@ -298,35 +456,5 @@ public class PlayerCarController : MonoBehaviour
         }
 
         #endregion
-    }
-
-    private void LogitechDrive()
-    {
-        rawSteeringInput = LogitechInput.GetAxis("Steering Horizontal");
-        rawForwardInput = LogitechInput.GetAxis("Gas Vertical");
-        parkInput = LogitechInput.GetAxis("Brake Vertical");
-        // SteeringInput = LogitechInput.GetAxis("Steering Horizontal");
-        backwardgear = LogitechInput.GetAxis("Clutch Vertical");
-
-        if (backwardgear > 0)
-        {
-            rawForwardInput = -1 * rawForwardInput;
-        }
-        else
-        {
-            rawForwardInput = LogitechInput.GetAxis("Gas Vertical");
-        }
-    }
-
-    private void KeyboardDrive()
-    {
-        rawSteeringInput = Input.GetAxis("Horizontal");
-        rawForwardInput = Input.GetAxis("Vertical");
-        parkInput = Input.GetAxis("Jump");
-    }
-
-    private void AutomaticDrive()
-    {
-        
     }
 }
