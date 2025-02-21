@@ -82,15 +82,22 @@ public class PlayerCarController : MonoBehaviour
     public GameObject Timer;
     public GameObject otherCar;
     public Rigidbody rb;
-    
-    public enum DrivingMode {Autonomous, BrakeControl}
+    public float currentAccelcation;
+
+    public enum DrivingMode
+    {
+        Autonomous,
+        BrakeControl
+    }
+
     public DrivingMode driveMode;
+
     private void Start()
     {
         parkInput = 0;
-        StartCoroutine(TestRoutine());
-
+        StartCoroutine(InitialRoutine());
     }
+
     public float targetSpeed_KmPerHour; // 목표 속도 (km/h)
     public float targetAcceleration; // 목표 가속도 (m/s²)
     public float durationSpeedUp; // 목표 가속 시간 (s)
@@ -98,13 +105,13 @@ public class PlayerCarController : MonoBehaviour
 
     private Coroutine currentCoroutine; // 현재 실행 중인 코루틴 저장
 
-    public IEnumerator TestRoutine()
+    public IEnumerator InitialRoutine()
     {
         SetDriveMode(DrivingMode.Autonomous);
-        float targetSpeedMS = CarUtils.ConvertKmHToMS(targetSpeed_KmPerHour);
-        yield return AccelerateToTargetSpeed(targetSpeedMS, durationSpeedUp);
-        yield return StartCoroutine(WaitAtTargetSpeed(5));
-        yield return StartCoroutine(WaitAtTargetSpeedUntilBrake());
+        float targetSpeedMS = CarUtils.ConvertKmHToMS(DrivingScenarioManager.Instance.startConditionSpeed_KmPerHour);
+        yield return AccelerateToTargetSpeed(targetSpeedMS - 10, 5);
+        // yield return StartCoroutine(WaitAtTargetSpeed(5));
+        // yield return StartCoroutine(WaitAtTargetSpeedUntilBrake());
         SetDriveMode(DrivingMode.BrakeControl);
     }
 
@@ -112,7 +119,27 @@ public class PlayerCarController : MonoBehaviour
     {
         driveMode = mode;
     }
-    
+
+    public float GetPlayerCarAcceleration()
+    {
+        return currentAccelcation;
+    }
+
+    #region Task
+
+    /// <summary>
+    /// B 차량(실험 차량)을 S-curve 기반으로 목표 속도 및 목표 간격에 맞춰 정렬하는 코루틴
+    /// </summary>
+    /// <param name="targetSpeed">목표 속도 (m/s)</param>
+    /// <param name="targetGap">목표 간격 (m)</param>
+    /// <param name="transitionTime">가속 및 감속을 수행할 시간 (s)</param>
+    /// <returns>코루틴 실행</returns>
+    public IEnumerator AlignTestCarToSpeedAndGap(float targetSpeed, float targetGap, float transitionTime)
+    {
+        // TODO: S-Curve 가감속 패턴으로 구현
+        yield return null;
+    }
+
     /// <summary>
     /// 목표 속도와 목표 시간이 주어지면, Lerp를 활용하여 등가속도 운동을 수행합니다.
     /// </summary>
@@ -122,12 +149,11 @@ public class PlayerCarController : MonoBehaviour
         Vector3 initialVelocity = rb.velocity; // 초기 속도 저장
         Vector3 targetVelocity = new Vector3(0, 0, targetSpeed);
         float calculatedAcceleration = (targetSpeed - initialVelocity.z) / duration;
-    
+
         float previousVelocityZ = initialVelocity.z; // 이전 속도 저장
         float measuredAcceleration = 0f; // 실제 측정된 가속도
 
         Debug.Log($"🚀 목표 속도 설정: {targetSpeed} m/s | 목표 시간: {duration}s | 계산된 가속도: {calculatedAcceleration}");
-        int count = 0;
         List<float> accelerations = new List<float>();
         while (elapsedTime < duration)
         {
@@ -141,15 +167,16 @@ public class PlayerCarController : MonoBehaviour
             // Debug.Log($"⏳ 시간: {elapsedTime:F2}/{duration}s | 속도: {rb.velocity.z:F3} m/s | 목표 속도: {targetSpeed} m/s | 측정 가속도: {measuredAcceleration:F3} m/s²");
 
             elapsedTime += Time.deltaTime;
-            count++;
             accelerations.Add(measuredAcceleration);
             yield return null; // 다음 프레임까지 대기
         }
 
         float averageAcceleration = accelerations.Sum() / accelerations.Count;
         rb.velocity = targetVelocity; // 최종 속도 보정
-        Debug.Log($"✅ 목표 속도 도달: {rb.velocity.z} m/s, 계산된 가속도: {calculatedAcceleration}, 평균 가속도 : {averageAcceleration}, 가속도 오차: {Math.Abs(calculatedAcceleration-averageAcceleration)/calculatedAcceleration* 100:F2}% ");
+        Debug.Log(
+            $"✅ 목표 속도 도달: {rb.velocity.z} m/s, 계산된 가속도: {calculatedAcceleration}, 평균 가속도 : {averageAcceleration}, 가속도 오차: {Math.Abs(calculatedAcceleration - averageAcceleration) / calculatedAcceleration * 100:F2}% ");
     }
+
     /// <summary>
     /// 현재 속도를 유지한 채 일정 시간 동안 대기합니다.
     /// </summary>
@@ -169,6 +196,7 @@ public class PlayerCarController : MonoBehaviour
 
         Debug.Log($"✅ {waitTime}s 대기 완료. 속도 유지 후 다음 동작 진행.");
     }
+
     /// <summary>
     /// 현재 속도를 유지한 채 브레이크 입력값이 들어올 때 까지 속도를 유지합니다.
     /// </summary>
@@ -192,11 +220,30 @@ public class PlayerCarController : MonoBehaviour
             {
                 rb.velocity = constantVelocity; // 속도 유지
                 yield return null;
-            }    
+            }
         }
-        
+
         Debug.Log($"실험자 브레이크 밟음. 속도 유지 로직 탈출.");
     }
+
+    public IEnumerator MaintainSpeed()
+    {
+        Vector3 constantVelocity = rb.velocity; // 현재 속도 저장
+
+        Debug.Log($"현재 속도를 유지한 채 대기. {constantVelocity.z:F3} m/s");
+        while (true)
+        {
+            rb.velocity = constantVelocity; // 속도 유지
+            yield return null;
+        }
+
+        yield return null;
+    }
+
+    #endregion
+
+    #region Movement
+
     private void FixedUpdate()
     {
         if (driveMode == DrivingMode.BrakeControl)
@@ -225,7 +272,6 @@ public class PlayerCarController : MonoBehaviour
                 // Editor 
                 MoveWheelTorques();
             }
-            
         }
     }
 
@@ -335,9 +381,8 @@ public class PlayerCarController : MonoBehaviour
 
     private void AutomaticDrive()
     {
-        
     }
-    
+
     /// <summary>
     /// 기존 제어 코드
     /// </summary>
@@ -372,7 +417,8 @@ public class PlayerCarController : MonoBehaviour
                 totalTorque = Mathf.Min(availableForwardTorque.Evaluate(Mathf.Abs(velocity.Value)),
                     -500 + 7900 * rawForwardInput - 9500 * rawForwardInput * rawForwardInput +
                     9200 * rawForwardInput * rawForwardInput * rawForwardInput);
-                Debug.Log($"totalTorque : {totalTorque}, availableForwardTorque.Evaluate(Mathf.Abs(velocity.Value): {availableForwardTorque.Evaluate(Mathf.Abs(velocity.Value))}, B: {-1800 + 7900 * rawForwardInput - 9500 * rawForwardInput * rawForwardInput + 9200 * rawForwardInput * rawForwardInput * rawForwardInput}");
+                Debug.Log(
+                    $"totalTorque : {totalTorque}, availableForwardTorque.Evaluate(Mathf.Abs(velocity.Value): {availableForwardTorque.Evaluate(Mathf.Abs(velocity.Value))}, B: {-1800 + 7900 * rawForwardInput - 9500 * rawForwardInput * rawForwardInput + 9200 * rawForwardInput * rawForwardInput * rawForwardInput}");
             }
             else
             {
@@ -382,6 +428,7 @@ public class PlayerCarController : MonoBehaviour
                     propulsiveDirection.Value = -1;
                     gearLeverIndication.Value = 1;
                 }
+
                 Debug.Log($"totalTorque : {totalTorque}");
             }
         }
@@ -403,6 +450,7 @@ public class PlayerCarController : MonoBehaviour
                     propulsiveDirection.Value = 1;
                     gearLeverIndication.Value = 3;
                 }
+
                 Debug.Log($"totalTorque : {totalTorque}");
             }
         }
@@ -422,6 +470,7 @@ public class PlayerCarController : MonoBehaviour
                     propulsiveDirection.Value = -1;
                     gearLeverIndication.Value = 1;
                 }
+
                 Debug.Log($"totalTorque : {totalTorque}");
             }
             else if (gearLeverIndication.Value == 0)
@@ -457,4 +506,6 @@ public class PlayerCarController : MonoBehaviour
 
         #endregion
     }
+
+    #endregion
 }

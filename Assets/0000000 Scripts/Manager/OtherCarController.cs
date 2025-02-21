@@ -14,52 +14,13 @@ public class OtherCarController : MonoBehaviour
     public const float durationSpeedDown = 3f; // 목표 시간 (s)
 
     private Coroutine currentCoroutine; // 현재 실행 중인 코루틴 저장
-
-    void Start()
-    {
-        // 원하는 코루틴 실행 (테스트할 방식 선택)
-        StartCoroutine(TestRoutine());
-        // StartCoroutine(AccelerateWithFixedAcceleration(targetAcceleration, duration));
-    }
-
-    public IEnumerator TestRoutine()
-    {
-        float targetSpeedMS = CarUtils.ConvertKmHToMS(targetSpeed_KmPerHour);
-        while (true)
-        {
-            yield return AccelerateToTargetSpeed(targetSpeedMS, durationSpeedUp);
-            yield return WaitAtTargetSpeed(5); 
-            
-            BrakePatternManager.instance.ActiveStandardBrakeLight();
-            yield return AccelerateWithFixedAcceleration(targetAcceleration, BrakeSystem.instance.durationSpeedDown);
-            
-            yield return WaitAtTargetSpeed(5); 
-            
-            yield return AccelerateToTargetSpeed(targetSpeedMS, durationSpeedUp);
-            yield return WaitAtTargetSpeed(5);
-            
-            BrakePatternManager.instance.ActiveFrequencyBrakeLight();
-            yield return AccelerateWithFixedAcceleration(targetAcceleration, BrakeSystem.instance.durationSpeedDown);
-            
-            //
-            
-            yield return AccelerateToTargetSpeed(targetSpeedMS, durationSpeedUp);
-            yield return WaitAtTargetSpeed(5);
-            
-            BrakePatternManager.instance.ActiveAreaBrakeLight();
-            yield return AccelerateWithFixedAcceleration(targetAcceleration, BrakeSystem.instance.durationSpeedDown);
-                
-            // 
-            
-            yield return AccelerateToTargetSpeed(targetSpeedMS, durationSpeedUp);
-            yield return WaitAtTargetSpeed(5);    
-            
-            BrakePatternManager.instance.ActiveBrightnessBrakeLight();
-            yield return AccelerateWithFixedAcceleration(targetAcceleration, BrakeSystem.instance.durationSpeedDown);
-        }
-    }
-
     
+
+    /*yield return AccelerateToTargetSpeed(targetSpeedMS, durationSpeedUp);
+    yield return WaitAtTargetSpeed(5); 
+            
+    BrakePatternManager.instance.ActiveStandardBrakeLight();
+    yield return AccelerateWithFixedAcceleration(targetAcceleration, BrakeSystem.instance.durationSpeedDown);*/
     /// <summary>
     /// 목표 속도와 목표 시간이 주어지면, Lerp를 활용하여 등가속도 운동을 수행합니다.
     /// </summary>
@@ -141,7 +102,7 @@ public class OtherCarController : MonoBehaviour
     /// <summary>
     /// 현재 속도를 유지한 채 일정 시간 동안 대기합니다.
     /// </summary>
-    public IEnumerator WaitAtTargetSpeed(float waitTime)
+    public IEnumerator MaintainTargetSpeed(float waitTime)
     {
         float elapsedTime = 0f;
         Vector3 constantVelocity = rb.velocity; // 현재 속도 저장
@@ -156,5 +117,20 @@ public class OtherCarController : MonoBehaviour
         }
 
         Debug.Log($"✅ {waitTime}s 대기 완료. 속도 유지 후 다음 동작 진행.");
+    }
+    /// <summary>
+    /// 현재 속도를 유지한 채 브레이크 입력값이 들어올 때 까지 속도를 유지합니다.
+    /// </summary>
+    public IEnumerator MaintainSpeed()
+    {
+        Vector3 constantVelocity = rb.velocity; // 현재 속도 저장
+
+        Debug.Log($"현재 속도를 유지한 채 대기. {constantVelocity.z:F3} m/s");
+        while (true)
+        {
+            rb.velocity = constantVelocity; // 속도 유지
+            yield return null;
+        }
+        yield return null;
     }
 }
