@@ -70,7 +70,7 @@ public class PlayerCarController : MonoBehaviour
     private VolvoCars.Data.Value.Public.LampGeneral
         lampValue = new VolvoCars.Data.Value.Public.LampGeneral(); // This is the value type used by lights/lamps
 
-    private float totalTorque; // The total torque requested by the user, will be split between the four wheels
+    public float totalTorque; // The total torque requested by the user, will be split between the four wheels
     private float steeringReduction; // Used to make it easier to drive with keyboard in higher speeds
     public const float MAX_BRAKE_TORQUE = 6000; // [Nm] 초기값 8000
     private bool brakeLightIsOn = false;
@@ -137,7 +137,7 @@ public class PlayerCarController : MonoBehaviour
                 LogitechDrive();
                 break;
             case driver.keyboard_Player:
-                MobileDrive();
+                KeyboardDrive();
                 break;
             case driver.automatic:
                 AutomaticDrive();
@@ -196,6 +196,7 @@ public class PlayerCarController : MonoBehaviour
             if (Mathf.Abs(velocity.Value) > 5f / 3.6f)
             {
                 totalTorque = -MAX_BRAKE_TORQUE; // Regular brakes
+                Debug.Log($"totalTorque : {totalTorque}");
             }
             else
             {
@@ -211,8 +212,9 @@ public class PlayerCarController : MonoBehaviour
             if (rawForwardInput >= 0 && velocity.Value > -1.5f)
             {
                 totalTorque = Mathf.Min(availableForwardTorque.Evaluate(Mathf.Abs(velocity.Value)),
-                    -1800 + 7900 * rawForwardInput - 9500 * rawForwardInput * rawForwardInput +
+                    -500 + 7900 * rawForwardInput - 9500 * rawForwardInput * rawForwardInput +
                     9200 * rawForwardInput * rawForwardInput * rawForwardInput);
+                Debug.Log($"totalTorque : {totalTorque}, availableForwardTorque.Evaluate(Mathf.Abs(velocity.Value): {availableForwardTorque.Evaluate(Mathf.Abs(velocity.Value))}, B: {-1800 + 7900 * rawForwardInput - 9500 * rawForwardInput * rawForwardInput + 9200 * rawForwardInput * rawForwardInput * rawForwardInput}");
             }
             else
             {
@@ -222,6 +224,7 @@ public class PlayerCarController : MonoBehaviour
                     propulsiveDirection.Value = -1;
                     gearLeverIndication.Value = 1;
                 }
+                Debug.Log($"totalTorque : {totalTorque}");
             }
         }
         else if (propulsiveDirection.Value == -1)
@@ -232,6 +235,7 @@ public class PlayerCarController : MonoBehaviour
                 float absInput = Mathf.Abs(rawForwardInput);
                 totalTorque = Mathf.Min(availableReverseTorque.Evaluate(Mathf.Abs(velocity.Value)),
                     -1800 + 7900 * absInput - 9500 * absInput * absInput + 9200 * absInput * absInput * absInput);
+                Debug.Log($"totalTorque : {totalTorque}");
             }
             else
             {
@@ -241,6 +245,7 @@ public class PlayerCarController : MonoBehaviour
                     propulsiveDirection.Value = 1;
                     gearLeverIndication.Value = 3;
                 }
+                Debug.Log($"totalTorque : {totalTorque}");
             }
         }
         else
@@ -259,10 +264,12 @@ public class PlayerCarController : MonoBehaviour
                     propulsiveDirection.Value = -1;
                     gearLeverIndication.Value = 1;
                 }
+                Debug.Log($"totalTorque : {totalTorque}");
             }
             else if (gearLeverIndication.Value == 0)
             {
                 totalTorque = -9000;
+                Debug.Log($"totalTorque : {totalTorque}");
             }
         }
 
@@ -311,7 +318,7 @@ public class PlayerCarController : MonoBehaviour
         }
     }
 
-    private void MobileDrive()
+    private void KeyboardDrive()
     {
         rawSteeringInput = Input.GetAxis("Horizontal");
         rawForwardInput = Input.GetAxis("Vertical");
