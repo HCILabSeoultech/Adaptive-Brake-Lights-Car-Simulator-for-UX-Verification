@@ -11,7 +11,6 @@ public class BrakeSystem : MonoBehaviour
     public float brakeIntensity = 0f; // 브레이크 강도 값 (0~1)
 
     [Header("Properties")] public float frequencyValue;
-    public float durationSpeedDown = 3f; // 목표 시간 (s)
     private void Awake()
     {
         if (instance == null) instance = this;

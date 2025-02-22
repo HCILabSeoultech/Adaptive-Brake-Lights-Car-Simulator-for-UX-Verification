@@ -23,32 +23,32 @@ public class BrakePatternManager : MonoBehaviour
         brightness = new BrightnessBrakeLight();
         area = new AreaBrakeLight();
     }
-
+    
     public void ActiveStandardBrakeLight()
     {
         LEDController.instance.ResetBrakeLight();
         LEDController.instance.SetLightBehavior(standard);
-        LEDController.instance.ApplyBrakeLight(BrakeSystem.instance.brakeIntensity, BrakeSystem.instance.durationSpeedDown);
+        LEDController.instance.ApplyBrakeLight(BrakeSystem.instance.brakeIntensity, DrivingScenarioManager.Instance.durationSpeedDown);
     }
 
     public void ActiveFrequencyBrakeLight()
     {
         LEDController.instance.ResetBrakeLight();
         LEDController.instance.SetLightBehavior(frequency);
-        LEDController.instance.ApplyBrakeLight(BrakeSystem.instance.brakeIntensity, BrakeSystem.instance.durationSpeedDown);
+        LEDController.instance.ApplyBrakeLight(BrakeSystem.instance.brakeIntensity, DrivingScenarioManager.Instance.durationSpeedDown);
     }
 
     public void ActiveBrightnessBrakeLight()
     {
         LEDController.instance.ResetBrakeLight();
         LEDController.instance.SetLightBehavior(brightness);
-        LEDController.instance.ApplyBrakeLight(BrakeSystem.instance.brakeIntensity, BrakeSystem.instance.durationSpeedDown);
+        LEDController.instance.ApplyBrakeLight(BrakeSystem.instance.brakeIntensity, DrivingScenarioManager.Instance.durationSpeedDown);
     }
 
     public void ActiveAreaBrakeLight()
     {
         LEDController.instance.ResetBrakeLight();
         LEDController.instance.SetLightBehavior(area);
-        LEDController.instance.ApplyBrakeLight(BrakeSystem.instance.brakeIntensity, BrakeSystem.instance.durationSpeedDown);
+        LEDController.instance.ApplyBrakeLight(BrakeSystem.instance.brakeIntensity, DrivingScenarioManager.Instance.durationSpeedDown);
     }
 }

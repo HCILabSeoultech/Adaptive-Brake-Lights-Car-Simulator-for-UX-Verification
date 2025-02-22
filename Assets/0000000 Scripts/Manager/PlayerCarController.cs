@@ -109,15 +109,21 @@ public class PlayerCarController : MonoBehaviour
     {
         SetDriveMode(DrivingMode.Autonomous);
         float targetSpeedMS = CarUtils.ConvertKmHToMS(DrivingScenarioManager.Instance.startConditionSpeed_KmPerHour);
-        yield return AccelerateToTargetSpeed(targetSpeedMS -5, 5);
-        // yield return StartCoroutine(WaitAtTargetSpeed(5));
-        // yield return StartCoroutine(WaitAtTargetSpeedUntilBrake());
-        // SetDriveMode(DrivingMode.BrakeControl);
+        yield return AccelerateToTargetSpeed(targetSpeedMS - 5, 5);
     }
 
+    public IEnumerator SetCanDriveState()
+    {
+        yield return StartCoroutine(WaitAtTargetSpeedUntilBrake());
+        SetDriveMode(DrivingMode.BrakeControl);
+    }
     public void SetDriveMode(DrivingMode mode)
     {
-        driveMode = mode;
+        if (driveMode != mode)
+        {
+            Debug.Log($"플레이어 차량 모드를 {driveMode} -> {mode}로 설정합니다.");
+            driveMode = mode;
+        }
     }
 
     public float GetPlayerCarAcceleration()
@@ -144,10 +150,10 @@ public class PlayerCarController : MonoBehaviour
         float speed_B0 = rb.velocity.z; // B 차량 초기 속도 (예: 80 km/h)
         float position_B0 = transform.position.z; // B 차량 초기 위치
         float targetGap_0 = otherCar.transform.position.z - transform.position.z;
-        
+
         float elapsedTime = 0f;
 
-        Debug.Log($"🚗 B 차량 정렬 시작! 초기 속도: {speed_B0:F2} m/s, 목표 속도: {targetSpeed} m/s, 목표 간격: {targetGap}m 뒤");
+        Debug.Log($"차량 정렬 시작! 초기 속도: {speed_B0:F2} m/s, 목표 속도: {targetSpeed} m/s, 목표 간격: {targetGap}m 뒤");
 
         while (elapsedTime < transitionTime)
         {
@@ -162,31 +168,25 @@ public class PlayerCarController : MonoBehaviour
             float currentSpeed_B = CalculateSpeed(Time.time, startTime, startTime + transitionTime, speed_B0,
                 targetSpeed, targetGap_0, targetGap);
             // 현재 B 차량의 위치 업데이트
-            float currentPosition_B = position_B0 + (speed_B0 * elapsedTime) + (0.5f * (currentSpeed_B - speed_B0) * elapsedTime);
+            float currentPosition_B = position_B0 + (speed_B0 * elapsedTime) +
+                                      (0.5f * (currentSpeed_B - speed_B0) * elapsedTime);
 
             // 현재 간격 계산
-            float currentGap = DrivingScenarioManager.Instance.otherCarController.transform.position.z 
+            float currentGap = DrivingScenarioManager.Instance.otherCarController.transform.position.z
                                - DrivingScenarioManager.Instance.playerCarController.transform.position.z;
-
-            /*// 🚨 목표 간격보다 크면 속도 유지, 작으면 미세 조정
-            if (currentGap < targetGap)
-            {
-                currentSpeed_B = Mathf.Lerp(currentSpeed_B, speed_A - 1f, Time.deltaTime * 2f); // 감속 조정
-            }*/
 
             // 🚗 속도 적용
             rb.velocity = new Vector3(0, 0, currentSpeed_B);
 
-            Debug.Log($"⏳ {elapsedTime:F2}/{transitionTime}s | B 속도: {currentSpeed_B:F2} m/s | 현재 간격: {currentGap:F2}m");
+            // Debug.Log($"{elapsedTime:F2}/{transitionTime}s | B 속도: {currentSpeed_B:F2} m/s | 현재 간격: {currentGap:F2}m");
 
             yield return null;
         }
 
         rb.velocity = new Vector3(0, 0, targetSpeed);
-        Debug.Log($"✅ B 차량 정렬 완료! 최종 속도: {rb.velocity.z:F2} m/s, 최종 간격: {targetGap}m");
-    
+        Debug.Log($"✅ B 차량 정렬 완료! 최종 속도: {rb.velocity.z:F2} m/s, 최종 간격: {otherCar.transform.position.z - transform.position.z}m");
     }
-    
+
     /// <summary>
     /// 후행 차량 B의 속도를 계산합니다.
     /// </summary>
@@ -202,17 +202,17 @@ public class PlayerCarController : MonoBehaviour
     {
         // t1 ~ t2 사이의 보간 변수 u (0에서 1까지)
         float u = (t - t1) / (t2 - t1);
-        
+
         // 보정 계수 k 계산 (D1-D2가 음수일 경우에도 올바르게 동작함)
         float k = (Mathf.PI / 2.0f) * ((y2 - y1) / (2.0f * (D1 - D2)) + 1.0f / (t2 - t1));
-        
+
         // 속도 함수 계산
         float speed = y1 + (y2 - y1) * (1.0f - Mathf.Cos(Mathf.PI * u)) / 2.0f
-                          + k * (D1 - D2) * Mathf.Sin(Mathf.PI * u);
-        
+                         + k * (D1 - D2) * Mathf.Sin(Mathf.PI * u);
+
         return speed;
     }
-    
+
     /// <summary>
     /// 목표 속도와 목표 시간이 주어지면, Lerp를 활용하여 등가속도 운동을 수행합니다.
     /// </summary>

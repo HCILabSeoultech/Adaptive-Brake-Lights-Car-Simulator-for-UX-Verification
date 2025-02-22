@@ -13,4 +13,27 @@ public class CarUtils
     {
         return speedKmH / 3.6f;
     }
+
+    public static List<float> GetRandomizedAccelerationsOrder()
+    {
+        List<float> accelerationOrder = new List<float>();
+        
+        // 1.0f부터 8.0f까지 리스트에 추가
+        for (float i = -1.0f; i >= -8.0f; i -= 1.0f)
+        {
+            accelerationOrder.Add(i);
+        }
+        
+        // 리스트 섞기 (Fisher-Yates Shuffle 알고리즘 사용)
+        System.Random random = new System.Random();
+        int count = accelerationOrder.Count;
+        for (int i = count - 1; i > 0; i--)
+        {
+            int j = random.Next(0, i + 1);
+            (accelerationOrder[i], accelerationOrder[j]) = (accelerationOrder[j], accelerationOrder[i]); // Swap
+        }
+
+        Debug.Log(string.Join(", ", accelerationOrder));
+        return accelerationOrder;
+    }
 }
