@@ -32,6 +32,7 @@ TagManager:
   - signal
   - turnright_sound
   - stay1way
+  - half
   layers:
   - Default
   - TransparentFX
