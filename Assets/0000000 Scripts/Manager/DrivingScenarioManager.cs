@@ -16,11 +16,14 @@ public class DrivingScenarioManager : MonoBehaviour
     [Header("Driving Condition")]
     public float startConditionSpeed_KmPerHour = 100f;
     public float startConditionDistance = 20f;
+    [Tooltip("시작 조건(속도, 거리) 완료 후 다음 시나리오 시작까지의 대기 시간")]
+    public float startWaitingTime = 5f;
     
     [Header("Car Conrtoller")]
     public OtherCarController otherCarController;
     public PlayerCarController playerCarController;
-    
+    private Coroutine otherCarCoroutine_MainyainTargetSpeed;
+    private Coroutine playerCarCoroutine_MainyainTargetSpeed;
     private void Awake()
     {
         if(!Instance) Instance = this;
@@ -31,6 +34,7 @@ public class DrivingScenarioManager : MonoBehaviour
     {
         Debug.Log("Starting Scenario 1");
         yield return StartCoroutine(AlignVehiclesBySpeedAndDistance());
+        yield return StartCoroutine(WaitForScenarioStart());
         yield return StartCoroutine(ExecuteScenarioRoutine());
         
         yield return null;
@@ -42,17 +46,35 @@ public class DrivingScenarioManager : MonoBehaviour
         
         float targetSpeedMS = CarUtils.ConvertKmHToMS(startConditionSpeed_KmPerHour);
         yield return StartCoroutine(otherCarController.AccelerateToTargetSpeed(targetSpeedMS, 5));
-        Coroutine otherCarCoroutine_MainyainTargetSpeed = StartCoroutine(otherCarController.MaintainSpeed());
+        otherCarCoroutine_MainyainTargetSpeed = StartCoroutine(otherCarController.MaintainSpeed());
         yield return StartCoroutine(playerCarController.AlignTestCarToSpeedAndGap(targetSpeedMS, 20, 10));
-        Coroutine playerCarCoroutine_MainyainTargetSpeed = StartCoroutine(playerCarController.MaintainSpeed());
+        playerCarCoroutine_MainyainTargetSpeed = StartCoroutine(playerCarController.MaintainSpeed());
         
         yield return StartCoroutine(WaitForScenarioReady());
         Debug.Log($"선두 차량, 실험자 차량 정렬 완료 | 목표 속도: {startConditionSpeed_KmPerHour}km/h, 목표 간격: {startConditionDistance}");
     }
 
+    public IEnumerator WaitForScenarioStart()
+    {
+        // 기존의 속도 유지 로직 로직 정지
+        if(otherCarCoroutine_MainyainTargetSpeed != null) StopCoroutine(otherCarCoroutine_MainyainTargetSpeed);
+        if(playerCarCoroutine_MainyainTargetSpeed != null) StopCoroutine(playerCarCoroutine_MainyainTargetSpeed);
+
+        Debug.Log($"선두 차량, 실험자 차량 {startWaitingTime}초 동안 속도 유지");
+        otherCarCoroutine_MainyainTargetSpeed =
+            StartCoroutine(otherCarController.MaintainSpeedForWaitTime(startWaitingTime));
+        playerCarCoroutine_MainyainTargetSpeed = 
+            StartCoroutine(playerCarController.MaintainSpeedForWaitTime(startWaitingTime));
+        yield return new WaitForSeconds(startWaitingTime);
+        
+        // 속도 유지 로직 정지
+        if(otherCarCoroutine_MainyainTargetSpeed != null) StopCoroutine(otherCarCoroutine_MainyainTargetSpeed);
+        if(playerCarCoroutine_MainyainTargetSpeed != null) StopCoroutine(playerCarCoroutine_MainyainTargetSpeed);
+        Debug.Log($"선두 차량, 실험자 차량 속도 유지 종료");
+    }
     public IEnumerator ExecuteScenarioRoutine()
     {
-        
+        Debug.Log("시나리오 시작");
         yield return null;
     }
 
@@ -83,7 +105,7 @@ public class DrivingScenarioManager : MonoBehaviour
         // 두 차량 사이의 거리 (m 단위)
         float currentDistance = Vector3.Distance(playerCarController.transform.position, otherCarController.transform.position);
         bool distanceAligned = Mathf.Abs(currentDistance - startConditionDistance) <= toleranceDistance;
-        Debug.Log($"speedAligned: {speedAligned}, distanceAligned: {distanceAligned}");
+        Debug.Log($"속도 조건: {speedAligned}, 간격 조건: {distanceAligned}");
         return speedAligned && distanceAligned;
     }
     

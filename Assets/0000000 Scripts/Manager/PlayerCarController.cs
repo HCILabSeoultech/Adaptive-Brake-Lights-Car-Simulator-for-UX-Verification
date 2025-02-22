@@ -109,7 +109,7 @@ public class PlayerCarController : MonoBehaviour
     {
         SetDriveMode(DrivingMode.Autonomous);
         float targetSpeedMS = CarUtils.ConvertKmHToMS(DrivingScenarioManager.Instance.startConditionSpeed_KmPerHour);
-        yield return AccelerateToTargetSpeed(targetSpeedMS - 10, 5);
+        yield return AccelerateToTargetSpeed(targetSpeedMS -5, 5);
         // yield return StartCoroutine(WaitAtTargetSpeed(5));
         // yield return StartCoroutine(WaitAtTargetSpeedUntilBrake());
         // SetDriveMode(DrivingMode.BrakeControl);
@@ -253,7 +253,7 @@ public class PlayerCarController : MonoBehaviour
     /// <summary>
     /// 현재 속도를 유지한 채 일정 시간 동안 대기합니다.
     /// </summary>
-    public IEnumerator WaitAtTargetSpeed(float waitTime)
+    public IEnumerator MaintainSpeedForWaitTime(float waitTime)
     {
         float elapsedTime = 0f;
         Vector3 constantVelocity = rb.velocity; // 현재 속도 저장

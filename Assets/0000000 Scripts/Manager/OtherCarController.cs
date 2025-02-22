@@ -102,7 +102,7 @@ public class OtherCarController : MonoBehaviour
     /// <summary>
     /// 현재 속도를 유지한 채 일정 시간 동안 대기합니다.
     /// </summary>
-    public IEnumerator MaintainTargetSpeed(float waitTime)
+    public IEnumerator MaintainSpeedForWaitTime(float waitTime)
     {
         float elapsedTime = 0f;
         Vector3 constantVelocity = rb.velocity; // 현재 속도 저장
