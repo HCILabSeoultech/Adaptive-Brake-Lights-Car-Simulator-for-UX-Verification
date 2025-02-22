@@ -43,7 +43,7 @@ public class DrivingScenarioManager : MonoBehaviour
         float targetSpeedMS = CarUtils.ConvertKmHToMS(startConditionSpeed_KmPerHour);
         yield return StartCoroutine(otherCarController.AccelerateToTargetSpeed(targetSpeedMS, 5));
         Coroutine otherCarCoroutine_MainyainTargetSpeed = StartCoroutine(otherCarController.MaintainSpeed());
-        yield return StartCoroutine(playerCarController.AlignTestCarToSpeedAndGap(targetSpeedMS, 1, 10));
+        yield return StartCoroutine(playerCarController.AlignTestCarToSpeedAndGap(targetSpeedMS, 20, 10));
         Coroutine playerCarCoroutine_MainyainTargetSpeed = StartCoroutine(playerCarController.MaintainSpeed());
         
         yield return StartCoroutine(WaitForScenarioReady());

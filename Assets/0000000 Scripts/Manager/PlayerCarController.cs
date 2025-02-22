@@ -92,7 +92,7 @@ public class PlayerCarController : MonoBehaviour
 
     public DrivingMode driveMode;
 
-    private void Start()
+    private void Awake()
     {
         parkInput = 0;
         StartCoroutine(InitialRoutine());
@@ -112,7 +112,7 @@ public class PlayerCarController : MonoBehaviour
         yield return AccelerateToTargetSpeed(targetSpeedMS - 10, 5);
         // yield return StartCoroutine(WaitAtTargetSpeed(5));
         // yield return StartCoroutine(WaitAtTargetSpeedUntilBrake());
-        SetDriveMode(DrivingMode.BrakeControl);
+        // SetDriveMode(DrivingMode.BrakeControl);
     }
 
     public void SetDriveMode(DrivingMode mode)
@@ -137,9 +137,82 @@ public class PlayerCarController : MonoBehaviour
     public IEnumerator AlignTestCarToSpeedAndGap(float targetSpeed, float targetGap, float transitionTime)
     {
         // TODO: S-Curve 가감속 패턴으로 구현
-        yield return null;
-    }
+        float startTime = Time.time;
+        float speed_A = 27.78f; // A 차량 속도 (100 km/h)
+        float position_A0 = otherCar.transform.position.z;
 
+        float speed_B0 = rb.velocity.z; // B 차량 초기 속도 (예: 80 km/h)
+        float position_B0 = transform.position.z; // B 차량 초기 위치
+        float targetGap_0 = otherCar.transform.position.z - transform.position.z;
+        
+        float elapsedTime = 0f;
+
+        Debug.Log($"🚗 B 차량 정렬 시작! 초기 속도: {speed_B0:F2} m/s, 목표 속도: {targetSpeed} m/s, 목표 간격: {targetGap}m 뒤");
+
+        while (elapsedTime < transitionTime)
+        {
+            elapsedTime += Time.deltaTime;
+
+            // 현재 A 차량의 위치 (등속 운동)
+            float currentPosition_A = position_A0 + speed_A * elapsedTime;
+
+            // 🚀 S-curve 기반 속도 변화 (부드러운 가속 및 감속)
+            float t = elapsedTime / transitionTime;
+
+            float currentSpeed_B = CalculateSpeed(Time.time, startTime, startTime + transitionTime, speed_B0,
+                targetSpeed, targetGap_0, targetGap);
+            // 현재 B 차량의 위치 업데이트
+            float currentPosition_B = position_B0 + (speed_B0 * elapsedTime) + (0.5f * (currentSpeed_B - speed_B0) * elapsedTime);
+
+            // 현재 간격 계산
+            float currentGap = DrivingScenarioManager.Instance.otherCarController.transform.position.z 
+                               - DrivingScenarioManager.Instance.playerCarController.transform.position.z;
+
+            /*// 🚨 목표 간격보다 크면 속도 유지, 작으면 미세 조정
+            if (currentGap < targetGap)
+            {
+                currentSpeed_B = Mathf.Lerp(currentSpeed_B, speed_A - 1f, Time.deltaTime * 2f); // 감속 조정
+            }*/
+
+            // 🚗 속도 적용
+            rb.velocity = new Vector3(0, 0, currentSpeed_B);
+
+            Debug.Log($"⏳ {elapsedTime:F2}/{transitionTime}s | B 속도: {currentSpeed_B:F2} m/s | 현재 간격: {currentGap:F2}m");
+
+            yield return null;
+        }
+
+        rb.velocity = new Vector3(0, 0, targetSpeed);
+        Debug.Log($"✅ B 차량 정렬 완료! 최종 속도: {rb.velocity.z:F2} m/s, 최종 간격: {targetGap}m");
+    
+    }
+    
+    /// <summary>
+    /// 후행 차량 B의 속도를 계산합니다.
+    /// </summary>
+    /// <param name="t">현재 시간</param>
+    /// <param name="t1">시작 시간 (t1)</param>
+    /// <param name="t2">종료 시간 (t2)</param>
+    /// <param name="y1">t1에서의 속도 (y1)</param>
+    /// <param name="y2">t2에서의 속도 (y2)</param>
+    /// <param name="D1">t1에서의 차량 간격 (D1)</param>
+    /// <param name="D2">t2에서의 차량 간격 (D2, 예: 20m)</param>
+    /// <returns>t 시간에서의 후행 차량 B의 속도</returns>
+    public static float CalculateSpeed(float t, float t1, float t2, float y1, float y2, float D1, float D2)
+    {
+        // t1 ~ t2 사이의 보간 변수 u (0에서 1까지)
+        float u = (t - t1) / (t2 - t1);
+        
+        // 보정 계수 k 계산 (D1-D2가 음수일 경우에도 올바르게 동작함)
+        float k = (Mathf.PI / 2.0f) * ((y2 - y1) / (2.0f * (D1 - D2)) + 1.0f / (t2 - t1));
+        
+        // 속도 함수 계산
+        float speed = y1 + (y2 - y1) * (1.0f - Mathf.Cos(Mathf.PI * u)) / 2.0f
+                          + k * (D1 - D2) * Mathf.Sin(Mathf.PI * u);
+        
+        return speed;
+    }
+    
     /// <summary>
     /// 목표 속도와 목표 시간이 주어지면, Lerp를 활용하여 등가속도 운동을 수행합니다.
     /// </summary>
