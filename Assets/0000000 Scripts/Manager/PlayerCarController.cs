@@ -109,7 +109,7 @@ public class PlayerCarController : MonoBehaviour
     {
         SetDriveMode(DrivingMode.Autonomous);
         float targetSpeedMS = CarUtils.ConvertKmHToMS(DrivingScenarioManager.Instance.startConditionSpeed_KmPerHour);
-        yield return AccelerateToTargetSpeed(targetSpeedMS - 5, 5);
+        yield return AccelerateToTargetSpeed(targetSpeedMS - 3, 5);
     }
 
     public IEnumerator SetCanDriveState()

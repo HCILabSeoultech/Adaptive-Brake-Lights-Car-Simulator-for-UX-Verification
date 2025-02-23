@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -24,15 +25,49 @@ public class DrivingScenarioManager : MonoBehaviour
     public PlayerCarController playerCarController;
     private Coroutine otherCarCoroutine_MaintainTargetSpeed;
     private Coroutine playerCarCoroutine_MaintainTargetSpeed;
+    [Header("DEBUG")]
+    public TextMeshProUGUI descriptionText;
 
     private void Awake()
     {
         if (!Instance) Instance = this;
-        StartCoroutine(Routine_A_StandardBrakeLight());
+    }
+
+    private void Start()
+    {
+        StartCoroutine(RoutineExperiment());
     }
 
     #region 루틴 별 호출
 
+    private IEnumerator RoutineExperiment()
+    {
+        yield return StartCoroutine(RoutineByBrakePatternTypes(brakePatternTypes[0]));
+        yield return StartCoroutine(RoutineByBrakePatternTypes(brakePatternTypes[1]));
+        yield return StartCoroutine(RoutineByBrakePatternTypes(brakePatternTypes[2]));
+        yield return StartCoroutine(RoutineByBrakePatternTypes(brakePatternTypes[3]));
+    } 
+    
+    private IEnumerator RoutineByBrakePatternTypes(BrakePatternType brakePatternType)
+    {
+        switch (brakePatternType)
+        {
+            case BrakePatternType.A_StandardBrakeLight:
+                yield return StartCoroutine(Routine_A_StandardBrakeLight());
+                break;
+            case BrakePatternType.B_BrightnessBrakeLight:
+                yield return StartCoroutine(Routine_B_BrightnessBrakeLight());
+                break;
+            case BrakePatternType.C_FrequencyBrakeLight:
+                yield return StartCoroutine(Routine_C_FrequencyBrakeLight());
+                break;
+            case BrakePatternType.D_AreaBrakeLight:
+                yield return StartCoroutine(Routine_D_AreaBrakeLight());
+                break;
+            default:
+                break;
+        }
+    }
     private IEnumerator Routine_A_StandardBrakeLight()
     {
         Debug.Log($"Starting Scenario {level} A_StandardBrakeLight");
@@ -76,8 +111,7 @@ public class DrivingScenarioManager : MonoBehaviour
         // 랜덤한 순서로 호출
         for (int i = 0; i < shuffledList.Count; i++)
         {
-            yield return
-                StartCoroutine(ExecuteScenarioRoutine(BrakePatternType.C_FrequencyBrakeLight, shuffledList[i]));
+            yield return StartCoroutine(ExecuteScenarioRoutine(BrakePatternType.C_FrequencyBrakeLight, shuffledList[i]));
             yield return StartCoroutine(AlignVehiclesBySpeedAndDistance());
             yield return StartCoroutine(WaitForScenarioStart());
         }
@@ -105,6 +139,7 @@ public class DrivingScenarioManager : MonoBehaviour
 
     public IEnumerator ExecuteScenarioRoutine(BrakePatternType brakePatternType, float acceleration)
     {
+        descriptionText.text = $"Lv{level}, {acceleration}m/s^2, Brake: {brakePatternType}";
         Debug.Log($"시나리오 호출 : {level}, {brakePatternType}, {acceleration}m/s^2으로 감속, 해당 시나리오가 끝날 때까지 대기합니다.");
 
         StartCoroutine(playerCarController.SetCanDriveState());
@@ -118,10 +153,13 @@ public class DrivingScenarioManager : MonoBehaviour
         Debug.Log($"선두 차량, 실험자 차량 정렬 시도 | 목표 속도: {startConditionSpeed_KmPerHour}km/h, 목표 간격: {startConditionDistance}");
         playerCarController.SetDriveMode(PlayerCarController.DrivingMode.Autonomous);
         
+        // 선두 차량 100km/h 정렬
         float targetSpeedMS = CarUtils.ConvertKmHToMS(startConditionSpeed_KmPerHour);
+        StartCoroutine(playerCarController.AccelerateToTargetSpeed(targetSpeedMS - 3, 5));
         yield return StartCoroutine(otherCarController.AccelerateToTargetSpeed(targetSpeedMS, 5));
         otherCarCoroutine_MaintainTargetSpeed = StartCoroutine(otherCarController.MaintainSpeed());
-
+        
+        // 후방 차량 100km/h, 간격 20m 정렬
         yield return StartCoroutine(playerCarController.AlignTestCarToSpeedAndGap(targetSpeedMS, 20, 10));
         playerCarCoroutine_MaintainTargetSpeed = StartCoroutine(playerCarController.MaintainSpeed());
 
