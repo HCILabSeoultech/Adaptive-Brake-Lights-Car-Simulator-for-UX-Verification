@@ -14,41 +14,37 @@ public class BrakePatternManager : MonoBehaviour
     private void Awake()
     {
         if (instance == null) instance = this;
-    }
-
-    void Start()
-    {
-        standard = new StandardBrakeLight();
-        frequency = new FrequencyBrakeLight();
-        brightness = new BrightnessBrakeLight();
-        area = new AreaBrakeLight();
+        standard = new A_StandardBrakeLight();
+        brightness = new B_BrightnessBrakeLight();
+        frequency = new C_FrequencyBrakeLight();
+        area = new D_AreaBrakeLight();
     }
     
-    public void ActiveStandardBrakeLight()
+    public void ActiveStandardBrakeLight(float acceleration)
     {
         LEDController.instance.ResetBrakeLight();
         LEDController.instance.SetLightBehavior(standard);
-        LEDController.instance.ApplyBrakeLight(BrakeSystem.instance.brakeIntensity, DrivingScenarioManager.Instance.durationSpeedDown);
+        LEDController.instance.ApplyBrakeLight(acceleration, DrivingScenarioManager.Instance.durationSpeedDown);
     }
 
-    public void ActiveFrequencyBrakeLight()
+    public void ActiveFrequencyBrakeLight(float acceleration)
     {
         LEDController.instance.ResetBrakeLight();
         LEDController.instance.SetLightBehavior(frequency);
-        LEDController.instance.ApplyBrakeLight(BrakeSystem.instance.brakeIntensity, DrivingScenarioManager.Instance.durationSpeedDown);
+        LEDController.instance.ApplyBrakeLight(acceleration, DrivingScenarioManager.Instance.durationSpeedDown);
     }
 
-    public void ActiveBrightnessBrakeLight()
+    public void ActiveBrightnessBrakeLight(float acceleration)
     {
         LEDController.instance.ResetBrakeLight();
         LEDController.instance.SetLightBehavior(brightness);
-        LEDController.instance.ApplyBrakeLight(BrakeSystem.instance.brakeIntensity, DrivingScenarioManager.Instance.durationSpeedDown);
+        LEDController.instance.ApplyBrakeLight(acceleration, DrivingScenarioManager.Instance.durationSpeedDown);
     }
 
-    public void ActiveAreaBrakeLight()
+    public void ActiveAreaBrakeLight(float acceleration)
     {
         LEDController.instance.ResetBrakeLight();
         LEDController.instance.SetLightBehavior(area);
-        LEDController.instance.ApplyBrakeLight(BrakeSystem.instance.brakeIntensity, DrivingScenarioManager.Instance.durationSpeedDown);
+        LEDController.instance.ApplyBrakeLight(acceleration, DrivingScenarioManager.Instance.durationSpeedDown);
     }
 }

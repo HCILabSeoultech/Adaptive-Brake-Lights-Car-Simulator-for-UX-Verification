@@ -31,7 +31,7 @@ public class LEDController : MonoBehaviour
         _currentLightBehavior = newBehavior;
     }
 
-    public void ApplyBrakeLight(float intensity, float duration)
+    public void ApplyBrakeLight(float acceleration, float duration)
     {
         if (_currentLightBehavior != null)
         {
@@ -42,7 +42,7 @@ public class LEDController : MonoBehaviour
                 activeCoroutine = null;
             }
 
-            activeCoroutine = StartCoroutine(_currentLightBehavior.ApplyLighting(mainBrakeRenderer, subBrakeRenderers, intensity, duration));
+            activeCoroutine = StartCoroutine(_currentLightBehavior.ApplyLighting(mainBrakeRenderer, subBrakeRenderers, acceleration, duration));
         }
     }
 

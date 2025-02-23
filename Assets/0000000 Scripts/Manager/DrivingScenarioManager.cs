@@ -139,7 +139,7 @@ public class DrivingScenarioManager : MonoBehaviour
 
     public IEnumerator ExecuteScenarioRoutine(BrakePatternType brakePatternType, float acceleration)
     {
-        descriptionText.text = $"Lv{level}, {acceleration}m/s^2, Brake: {brakePatternType}";
+        descriptionText.text = $"{level}, {acceleration}m/s^2, Brake: {brakePatternType}";
         Debug.Log($"시나리오 호출 : {level}, {brakePatternType}, {acceleration}m/s^2으로 감속, 해당 시나리오가 끝날 때까지 대기합니다.");
 
         StartCoroutine(playerCarController.SetCanDriveState());
@@ -155,7 +155,7 @@ public class DrivingScenarioManager : MonoBehaviour
         
         // 선두 차량 100km/h 정렬
         float targetSpeedMS = CarUtils.ConvertKmHToMS(startConditionSpeed_KmPerHour);
-        StartCoroutine(playerCarController.AccelerateToTargetSpeed(targetSpeedMS - 3, 5));
+        StartCoroutine(playerCarController.AccelerateToTargetSpeed(targetSpeedMS - 2, 5));
         yield return StartCoroutine(otherCarController.AccelerateToTargetSpeed(targetSpeedMS, 5));
         otherCarCoroutine_MaintainTargetSpeed = StartCoroutine(otherCarController.MaintainSpeed());
         
