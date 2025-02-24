@@ -16,21 +16,19 @@ public class D_AreaBrakeLight : ILightBehavior
         {
             if (acceleration >= -4f)
             {
-                for (int i = 0; i < 2; i++)
+                for (int i = 0; i < 3; i++)
                 {
-                    // subBrakeRenderers[i].gameObject.SetActive(true);
                     subBrakeRenderers[i].material.color = Color.red;
                 }
-                Debug.Log("2개 켬");
+                Debug.Log("3개 켬");
             }
             else
             {
-                for (int i = 0; i < 5; i++)
+                for (int i = 0; i < 6; i++)
                 {
-                    // subBrakeRenderers[i].gameObject.SetActive(true);
                     subBrakeRenderers[i].material.color = Color.red;
                 }
-                Debug.Log("5개 켬");
+                Debug.Log("6개 켬");
             }
         }
         else if (DrivingScenarioManager.Instance.level == Level.level3)
@@ -39,41 +37,27 @@ public class D_AreaBrakeLight : ILightBehavior
             {
                 for (int i = 0; i < 2; i++)
                 {
-                    // subBrakeRenderers[i].gameObject.SetActive(true);
                     subBrakeRenderers[i].material.color = Color.red;
                 }
                 Debug.Log("2개 켬");
             }
             else if (acceleration >= -5f)
             {
-                for (int i = 0; i < 3; i++)
+                for (int i = 0; i < 4; i++)
                 {
-                    // subBrakeRenderers[i].gameObject.SetActive(true);
                     subBrakeRenderers[i].material.color = Color.red;
                 }
-                Debug.Log("3개 켬");
+                Debug.Log("4개 켬");
             }
             else
             {
-                for (int i = 0; i < 5; i++)
+                for (int i = 0; i < 6; i++)
                 {
-                    // subBrakeRenderers[i].gameObject.SetActive(true);
                     subBrakeRenderers[i].material.color = Color.red;
                 }
-                Debug.Log("5개 켬");
+                Debug.Log("6개 켬");
             }
         }
-        
-        /*for (int j = 0; j < 3; j++)
-        {
-            for (int i = 0; i < subBrakeRenderers.Count; i++)
-            {
-                subBrakeRenderers[i].gameObject.SetActive(i < activeLEDs);
-                subBrakeRenderers[i].material.color = Color.red;
-                yield return new WaitForSeconds(0.1f);
-            }
-        }
-        */
 
         yield return new WaitForSeconds(duration);
         DeActivateLighting(subBrakeRenderers, mainBrakeRenderer);

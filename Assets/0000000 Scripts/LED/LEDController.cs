@@ -41,8 +41,9 @@ public class LEDController : MonoBehaviour
                 StopCoroutine(activeCoroutine);
                 activeCoroutine = null;
             }
-
-            activeCoroutine = StartCoroutine(_currentLightBehavior.ApplyLighting(mainBrakeRenderer, subBrakeRenderers, acceleration, duration));
+            
+            activeCoroutine = StartCoroutine(_currentLightBehavior.ApplyLighting(mainBrakeRenderer,
+                subBrakeRenderers, acceleration, duration));
         }
     }
 
