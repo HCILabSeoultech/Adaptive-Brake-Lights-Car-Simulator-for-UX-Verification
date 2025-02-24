@@ -190,8 +190,17 @@ public class DrivingScenarioManager : MonoBehaviour
     public IEnumerator WaitForScenarioReady()
     {
         // IsScenarioReady()가 true를 반환할 때까지 매 프레임마다 대기합니다.
+        int failCount = 0;
         while (!IsScenarioReady())
         {
+            failCount++;
+            if (failCount >= 50)
+            {
+                Debug.Log("시다리오 시작 조건 누적 실패, 거리 재조정 시도");
+                float targetSpeedMS = CarUtils.ConvertKmHToMS(startConditionSpeed_KmPerHour);
+                yield return StartCoroutine(playerCarController.AlignTestCarToSpeedAndGap(targetSpeedMS, 20, 5));
+                break;
+            }
             yield return null;
         }
 
