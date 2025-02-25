@@ -73,7 +73,7 @@ public class PlayerCarController : MonoBehaviour
         lampValue = new VolvoCars.Data.Value.Public.LampGeneral(); // This is the value type used by lights/lamps
 
     private float steeringReduction; // Used to make it easier to drive with keyboard in higher speeds
-    private const float MAX_BRAKE_TORQUE = 6000; // [Nm] 초기값 8000
+    public float MAX_BRAKE_TORQUE = 6000; // [Nm] 초기값 8000
     private bool brakeLightIsOn = false;
     Action<bool> doorIsOpenR1LAction; // Described more in Start()
 
@@ -114,6 +114,7 @@ public class PlayerCarController : MonoBehaviour
 
     public IEnumerator SetCanDriveState()
     {
+        totalTorque = 0;
         yield return StartCoroutine(WaitAtTargetSpeedUntilBrake());
         SetDriveMode(DrivingMode.BrakeControl);
     }
@@ -279,17 +280,17 @@ public class PlayerCarController : MonoBehaviour
 
         Debug.Log($"현재 속도를 유지한 채 브레이크 입력값이 들어올 때 까지 속도를 유지합니다. {constantVelocity.z:F3} m/s");
 
-        if (driveContreller == driver.keyboard_Player)
+        if (driveContreller == driver.Logiwheel)
         {
-            while (Input.GetAxis("Jump") <= 0)
+            while (LogitechInput.GetAxis("Brake Vertical") <= 0)
             {
                 rb.velocity = constantVelocity; // 속도 유지
                 yield return null;
             }
         }
-        else if (driveContreller == driver.Logiwheel)
+        else if (driveContreller == driver.keyboard_Player)
         {
-            while (LogitechInput.GetAxis("Brake Vertical") <= 0)
+            while (Input.GetAxis("Jump") <= 0)
             {
                 rb.velocity = constantVelocity; // 속도 유지
                 yield return null;
@@ -351,10 +352,10 @@ public class PlayerCarController : MonoBehaviour
     private void ApplyWheelTorques(float totalWheelTorque)
     {
         // Set the torque values for the four wheels.
-        wheelTorqueValue.fL = 1.4f * totalWheelTorque / 4f;
-        wheelTorqueValue.fR = 1.4f * totalWheelTorque / 4f;
-        wheelTorqueValue.rL = 0.6f * totalWheelTorque / 4f;
-        wheelTorqueValue.rR = 0.6f * totalWheelTorque / 4f;
+        wheelTorqueValue.fL = 3.0f * totalWheelTorque / 4f;
+        wheelTorqueValue.fR = 3.0f * totalWheelTorque / 4f;
+        wheelTorqueValue.rL = 1.5f * totalWheelTorque / 4f;
+        wheelTorqueValue.rR = 1.5f * totalWheelTorque / 4f;
 
         // Update the wheel torque data item with the new values. This is accessible to other scripts, such as chassis dynamics.
         wheelTorque.Value = wheelTorqueValue;
@@ -369,20 +370,35 @@ public class PlayerCarController : MonoBehaviour
 
         if (driveMode == DrivingMode.BrakeControl)
         {
-            if (parkInput > 0)
-            {
                 // 사용자가 브레이크를 밟았을 경우 (Hand Brake)
-                if (Mathf.Abs(velocity.Value) > 5f / 3.6f)
+                if (parkInput > 0.1f)
+                {
+                    totalTorque = -MAX_BRAKE_TORQUE / 3; // 일반 제동
+                }
+                else if (parkInput > 0.3f)
+                {
+                    totalTorque = -MAX_BRAKE_TORQUE / 2; // 일반 제동
+                }
+                else if (parkInput > 0.5f)
                 {
                     totalTorque = -MAX_BRAKE_TORQUE; // 일반 제동
                 }
-                else
+                else if(parkInput > -0.1f && parkInput < 0.1f)
                 {
-                    totalTorque = -9000; // P모드 제동
-                    propulsiveDirection.Value = 0;
-                    gearLeverIndication.Value = 0;
-                }
-                //Debug.Log($"🛑 Brake Applied - totalTorque: {totalTorque}");
+                /*totalTorque = -9000; // P모드 제동
+                propulsiveDirection.Value = 0;
+                gearLeverIndication.Value = 0;*/
+                // 🚗 브레이크를 밟지 않은 경우, 새로운 토크 계산식 적용
+                totalTorque = Mathf.Min(
+                    availableForwardTorque.Evaluate(Mathf.Abs(velocity.Value)),
+                    0 + 7900 * rawForwardInput - 9500 * rawForwardInput * rawForwardInput +
+                    9200 * rawForwardInput * rawForwardInput * rawForwardInput
+                );
+            }
+                Debug.Log($"Brake Applied - totalTorque: {totalTorque}");
+
+            /*if (parkInput > -0.5f)
+            {
             }
             else
             {
@@ -393,8 +409,8 @@ public class PlayerCarController : MonoBehaviour
                     9200 * rawForwardInput * rawForwardInput * rawForwardInput
                 );
 
-                //Debug.Log($"🚗 BrakeControl Mode - totalTorque: {totalTorque}");
-            }
+                //Debug.Log($"BrakeControl Mode - totalTorque: {totalTorque}");
+            }*/
         }
 
         ApplyWheelTorques(totalTorque);
@@ -429,6 +445,7 @@ public class PlayerCarController : MonoBehaviour
         rawSteeringInput = LogitechInput.GetAxis("Steering Horizontal");
         rawForwardInput = LogitechInput.GetAxis("Gas Vertical");
         parkInput = LogitechInput.GetAxis("Brake Vertical");
+        Debug.Log($"brake value : {parkInput}");
         // SteeringInput = LogitechInput.GetAxis("Steering Horizontal");
         backwardgear = LogitechInput.GetAxis("Clutch Vertical");
 
