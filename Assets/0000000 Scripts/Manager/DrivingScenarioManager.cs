@@ -159,8 +159,8 @@ public class DrivingScenarioManager : MonoBehaviour
         yield return StartCoroutine(otherCarController.AccelerateToTargetSpeed(targetSpeedMS, 5));
         otherCarCoroutine_MaintainTargetSpeed = StartCoroutine(otherCarController.MaintainSpeed());
         
-        // 후방 차량 100km/h, 간격 20m 정렬
-        yield return StartCoroutine(playerCarController.AlignTestCarToSpeedAndGap(targetSpeedMS, 20, 10));
+        // 후방 차량 {startConditionSpeed_KmPerHour}km/h, 간격 {startConditionDistance}m 정렬
+        yield return StartCoroutine(playerCarController.AlignTestCarToSpeedAndGap(targetSpeedMS, startConditionDistance, 10));
         playerCarCoroutine_MaintainTargetSpeed = StartCoroutine(playerCarController.MaintainSpeed());
 
         yield return StartCoroutine(WaitForScenarioReady());
@@ -198,7 +198,7 @@ public class DrivingScenarioManager : MonoBehaviour
             {
                 Debug.Log("시다리오 시작 조건 누적 실패, 거리 재조정 시도");
                 float targetSpeedMS = CarUtils.ConvertKmHToMS(startConditionSpeed_KmPerHour);
-                yield return StartCoroutine(playerCarController.AlignTestCarToSpeedAndGap(targetSpeedMS, 20, 5));
+                yield return StartCoroutine(playerCarController.AlignTestCarToSpeedAndGap(targetSpeedMS, startConditionDistance, 5));
                 break;
             }
             yield return null;
