@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
+using Random = UnityEngine.Random;
 
 // 선두 차량과 실험자 차량 상호작용을 해야 함. 선두 차량의 상태와 실험자 차량의 상태를 중앙 제어하는 시스템
 public class DrivingScenarioManager : MonoBehaviour
@@ -80,7 +81,7 @@ public class DrivingScenarioManager : MonoBehaviour
         {
             yield return StartCoroutine(ExecuteScenarioRoutine(BrakePatternType.A_StandardBrakeLight, shuffledList[i]));
             yield return StartCoroutine(AlignVehiclesBySpeedAndDistance());
-            yield return StartCoroutine(WaitForScenarioStart());
+            yield return StartCoroutine(WaitForScenarioStart(Random.Range(3.0f, 5.0f)));
         }
     }
 
@@ -97,7 +98,7 @@ public class DrivingScenarioManager : MonoBehaviour
             yield return StartCoroutine(
                 ExecuteScenarioRoutine(BrakePatternType.B_BrightnessBrakeLight, shuffledList[i]));
             yield return StartCoroutine(AlignVehiclesBySpeedAndDistance());
-            yield return StartCoroutine(WaitForScenarioStart());
+            yield return StartCoroutine(WaitForScenarioStart(Random.Range(3.0f, 5.0f)));
         }
     }
 
@@ -113,7 +114,7 @@ public class DrivingScenarioManager : MonoBehaviour
         {
             yield return StartCoroutine(ExecuteScenarioRoutine(BrakePatternType.C_FrequencyBrakeLight, shuffledList[i]));
             yield return StartCoroutine(AlignVehiclesBySpeedAndDistance());
-            yield return StartCoroutine(WaitForScenarioStart());
+            yield return StartCoroutine(WaitForScenarioStart(Random.Range(3.0f, 5.0f)));
         }
     }
 
@@ -129,7 +130,7 @@ public class DrivingScenarioManager : MonoBehaviour
         {
             yield return StartCoroutine(ExecuteScenarioRoutine(BrakePatternType.D_AreaBrakeLight, shuffledList[i]));
             yield return StartCoroutine(AlignVehiclesBySpeedAndDistance());
-            yield return StartCoroutine(WaitForScenarioStart());
+            yield return StartCoroutine(WaitForScenarioStart(Random.Range(3.0f, 5.0f)));
         }
     }
 
@@ -167,7 +168,7 @@ public class DrivingScenarioManager : MonoBehaviour
         Debug.Log($"선두 차량, 실험자 차량 정렬 완료 | 목표 속도: {startConditionSpeed_KmPerHour}km/h, 목표 간격: {startConditionDistance}");
     }
 
-    public IEnumerator WaitForScenarioStart()
+    public IEnumerator WaitForScenarioStart(float randomTime = 0)
     {
         // 기존의 속도 유지 로직 로직 정지
         if (otherCarCoroutine_MaintainTargetSpeed != null) StopCoroutine(otherCarCoroutine_MaintainTargetSpeed);
@@ -178,7 +179,16 @@ public class DrivingScenarioManager : MonoBehaviour
             StartCoroutine(otherCarController.MaintainSpeedForWaitTime(startWaitingTime));
         playerCarCoroutine_MaintainTargetSpeed =
             StartCoroutine(playerCarController.MaintainSpeedForWaitTime(startWaitingTime));
-        yield return new WaitForSeconds(startWaitingTime);
+        if (randomTime == 0f)
+        {
+            Debug.Log($"일정 시간 대기 ({startWaitingTime}s)");
+            yield return new WaitForSeconds(startWaitingTime);
+        }
+        else
+        {
+            Debug.Log($"랜덤 시간 대기 ({randomTime}s)");
+            yield return new WaitForSeconds(randomTime);
+        }
 
         // 속도 유지 로직 정지
         if (otherCarCoroutine_MaintainTargetSpeed != null) StopCoroutine(otherCarCoroutine_MaintainTargetSpeed);
