@@ -8,39 +8,45 @@ public class B_BrightnessBrakeLight : ILightBehavior
         float acceleration, float duration)
     {
         mainBrakeRenderer.material.color = Color.red;
-
+        Color lightColor = Color.black;
         if (DrivingScenarioManager.Instance.level == Level.level2)
         {
             if (acceleration >= -4f)
             {
-                acceleration = 0.5f;
+                lightColor = new Color(0.7f, 0, 0);
+                // 180
             }
             else
             {
-                acceleration = 1f;
+                lightColor = new Color(1f, 0, 0); 
+                // 255
             }
         }
         else if (DrivingScenarioManager.Instance.level == Level.level3)
         {
             if (acceleration >= -2f)
             {
-                acceleration = 0.4f;
+                lightColor = new Color(0.6f, 0, 0);
+                // 150
             }
             else if (acceleration >= -5f)
             {
-                acceleration = 0.7f;
+                lightColor = new Color(0.75f, 0, 0);
+                // 190
             }
             else
             {
-                acceleration = 1f;
+                lightColor = new Color(1f, 0, 0);
+                // 255
             }
         }
 
-        Color lightColor = Color.Lerp(Color.black, Color.red, acceleration);
+        // Color lightColor = Color.Lerp(Color.black, Color.red, acceleration);
         foreach (var led in subBrakeRenderers)
         {
             led.material.color = lightColor;
         }
+        
 
         yield return new WaitForSeconds(duration);
         DeActivateLighting(subBrakeRenderers, mainBrakeRenderer);
