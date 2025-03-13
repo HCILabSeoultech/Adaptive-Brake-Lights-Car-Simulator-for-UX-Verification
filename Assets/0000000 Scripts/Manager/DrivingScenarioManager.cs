@@ -11,10 +11,12 @@ public class DrivingScenarioManager : MonoBehaviour
 {
     public static DrivingScenarioManager Instance;
 
+    public string userName = "";
+    public string userNumber = "";
     [Header("Driving scenario settings")] 
     public BrakePatternType[] brakePatternTypes;
     public Level level;
-    private int _currentBrakePatternIndex;
+    public int _currentBrakePatternIndex;
     [Header("Driving Condition")] 
     public float startConditionSpeed_KmPerHour = 100f;
     public float startConditionDistance = 20f;
@@ -31,7 +33,7 @@ public class DrivingScenarioManager : MonoBehaviour
 
     private void Awake()
     {
-        if (!Instance) Instance = this;
+        if (Instance == null) Instance = this;
     }
 
     private void Start()
@@ -43,26 +45,30 @@ public class DrivingScenarioManager : MonoBehaviour
 
     private IEnumerator RoutineExperiment()
     {
-        yield return StartCoroutine(RoutineByBrakePatternTypes(brakePatternTypes[0]));
-        yield return StartCoroutine(RoutineByBrakePatternTypes(brakePatternTypes[1]));
-        yield return StartCoroutine(RoutineByBrakePatternTypes(brakePatternTypes[2]));
-        yield return StartCoroutine(RoutineByBrakePatternTypes(brakePatternTypes[3]));
+        SetCurrentScenarioIndex(0);
+        yield return StartCoroutine(RoutineByBrakePatternTypes(brakePatternTypes[_currentBrakePatternIndex]));
+        SetCurrentScenarioIndex(1);
+        yield return StartCoroutine(RoutineByBrakePatternTypes(brakePatternTypes[_currentBrakePatternIndex]));
+        SetCurrentScenarioIndex(2);
+        yield return StartCoroutine(RoutineByBrakePatternTypes(brakePatternTypes[_currentBrakePatternIndex]));
+        SetCurrentScenarioIndex(3);
+        yield return StartCoroutine(RoutineByBrakePatternTypes(brakePatternTypes[_currentBrakePatternIndex]));
     } 
     
     private IEnumerator RoutineByBrakePatternTypes(BrakePatternType brakePatternType)
     {
         switch (brakePatternType)
         {
-            case BrakePatternType.A_StandardBrakeLight:
+            case BrakePatternType.기본제동등:
                 yield return StartCoroutine(Routine_A_StandardBrakeLight());
                 break;
-            case BrakePatternType.B_BrightnessBrakeLight:
+            case BrakePatternType.밝기변화제동등:
                 yield return StartCoroutine(Routine_B_BrightnessBrakeLight());
                 break;
-            case BrakePatternType.C_FrequencyBrakeLight:
+            case BrakePatternType.점멸주파수변화제동등:
                 yield return StartCoroutine(Routine_C_FrequencyBrakeLight());
                 break;
-            case BrakePatternType.D_AreaBrakeLight:
+            case BrakePatternType.면적변화제동등:
                 yield return StartCoroutine(Routine_D_AreaBrakeLight());
                 break;
             default:
@@ -79,7 +85,7 @@ public class DrivingScenarioManager : MonoBehaviour
         // 랜덤한 순서로 호출
         for (int i = 0; i < shuffledList.Count; i++)
         {
-            yield return StartCoroutine(ExecuteScenarioRoutine(BrakePatternType.A_StandardBrakeLight, shuffledList[i]));
+            yield return StartCoroutine(ExecuteScenarioRoutine(BrakePatternType.기본제동등, shuffledList[i]));
             yield return StartCoroutine(AlignVehiclesBySpeedAndDistance());
             yield return StartCoroutine(WaitForScenarioStart(Random.Range(3.0f, 5.0f)));
         }
@@ -96,7 +102,7 @@ public class DrivingScenarioManager : MonoBehaviour
         for (int i = 0; i < shuffledList.Count; i++)
         {
             yield return StartCoroutine(
-                ExecuteScenarioRoutine(BrakePatternType.B_BrightnessBrakeLight, shuffledList[i]));
+                ExecuteScenarioRoutine(BrakePatternType.밝기변화제동등, shuffledList[i]));
             yield return StartCoroutine(AlignVehiclesBySpeedAndDistance());
             yield return StartCoroutine(WaitForScenarioStart(Random.Range(3.0f, 5.0f)));
         }
@@ -112,7 +118,7 @@ public class DrivingScenarioManager : MonoBehaviour
         // 랜덤한 순서로 호출
         for (int i = 0; i < shuffledList.Count; i++)
         {
-            yield return StartCoroutine(ExecuteScenarioRoutine(BrakePatternType.C_FrequencyBrakeLight, shuffledList[i]));
+            yield return StartCoroutine(ExecuteScenarioRoutine(BrakePatternType.점멸주파수변화제동등, shuffledList[i]));
             yield return StartCoroutine(AlignVehiclesBySpeedAndDistance());
             yield return StartCoroutine(WaitForScenarioStart(Random.Range(3.0f, 5.0f)));
         }
@@ -128,7 +134,7 @@ public class DrivingScenarioManager : MonoBehaviour
         // 랜덤한 순서로 호출
         for (int i = 0; i < shuffledList.Count; i++)
         {
-            yield return StartCoroutine(ExecuteScenarioRoutine(BrakePatternType.D_AreaBrakeLight, shuffledList[i]));
+            yield return StartCoroutine(ExecuteScenarioRoutine(BrakePatternType.면적변화제동등, shuffledList[i]));
             yield return StartCoroutine(AlignVehiclesBySpeedAndDistance());
             yield return StartCoroutine(WaitForScenarioStart(Random.Range(3.0f, 5.0f)));
         }
@@ -253,14 +259,14 @@ public class DrivingScenarioManager : MonoBehaviour
 
 public enum Level
 {
-    level2,
-    level3
+    수준2,
+    수준3
 }
 
 public enum BrakePatternType
 {
-    A_StandardBrakeLight,
-    B_BrightnessBrakeLight,
-    C_FrequencyBrakeLight,
-    D_AreaBrakeLight,
+    기본제동등,
+    밝기변화제동등,
+    점멸주파수변화제동등,
+    면적변화제동등,
 }

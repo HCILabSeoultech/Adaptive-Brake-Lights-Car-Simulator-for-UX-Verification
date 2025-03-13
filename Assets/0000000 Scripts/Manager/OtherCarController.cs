@@ -15,16 +15,16 @@ public class OtherCarController : MonoBehaviour
     {
         switch (brakePatternType)
         {
-            case BrakePatternType.A_StandardBrakeLight:
+            case BrakePatternType.기본제동등:
                 BrakePatternManager.instance.ActiveStandardBrakeLight(acceleration);
                 break;
-            case BrakePatternType.B_BrightnessBrakeLight:
+            case BrakePatternType.밝기변화제동등:
                 BrakePatternManager.instance.ActiveBrightnessBrakeLight(acceleration);
                 break;
-            case BrakePatternType.C_FrequencyBrakeLight:
+            case BrakePatternType.점멸주파수변화제동등:
                 BrakePatternManager.instance.ActiveFrequencyBrakeLight(acceleration);
                 break;
-            case BrakePatternType.D_AreaBrakeLight:
+            case BrakePatternType.면적변화제동등:
                 BrakePatternManager.instance.ActiveAreaBrakeLight(acceleration);
                 break;
             default:

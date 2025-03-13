@@ -18,7 +18,7 @@ public class C_FrequencyBrakeLight : ILightBehavior
 
         float blinkInterval=0; // = 1 / BrakeSystem.instance.frequencyValue;
 
-        if (DrivingScenarioManager.Instance.level == Level.level2)
+        if (DrivingScenarioManager.Instance.level == Level.수준2)
         {
             if (acceleration >= -4f)
             {
@@ -29,7 +29,7 @@ public class C_FrequencyBrakeLight : ILightBehavior
                 blinkInterval = highFrequencyValue;
             }
         }
-        else if (DrivingScenarioManager.Instance.level == Level.level3)
+        else if (DrivingScenarioManager.Instance.level == Level.수준3)
         {
             if (acceleration >= -2f)
             {

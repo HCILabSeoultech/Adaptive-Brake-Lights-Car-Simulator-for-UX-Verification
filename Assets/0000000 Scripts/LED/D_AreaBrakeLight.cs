@@ -12,7 +12,7 @@ public class D_AreaBrakeLight : ILightBehavior
         mainBrakeRenderer.material.color = Color.red;
 
         // TODO: acceleration(감속률)에 따른 범위 변화로 변경
-        if (DrivingScenarioManager.Instance.level == Level.level2)
+        if (DrivingScenarioManager.Instance.level == Level.수준2)
         {
             if (acceleration >= -4f)
             {
@@ -31,7 +31,7 @@ public class D_AreaBrakeLight : ILightBehavior
                 Debug.Log("6개 켬");
             }
         }
-        else if (DrivingScenarioManager.Instance.level == Level.level3)
+        else if (DrivingScenarioManager.Instance.level == Level.수준3)
         {
             if (acceleration >= -2f)
             {
