@@ -46,6 +46,7 @@ public class DrivingScenarioManager : MonoBehaviour
 
     private IEnumerator RoutineExperiment()
     {
+        AudioManager.Instance.PlayStartDrivingAudio();
         SetCurrentScenarioIndex(0);
         yield return StartCoroutine(RoutineByBrakePatternTypes(brakePatternTypes[_currentBrakePatternIndex]));
         SetCurrentScenarioIndex(1);
@@ -54,6 +55,7 @@ public class DrivingScenarioManager : MonoBehaviour
         yield return StartCoroutine(RoutineByBrakePatternTypes(brakePatternTypes[_currentBrakePatternIndex]));
         SetCurrentScenarioIndex(3);
         yield return StartCoroutine(RoutineByBrakePatternTypes(brakePatternTypes[_currentBrakePatternIndex]));
+        AudioManager.Instance.PlayEndDrivingAudio();
     } 
     
     private IEnumerator RoutineByBrakePatternTypes(BrakePatternType brakePatternType)
@@ -173,6 +175,7 @@ public class DrivingScenarioManager : MonoBehaviour
         yield return StartCoroutine(otherCarController.AccelerateToTargetSpeed(targetSpeedMS, 5));
         otherCarCoroutine_MaintainTargetSpeed = StartCoroutine(otherCarController.MaintainSpeed());
         
+        AudioManager.Instance.PlayRearrangementAudio();
         // 후방 차량 {startConditionSpeed_KmPerHour}km/h, 간격 {startConditionDistance}m 정렬
         yield return StartCoroutine(playerCarController.AlignTestCarToSpeedAndGap(targetSpeedMS, startConditionDistance, 10));
         playerCarCoroutine_MaintainTargetSpeed = StartCoroutine(playerCarController.MaintainSpeed());
