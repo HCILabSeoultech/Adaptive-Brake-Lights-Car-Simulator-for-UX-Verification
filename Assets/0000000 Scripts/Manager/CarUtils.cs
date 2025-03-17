@@ -36,4 +36,21 @@ public class CarUtils
         Debug.Log(string.Join(", ", accelerationOrder));
         return accelerationOrder;
     }
+
+    public static List<float> GetRandomizedAccelerationsOrder(Level level)
+    {
+        List<float> accelerationOrder = new List<float>();
+        if (level == Level.수준2)
+        {
+            return null;
+            
+        }else if (level == Level.수준3)
+        {
+            return null;
+        }
+        else
+        {
+            return null;
+        }
+    }
 }
