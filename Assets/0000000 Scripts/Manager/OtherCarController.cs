@@ -10,9 +10,9 @@ public class OtherCarController : MonoBehaviour
     public Rigidbody rb; // Rigidbody 참조
     public float targetAccelderation; // 목표 가속도 (m/s²)
     private Coroutine currentCoroutine; // 현재 실행 중인 코루틴 저장
-
     public IEnumerator ExecuteBehaviourByScenario(BrakePatternType brakePatternType, float acceleration)
     {
+        targetAccelderation = acceleration;
         switch (brakePatternType)
         {
             case BrakePatternType.기본제동등:
@@ -32,6 +32,7 @@ public class OtherCarController : MonoBehaviour
         }
         yield return StartCoroutine(AccelerateWithFixedAcceleration(acceleration, DrivingScenarioManager.Instance.durationSpeedDown));
         yield return StartCoroutine(MaintainSpeedForWaitTime(2));
+        targetAccelderation = 0;
     }
     
     /// <summary>
@@ -46,7 +47,7 @@ public class OtherCarController : MonoBehaviour
 
         float previousVelocityZ = initialVelocity.z; // 이전 속도 저장
         float measuredAcceleration = 0f; // 실제 측정된 가속도
-
+        
         Debug.Log($"🚀 목표 속도 설정: {targetSpeed} m/s | 목표 시간: {duration}s | 계산된 가속도: {calculatedAcceleration}");
         int count = 0;
         List<float> accelerations = new List<float>();

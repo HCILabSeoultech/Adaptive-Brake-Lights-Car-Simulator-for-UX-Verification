@@ -13,7 +13,7 @@ public class PlayerCarController : MonoBehaviour
     // 아두이노 쓰기위한 코드
     public SerialController serialController;
     LogitechGSDK.LogiControllerPropertiesData properties;
-
+    
     // For tutorial, see the Data section below and Start().
     private GameObject Take_over;
 
@@ -83,7 +83,7 @@ public class PlayerCarController : MonoBehaviour
     public GameObject otherCar;
     public Rigidbody rb;
     public float currentAccelcation;
-
+    private float previousVelocityZ;
     public enum DrivingMode
     {
         Autonomous,
@@ -96,6 +96,7 @@ public class PlayerCarController : MonoBehaviour
     {
         parkInput = 0;
         StartCoroutine(InitialRoutine());
+        previousVelocityZ = rb.velocity.z; // 이전 속도 저장
     }
 
     public float targetSpeed_KmPerHour; // 목표 속도 (km/h)
@@ -213,7 +214,7 @@ public class PlayerCarController : MonoBehaviour
 
         return speed;
     }
-
+    
     /// <summary>
     /// 목표 속도와 목표 시간이 주어지면, Lerp를 활용하여 등가속도 운동을 수행합니다.
     /// </summary>
@@ -320,6 +321,10 @@ public class PlayerCarController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        // 실제 측정된 가속도 계산 (Δv / Δt)
+        currentAccelcation = (rb.velocity.z - previousVelocityZ) / Time.fixedDeltaTime;
+        previousVelocityZ = rb.velocity.z; // 현재 속도를 이전 속도로 저장
+        
         if (driveMode == DrivingMode.BrakeControl)
         {
             switch (driveContreller)
@@ -469,6 +474,17 @@ public class PlayerCarController : MonoBehaviour
         parkInput = Input.GetAxis("Jump");
     }
 
+    public float GetForwardInput0to1()
+    {
+        Debug.Log(rawForwardInput);
+        return (rawForwardInput + 1) * 0.5f; // newValue = (originalValue - x) / (y - x)
+
+    }
+    public float GetBrakeInput0to1()
+    {
+        Debug.Log(parkInput);
+        return (parkInput + 1) * 0.5f;  // newValue = (originalValue - x) / (y - x)
+    }
     private void AutomaticDrive()
     {
     }

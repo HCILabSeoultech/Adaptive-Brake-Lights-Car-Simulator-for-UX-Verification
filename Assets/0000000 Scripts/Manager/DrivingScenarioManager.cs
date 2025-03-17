@@ -23,7 +23,8 @@ public class DrivingScenarioManager : MonoBehaviour
     public float durationSpeedDown = 2.5f;
     [Tooltip("시작 조건(속도, 거리) 완료 후 다음 시나리오 시작까지의 대기 시간")]
     public float startWaitingTime = 5f;
-
+    public float reasonableDistance = 5;
+    
     [Header("Car Conrtoller")] public OtherCarController otherCarController;
     public PlayerCarController playerCarController;
     private Coroutine otherCarCoroutine_MaintainTargetSpeed;
@@ -57,6 +58,7 @@ public class DrivingScenarioManager : MonoBehaviour
     
     private IEnumerator RoutineByBrakePatternTypes(BrakePatternType brakePatternType)
     {
+        
         switch (brakePatternType)
         {
             case BrakePatternType.기본제동등:
@@ -85,6 +87,7 @@ public class DrivingScenarioManager : MonoBehaviour
         // 랜덤한 순서로 호출
         for (int i = 0; i < shuffledList.Count; i++)
         {
+            UserDataLoggingManager.Instance.SetCanWrite(true);
             yield return StartCoroutine(ExecuteScenarioRoutine(BrakePatternType.기본제동등, shuffledList[i]));
             yield return StartCoroutine(AlignVehiclesBySpeedAndDistance());
             yield return StartCoroutine(WaitForScenarioStart(Random.Range(3.0f, 5.0f)));
@@ -101,6 +104,7 @@ public class DrivingScenarioManager : MonoBehaviour
         // 랜덤한 순서로 호출
         for (int i = 0; i < shuffledList.Count; i++)
         {
+            UserDataLoggingManager.Instance.SetCanWrite(true);
             yield return StartCoroutine(
                 ExecuteScenarioRoutine(BrakePatternType.밝기변화제동등, shuffledList[i]));
             yield return StartCoroutine(AlignVehiclesBySpeedAndDistance());
@@ -118,6 +122,7 @@ public class DrivingScenarioManager : MonoBehaviour
         // 랜덤한 순서로 호출
         for (int i = 0; i < shuffledList.Count; i++)
         {
+            UserDataLoggingManager.Instance.SetCanWrite(true);
             yield return StartCoroutine(ExecuteScenarioRoutine(BrakePatternType.점멸주파수변화제동등, shuffledList[i]));
             yield return StartCoroutine(AlignVehiclesBySpeedAndDistance());
             yield return StartCoroutine(WaitForScenarioStart(Random.Range(3.0f, 5.0f)));
@@ -134,6 +139,7 @@ public class DrivingScenarioManager : MonoBehaviour
         // 랜덤한 순서로 호출
         for (int i = 0; i < shuffledList.Count; i++)
         {
+            UserDataLoggingManager.Instance.SetCanWrite(true);
             yield return StartCoroutine(ExecuteScenarioRoutine(BrakePatternType.면적변화제동등, shuffledList[i]));
             yield return StartCoroutine(AlignVehiclesBySpeedAndDistance());
             yield return StartCoroutine(WaitForScenarioStart(Random.Range(3.0f, 5.0f)));
@@ -153,6 +159,7 @@ public class DrivingScenarioManager : MonoBehaviour
         yield return StartCoroutine(otherCarController.ExecuteBehaviourByScenario(brakePatternType, acceleration));
 
         Debug.Log($"시나리오 호출 : {level}, {brakePatternType}, {acceleration}m/s^2으로 감속, 해당 시나리오를 종료합니다.");
+        
     }
 
     public IEnumerator AlignVehiclesBySpeedAndDistance()
@@ -238,7 +245,7 @@ public class DrivingScenarioManager : MonoBehaviour
 
         // 두 차량 사이의 거리 (m 단위)
         float currentDistance =
-            Vector3.Distance(playerCarController.transform.position, otherCarController.transform.position);
+            GetCurrentDistance();
         bool distanceAligned = Mathf.Abs(currentDistance - startConditionDistance) <= toleranceDistance;
         Debug.Log($"속도 조건: {speedAligned}, 간격 조건: {distanceAligned}");
         return speedAligned && distanceAligned;
@@ -254,6 +261,35 @@ public class DrivingScenarioManager : MonoBehaviour
         return Vector3.Distance(otherCarController.transform.position, playerCarController.transform.position);
     }
 
+    public bool IsConflictWithOtherCar()
+    {
+        if (GetCurrentDistance() < 4.5f)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public bool IsReasonableDistance()
+    {
+        float maxDistance = startConditionDistance + reasonableDistance;
+        float minDistance = startConditionDistance - reasonableDistance;
+        
+        float currentDistance = GetCurrentDistance();
+
+        if (currentDistance < maxDistance && currentDistance > minDistance)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    
     #endregion
 }
 
