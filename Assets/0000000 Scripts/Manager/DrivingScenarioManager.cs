@@ -22,7 +22,6 @@ public class DrivingScenarioManager : MonoBehaviour
 
     [Tooltip("시작 조건(속도, 거리) 완료 후 다음 시나리오 시작까지의 대기 시간")]
     public float startWaitingTime = 5f;
-
     public float reasonableDistance = 5;
 
     [Header("Car Conrtoller")] public OtherCarController otherCarController;

@@ -13,7 +13,7 @@ public class PlayerCarController : MonoBehaviour
     // 아두이노 쓰기위한 코드
     public SerialController serialController;
     LogitechGSDK.LogiControllerPropertiesData properties;
-    
+
     // For tutorial, see the Data section below and Start().
     private GameObject Take_over;
 
@@ -84,6 +84,7 @@ public class PlayerCarController : MonoBehaviour
     public Rigidbody rb;
     public float currentAccelcation;
     private float previousVelocityZ;
+
     public enum DrivingMode
     {
         Autonomous,
@@ -109,7 +110,16 @@ public class PlayerCarController : MonoBehaviour
     public IEnumerator InitialRoutine()
     {
         SetDriveMode(DrivingMode.Autonomous);
-        float targetSpeedMS = CarUtils.ConvertKmHToMS(DrivingScenarioManager.Instance.startConditionSpeed_KmPerHour);
+        float targetSpeedMS = 0;
+
+        if (DrivingScenarioManager.Instance != null)
+        {
+            targetSpeedMS = CarUtils.ConvertKmHToMS(DrivingScenarioManager.Instance.startConditionSpeed_KmPerHour);
+        }
+        else if (PreDrivingScenarioManager.Instance != null)
+        {
+            targetSpeedMS = CarUtils.ConvertKmHToMS(PreDrivingScenarioManager.Instance.startConditionSpeed_KmPerHour);
+        }
         yield return AccelerateToTargetSpeed(targetSpeedMS - 2, 5);
     }
 
@@ -119,6 +129,7 @@ public class PlayerCarController : MonoBehaviour
         yield return StartCoroutine(WaitAtTargetSpeedUntilBrake());
         SetDriveMode(DrivingMode.BrakeControl);
     }
+
     public void SetDriveMode(DrivingMode mode)
     {
         if (driveMode != mode)
@@ -174,8 +185,17 @@ public class PlayerCarController : MonoBehaviour
                                       (0.5f * (currentSpeed_B - speed_B0) * elapsedTime);
 
             // 현재 간격 계산
-            float currentGap = DrivingScenarioManager.Instance.otherCarController.transform.position.z
-                               - DrivingScenarioManager.Instance.playerCarController.transform.position.z;
+            float currentGap = 0;
+            if (DrivingScenarioManager.Instance != null)
+            {
+                currentGap = DrivingScenarioManager.Instance.otherCarController.transform.position.z
+                             - DrivingScenarioManager.Instance.playerCarController.transform.position.z;
+            }
+            else if (PreDrivingScenarioManager.Instance != null)
+            {
+                currentGap = PreDrivingScenarioManager.Instance.otherCarController.transform.position.z
+                             - PreDrivingScenarioManager.Instance.playerCarController.transform.position.z;
+            }
 
             // 🚗 속도 적용
             rb.velocity = new Vector3(0, 0, currentSpeed_B);
@@ -186,7 +206,8 @@ public class PlayerCarController : MonoBehaviour
         }
 
         rb.velocity = new Vector3(0, 0, targetSpeed);
-        Debug.Log($"✅ B 차량 정렬 완료! 최종 속도: {rb.velocity.z:F2} m/s, 최종 간격: {otherCar.transform.position.z - transform.position.z}m");
+        Debug.Log(
+            $"✅ B 차량 정렬 완료! 최종 속도: {rb.velocity.z:F2} m/s, 최종 간격: {otherCar.transform.position.z - transform.position.z}m");
     }
 
     /// <summary>
@@ -214,7 +235,7 @@ public class PlayerCarController : MonoBehaviour
 
         return speed;
     }
-    
+
     /// <summary>
     /// 목표 속도와 목표 시간이 주어지면, Lerp를 활용하여 등가속도 운동을 수행합니다.
     /// </summary>
@@ -324,7 +345,7 @@ public class PlayerCarController : MonoBehaviour
         // 실제 측정된 가속도 계산 (Δv / Δt)
         currentAccelcation = (rb.velocity.z - previousVelocityZ) / Time.fixedDeltaTime;
         previousVelocityZ = rb.velocity.z; // 현재 속도를 이전 속도로 저장
-        
+
         if (driveMode == DrivingMode.BrakeControl)
         {
             switch (driveContreller)
@@ -375,21 +396,21 @@ public class PlayerCarController : MonoBehaviour
 
         if (driveMode == DrivingMode.BrakeControl)
         {
-                // 사용자가 브레이크를 밟았을 경우 (Hand Brake)
-                if (parkInput > 0.1f)
-                {
-                    totalTorque = -MAX_BRAKE_TORQUE / 3; // 일반 제동
-                }
-                else if (parkInput > 0.3f)
-                {
-                    totalTorque = -MAX_BRAKE_TORQUE / 2; // 일반 제동
-                }
-                else if (parkInput > 0.5f)
-                {
-                    totalTorque = -MAX_BRAKE_TORQUE; // 일반 제동
-                }
-                else if(parkInput > -0.1f && parkInput < 0.1f)
-                {
+            // 사용자가 브레이크를 밟았을 경우 (Hand Brake)
+            if (parkInput > 0.1f)
+            {
+                totalTorque = -MAX_BRAKE_TORQUE / 3; // 일반 제동
+            }
+            else if (parkInput > 0.3f)
+            {
+                totalTorque = -MAX_BRAKE_TORQUE / 2; // 일반 제동
+            }
+            else if (parkInput > 0.5f)
+            {
+                totalTorque = -MAX_BRAKE_TORQUE; // 일반 제동
+            }
+            else if (parkInput > -0.1f && parkInput < 0.1f)
+            {
                 /*totalTorque = -9000; // P모드 제동
                 propulsiveDirection.Value = 0;
                 gearLeverIndication.Value = 0;*/
@@ -400,7 +421,8 @@ public class PlayerCarController : MonoBehaviour
                     9200 * rawForwardInput * rawForwardInput * rawForwardInput
                 );
             }
-                Debug.Log($"Brake Applied - totalTorque: {totalTorque}");
+
+            Debug.Log($"Brake Applied - totalTorque: {totalTorque}");
 
             /*if (parkInput > -0.5f)
             {
@@ -476,15 +498,25 @@ public class PlayerCarController : MonoBehaviour
 
     public float GetForwardInput0to1()
     {
-        Debug.Log(rawForwardInput);
-        return (rawForwardInput + 1) * 0.5f; // newValue = (originalValue - x) / (y - x)
-
+        // Debug.Log(rawForwardInput); (-1 ~ 1) -> (0 ~ 1)
+        if (rawForwardInput < 0)
+        {
+            return 0;
+        }
+        return rawForwardInput; // + 1) * 0.5f; // newValue = (originalValue - x) / (y - x)
     }
+
     public float GetBrakeInput0to1()
     {
-        Debug.Log(parkInput);
-        return (parkInput + 1) * 0.5f;  // newValue = (originalValue - x) / (y - x)
+        // Debug.Log(parkInput);
+        if (parkInput < 0)
+        {
+            return 0;
+        }
+
+        return parkInput;  // ( + 1) * 0.5f; // newValue = (originalValue - x) / (y - x)
     }
+
     private void AutomaticDrive()
     {
     }

@@ -30,7 +30,7 @@ public class OtherCarController : MonoBehaviour
             default:
                 break;
         }
-        yield return StartCoroutine(AccelerateWithFixedAcceleration(acceleration, DrivingScenarioManager.Instance.durationSpeedDown));
+        yield return StartCoroutine(AccelerateWithFixedAcceleration(acceleration, DrivingScenarioManager.Instance != null ? DrivingScenarioManager.Instance.durationSpeedDown : PreDrivingScenarioManager.Instance.durationSpeedDown));
         yield return StartCoroutine(MaintainSpeedForWaitTime(2));
         targetAccelderation = 0;
     }

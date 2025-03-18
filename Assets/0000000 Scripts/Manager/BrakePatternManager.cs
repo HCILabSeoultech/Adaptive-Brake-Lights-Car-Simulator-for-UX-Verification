@@ -24,7 +24,7 @@ public class BrakePatternManager : MonoBehaviour
     {
         LEDController.instance.ResetBrakeLight();
         LEDController.instance.SetLightBehavior(standard);
-        LEDController.instance.ApplyBrakeLight(acceleration, DrivingScenarioManager.Instance.durationSpeedDown);
+        LEDController.instance.ApplyBrakeLight(acceleration, DrivingScenarioManager.Instance != null ? DrivingScenarioManager.Instance.durationSpeedDown : PreDrivingScenarioManager.Instance.durationSpeedDown);
     }
 
     public void ActiveFrequencyBrakeLight(float acceleration)
