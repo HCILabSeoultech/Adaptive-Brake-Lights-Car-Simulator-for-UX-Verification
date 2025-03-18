@@ -1,0 +1,297 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using TMPro;
+using UnityEngine;
+using UnityEngine.Serialization;
+using Random = UnityEngine.Random;
+
+// 선두 차량과 실험자 차량 상호작용을 해야 함. 선두 차량의 상태와 실험자 차량의 상태를 중앙 제어하는 시스템
+public class PreDrivingScenarioManager : MonoBehaviour
+{
+    public static PreDrivingScenarioManager Instance;
+
+    public string userName = "";
+    public string userNumber = "";
+    [Header("Driving scenario settings")] 
+    public BrakePatternType[] brakePatternTypes;
+    public Level level;
+    public int _currentBrakePatternIndex;
+    [Header("Driving Condition")] 
+    public float startConditionSpeed_KmPerHour = 100f;
+    public float startConditionDistance = 20f;
+    public float durationSpeedDown = 2.5f;
+    [Tooltip("시작 조건(속도, 거리) 완료 후 다음 시나리오 시작까지의 대기 시간")]
+    public float startWaitingTime = 5f;
+    public float reasonableDistance = 5;
+    
+    [Header("Car Conrtoller")] public OtherCarController otherCarController;
+    public PlayerCarController playerCarController;
+    private Coroutine otherCarCoroutine_MaintainTargetSpeed;
+    private Coroutine playerCarCoroutine_MaintainTargetSpeed;
+    [Header("DEBUG")]
+    public TextMeshProUGUI descriptionText;
+
+    private void Awake()
+    {
+        if (Instance == null) Instance = this;
+    }
+
+    private void Start()
+    {
+        StartCoroutine(RoutineExperiment());
+    }
+
+    #region 루틴 별 호출
+
+    private IEnumerator RoutineExperiment()
+    {
+        AudioManager.Instance.PlayStartDrivingAudio();
+        SetCurrentScenarioIndex(0);
+        yield return StartCoroutine(RoutineByBrakePatternTypes(brakePatternTypes[_currentBrakePatternIndex]));
+        SetCurrentScenarioIndex(1);
+        yield return StartCoroutine(RoutineByBrakePatternTypes(brakePatternTypes[_currentBrakePatternIndex]));
+        SetCurrentScenarioIndex(2);
+        yield return StartCoroutine(RoutineByBrakePatternTypes(brakePatternTypes[_currentBrakePatternIndex]));
+        SetCurrentScenarioIndex(3);
+        yield return StartCoroutine(RoutineByBrakePatternTypes(brakePatternTypes[_currentBrakePatternIndex]));
+        AudioManager.Instance.PlayEndDrivingAudio();
+    } 
+    
+    private IEnumerator RoutineByBrakePatternTypes(BrakePatternType brakePatternType)
+    {
+        
+        switch (brakePatternType)
+        {
+            case BrakePatternType.기본제동등:
+                yield return StartCoroutine(Routine_A_StandardBrakeLight());
+                break;
+            case BrakePatternType.밝기변화제동등:
+                yield return StartCoroutine(Routine_B_BrightnessBrakeLight());
+                break;
+            case BrakePatternType.점멸주파수변화제동등:
+                yield return StartCoroutine(Routine_C_FrequencyBrakeLight());
+                break;
+            case BrakePatternType.면적변화제동등:
+                yield return StartCoroutine(Routine_D_AreaBrakeLight());
+                break;
+            default:
+                break;
+        }
+    }
+    private IEnumerator Routine_A_StandardBrakeLight()
+    {
+        Debug.Log($"Starting Scenario {level} A_StandardBrakeLight");
+        yield return StartCoroutine(AlignVehiclesBySpeedAndDistance());
+        yield return StartCoroutine(WaitForScenarioStart());
+
+        List<float> shuffledList = CarUtils.GetRandomizedAccelerationsOrder();
+        // 랜덤한 순서로 호출
+        for (int i = 0; i < shuffledList.Count; i++)
+        {
+            UserDataLoggingManager.Instance.SetCanWrite(true);
+            yield return StartCoroutine(ExecuteScenarioRoutine(BrakePatternType.기본제동등, shuffledList[i]));
+            yield return StartCoroutine(AlignVehiclesBySpeedAndDistance());
+            yield return StartCoroutine(WaitForScenarioStart(Random.Range(3.0f, 5.0f)));
+        }
+    }
+
+    private IEnumerator Routine_B_BrightnessBrakeLight()
+    {
+        Debug.Log("Starting Scenario A_StandardBrakeLight");
+        yield return StartCoroutine(AlignVehiclesBySpeedAndDistance());
+        yield return StartCoroutine(WaitForScenarioStart());
+
+        List<float> shuffledList = CarUtils.GetRandomizedAccelerationsOrder();
+        // 랜덤한 순서로 호출
+        for (int i = 0; i < shuffledList.Count; i++)
+        {
+            UserDataLoggingManager.Instance.SetCanWrite(true);
+            yield return StartCoroutine(
+                ExecuteScenarioRoutine(BrakePatternType.밝기변화제동등, shuffledList[i]));
+            yield return StartCoroutine(AlignVehiclesBySpeedAndDistance());
+            yield return StartCoroutine(WaitForScenarioStart(Random.Range(3.0f, 5.0f)));
+        }
+    }
+
+    private IEnumerator Routine_C_FrequencyBrakeLight()
+    {
+        Debug.Log("Starting Scenario A_StandardBrakeLight");
+        yield return StartCoroutine(AlignVehiclesBySpeedAndDistance());
+        yield return StartCoroutine(WaitForScenarioStart());
+
+        List<float> shuffledList = CarUtils.GetRandomizedAccelerationsOrder();
+        // 랜덤한 순서로 호출
+        for (int i = 0; i < shuffledList.Count; i++)
+        {
+            UserDataLoggingManager.Instance.SetCanWrite(true);
+            yield return StartCoroutine(ExecuteScenarioRoutine(BrakePatternType.점멸주파수변화제동등, shuffledList[i]));
+            yield return StartCoroutine(AlignVehiclesBySpeedAndDistance());
+            yield return StartCoroutine(WaitForScenarioStart(Random.Range(3.0f, 5.0f)));
+        }
+    }
+
+    private IEnumerator Routine_D_AreaBrakeLight()
+    {
+        Debug.Log("Starting Scenario A_StandardBrakeLight");
+        yield return StartCoroutine(AlignVehiclesBySpeedAndDistance());
+        yield return StartCoroutine(WaitForScenarioStart());
+
+        List<float> shuffledList = CarUtils.GetRandomizedAccelerationsOrder();
+        // 랜덤한 순서로 호출
+        for (int i = 0; i < shuffledList.Count; i++)
+        {
+            UserDataLoggingManager.Instance.SetCanWrite(true);
+            yield return StartCoroutine(ExecuteScenarioRoutine(BrakePatternType.면적변화제동등, shuffledList[i]));
+            yield return StartCoroutine(AlignVehiclesBySpeedAndDistance());
+            yield return StartCoroutine(WaitForScenarioStart(Random.Range(3.0f, 5.0f)));
+        }
+    }
+
+    #endregion
+
+    #region 시나리오 실제 제어
+
+    public IEnumerator ExecuteScenarioRoutine(BrakePatternType brakePatternType, float acceleration)
+    {
+        descriptionText.text = $"{level}, {acceleration}m/s^2, Brake: {brakePatternType}";
+        Debug.Log($"시나리오 호출 : {level}, {brakePatternType}, {acceleration}m/s^2으로 감속, 해당 시나리오가 끝날 때까지 대기합니다.");
+
+        StartCoroutine(playerCarController.SetCanDriveState());
+        yield return StartCoroutine(otherCarController.ExecuteBehaviourByScenario(brakePatternType, acceleration));
+
+        Debug.Log($"시나리오 호출 : {level}, {brakePatternType}, {acceleration}m/s^2으로 감속, 해당 시나리오를 종료합니다.");
+        
+    }
+
+    public IEnumerator AlignVehiclesBySpeedAndDistance()
+    {
+        Debug.Log($"선두 차량, 실험자 차량 정렬 시도 | 목표 속도: {startConditionSpeed_KmPerHour}km/h, 목표 간격: {startConditionDistance}");
+        playerCarController.SetDriveMode(PlayerCarController.DrivingMode.Autonomous);
+        
+        // 선두 차량 100km/h 정렬
+        float targetSpeedMS = CarUtils.ConvertKmHToMS(startConditionSpeed_KmPerHour);
+        StartCoroutine(playerCarController.AccelerateToTargetSpeed(targetSpeedMS - 2, 5));
+        yield return StartCoroutine(otherCarController.AccelerateToTargetSpeed(targetSpeedMS, 5));
+        otherCarCoroutine_MaintainTargetSpeed = StartCoroutine(otherCarController.MaintainSpeed());
+        
+        AudioManager.Instance.PlayRearrangementAudio();
+        // 후방 차량 {startConditionSpeed_KmPerHour}km/h, 간격 {startConditionDistance}m 정렬
+        yield return StartCoroutine(playerCarController.AlignTestCarToSpeedAndGap(targetSpeedMS, startConditionDistance, 10));
+        playerCarCoroutine_MaintainTargetSpeed = StartCoroutine(playerCarController.MaintainSpeed());
+
+        yield return StartCoroutine(WaitForScenarioReady());
+        Debug.Log($"선두 차량, 실험자 차량 정렬 완료 | 목표 속도: {startConditionSpeed_KmPerHour}km/h, 목표 간격: {startConditionDistance}");
+    }
+
+    public IEnumerator WaitForScenarioStart(float randomTime = 0)
+    {
+        // 기존의 속도 유지 로직 로직 정지
+        if (otherCarCoroutine_MaintainTargetSpeed != null) StopCoroutine(otherCarCoroutine_MaintainTargetSpeed);
+        if (playerCarCoroutine_MaintainTargetSpeed != null) StopCoroutine(playerCarCoroutine_MaintainTargetSpeed);
+
+        Debug.Log($"선두 차량, 실험자 차량 {startWaitingTime}초 동안 속도 유지");
+        otherCarCoroutine_MaintainTargetSpeed =
+            StartCoroutine(otherCarController.MaintainSpeedForWaitTime(startWaitingTime));
+        playerCarCoroutine_MaintainTargetSpeed =
+            StartCoroutine(playerCarController.MaintainSpeedForWaitTime(startWaitingTime));
+        if (randomTime == 0f)
+        {
+            Debug.Log($"일정 시간 대기 ({startWaitingTime}s)");
+            yield return new WaitForSeconds(startWaitingTime);
+        }
+        else
+        {
+            Debug.Log($"랜덤 시간 대기 ({randomTime}s)");
+            yield return new WaitForSeconds(randomTime);
+        }
+
+        // 속도 유지 로직 정지
+        if (otherCarCoroutine_MaintainTargetSpeed != null) StopCoroutine(otherCarCoroutine_MaintainTargetSpeed);
+        if (playerCarCoroutine_MaintainTargetSpeed != null) StopCoroutine(playerCarCoroutine_MaintainTargetSpeed);
+        Debug.Log($"선두 차량, 실험자 차량 속도 유지 종료");
+    }
+
+
+    public IEnumerator WaitForScenarioReady()
+    {
+        // IsScenarioReady()가 true를 반환할 때까지 매 프레임마다 대기합니다.
+        int failCount = 0;
+        while (!IsScenarioReady())
+        {
+            failCount++;
+            if (failCount >= 50)
+            {
+                Debug.Log("시다리오 시작 조건 누적 실패, 거리 재조정 시도");
+                float targetSpeedMS = CarUtils.ConvertKmHToMS(startConditionSpeed_KmPerHour);
+                yield return StartCoroutine(playerCarController.AlignTestCarToSpeedAndGap(targetSpeedMS, startConditionDistance, 5));
+                break;
+            }
+            yield return null;
+        }
+
+        // true가 되면 여기서 실행이 계속됩니다.
+        Debug.Log("시나리오 시작 조건이 준비되었습니다.");
+    }
+
+    public bool IsScenarioReady()
+    {
+        float toleranceSpeed = 1f; // km/h 단위 허용 오차
+        float toleranceDistance = 0.5f; // m 단위 허용 오차
+
+        // 실험자 차량과 선두 차량의 속도 (m/s를 km/h로 변환: 1 m/s = 3.6 km/h)
+        float playerSpeed = playerCarController.rb.velocity.magnitude * 3.6f;
+        float otherSpeed = otherCarController.rb.velocity.magnitude * 3.6f;
+
+        bool speedAligned = (Mathf.Abs(playerSpeed - startConditionSpeed_KmPerHour) <= toleranceSpeed) &&
+                            (Mathf.Abs(otherSpeed - startConditionSpeed_KmPerHour) <= toleranceSpeed);
+
+        // 두 차량 사이의 거리 (m 단위)
+        float currentDistance =
+            GetCurrentDistance();
+        bool distanceAligned = Mathf.Abs(currentDistance - startConditionDistance) <= toleranceDistance;
+        Debug.Log($"속도 조건: {speedAligned}, 간격 조건: {distanceAligned}");
+        return speedAligned && distanceAligned;
+    }
+
+    public void SetCurrentScenarioIndex(int scenarioIndex)
+    {
+        _currentBrakePatternIndex = scenarioIndex;
+    }
+
+    public float GetCurrentDistance()
+    {
+        return Vector3.Distance(otherCarController.transform.position, playerCarController.transform.position);
+    }
+
+    public bool IsConflictWithOtherCar()
+    {
+        if (GetCurrentDistance() < 4.5f)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public bool IsReasonableDistance()
+    {
+        float maxDistance = startConditionDistance + reasonableDistance;
+        float minDistance = startConditionDistance - reasonableDistance;
+        
+        float currentDistance = GetCurrentDistance();
+
+        if (currentDistance < maxDistance && currentDistance > minDistance)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    
+    #endregion
+}

@@ -24,7 +24,7 @@ public class B_BrightnessBrakeLight : ILightBehavior
         }
         else if (DrivingScenarioManager.Instance.level == Level.수준3)
         {
-            if (acceleration >= -2f)
+            if (acceleration >= -3f)
             {
                 lightColor = new Color(0.6f, 0, 0);
                 // 150

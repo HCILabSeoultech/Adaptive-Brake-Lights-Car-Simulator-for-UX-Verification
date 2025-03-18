@@ -33,7 +33,7 @@ public class D_AreaBrakeLight : ILightBehavior
         }
         else if (DrivingScenarioManager.Instance.level == Level.수준3)
         {
-            if (acceleration >= -2f)
+            if (acceleration >= -3f)
             {
                 for (int i = 0; i < 2; i++)
                 {

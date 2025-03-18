@@ -53,4 +53,48 @@ public class CarUtils
             return null;
         }
     }
+    
+    public static List<(float deceleration, float distance)> GetRandomDecelerationDistanceList(Level level)
+    {
+        List<float> decelerationLevels = new List<float>();
+
+        if (level == Level.수준2)
+        {
+            decelerationLevels.Add(-2f);
+            decelerationLevels.Add(-6f);
+        }
+        else
+        {
+            decelerationLevels.Add(-2f);
+            decelerationLevels.Add(-4f);
+            decelerationLevels.Add(-6f);
+        }
+
+        float[] possibleValues = { 20f, 40f, 60f };
+        List<(float, float)> allCombinations = new List<(float, float)>();
+
+        // 모든 조합 생성
+        foreach (int decel in decelerationLevels)
+        {
+            foreach (int value in possibleValues)
+            {
+                allCombinations.Add((decel, value));
+            }
+        }
+
+        // 셔플
+        System.Random rnd = new System.Random();
+        for (int i = allCombinations.Count - 1; i > 0; i--)
+        {
+            int swapIndex = rnd.Next(i + 1);
+            // 구조 분해로 스왑 - 튜플 문법
+            (allCombinations[i], allCombinations[swapIndex]) = (allCombinations[swapIndex], allCombinations[i]);
+        }
+
+        foreach (var combination in allCombinations)
+        {
+            Debug.Log(combination);
+        }
+        return allCombinations;
+    }
 }

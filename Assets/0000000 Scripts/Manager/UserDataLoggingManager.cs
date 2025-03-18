@@ -97,15 +97,13 @@ public class UserDataLoggingManager : MonoBehaviour
         }
         Debug.Log($"Created User Data (CSV Format), PATH: {filePath}");
     }
-
-    
     
     
     public void WriteCsvRow()
     {
-        string csvRow = $"{DrivingScenarioManager.Instance.level},{DrivingScenarioManager.Instance.brakePatternTypes[DrivingScenarioManager.Instance._currentBrakePatternIndex]}, {DrivingScenarioManager.Instance.startConditionDistance},{DrivingScenarioManager.Instance.IsConflictWithOtherCar()}," +
+        string csvRow = $"{DrivingScenarioManager.Instance.level},{DrivingScenarioManager.Instance.brakePatternTypes[DrivingScenarioManager.Instance._currentBrakePatternIndex]}, {DrivingScenarioManager.Instance.startConditionDistance}," +
                         $"{DrivingScenarioManager.Instance.IsReasonableDistance()}," +
-                        $"{DateTime.Now:yyyy-MM-dd HH:mm:ss},{DrivingScenarioManager.Instance.otherCarController.targetAccelderation},{DrivingScenarioManager.Instance.playerCarController.GetPlayerCarAcceleration()}," +
+                        $"{DateTime.Now:yyyy-MM-dd hh:mm:ss:fff},{DrivingScenarioManager.Instance.IsConflictWithOtherCar()},{DrivingScenarioManager.Instance.otherCarController.targetAccelderation},{DrivingScenarioManager.Instance.playerCarController.GetPlayerCarAcceleration()}," +
                         $"{DrivingScenarioManager.Instance.playerCarController.GetForwardInput0to1()},{DrivingScenarioManager.Instance.playerCarController.GetBrakeInput0to1()},{DrivingScenarioManager.Instance.GetCurrentDistance()}";
 
         using (StreamWriter writer = new StreamWriter(filePath, true, new System.Text.UTF8Encoding(true)))
