@@ -45,6 +45,7 @@ public class DrivingScenarioManager : MonoBehaviour
     private IEnumerator RoutineExperiment()
     {
         AudioManager.Instance.PlayStartDrivingAudio();
+        yield return new WaitForSeconds(3);
         SetCurrentScenarioIndex(0);
         yield return StartCoroutine(RoutineByBrakePatternTypes(brakePatternTypes[_currentBrakePatternIndex]));
         SetCurrentScenarioIndex(1);

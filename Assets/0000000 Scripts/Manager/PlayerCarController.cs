@@ -120,6 +120,7 @@ public class PlayerCarController : MonoBehaviour
         {
             targetSpeedMS = CarUtils.ConvertKmHToMS(PreDrivingScenarioManager.Instance.startConditionSpeed_KmPerHour);
         }
+        yield return new WaitForSeconds(3);
         yield return AccelerateToTargetSpeed(targetSpeedMS - 2, 5);
     }
 
