@@ -11,7 +11,7 @@ public class UserDataLoggingManager : MonoBehaviour
     public float dataSaveTime = 2.5f; // CanWrite을 유지할 시간 (초)
     private bool canWrite = false;
     private float canWriteStartTime; // CanWrite이 true가 된 시간
-
+    public SpeedAndGearUIManager speedAndGearUIManager;
     public bool CanWrite
     {
         get => canWrite;
@@ -85,7 +85,7 @@ public class UserDataLoggingManager : MonoBehaviour
     {
         List<string> lines = new List<string>()
         {
-            "수준,브레이크 유형,간격,충돌여부,안전거리유지중인가,현재 시간,선두 차량 가속도,실험 차량 가속도,엑셀 세기,브레이크 세기,차량 간 거리"
+            "수준,브레이크 유형,간격,안전거리유지중인가,현재 시간,충돌여부,선두 차량 가속도,실험 차량 가속도,선두 차량 속도,실험 차량 속도,엑셀 세기,브레이크 세기,차량 간 거리"
         };
 
         using (StreamWriter writer = new StreamWriter(filePath, false, new System.Text.UTF8Encoding(true)))
@@ -104,6 +104,7 @@ public class UserDataLoggingManager : MonoBehaviour
         string csvRow = $"{DrivingScenarioManager.Instance.level},{DrivingScenarioManager.Instance.brakePatternTypes[DrivingScenarioManager.Instance._currentBrakePatternIndex]}, {DrivingScenarioManager.Instance.startConditionDistance}," +
                         $"{DrivingScenarioManager.Instance.IsReasonableDistance()}," +
                         $"{DateTime.Now:yyyy-MM-dd hh:mm:ss:fff},{DrivingScenarioManager.Instance.IsConflictWithOtherCar()},{DrivingScenarioManager.Instance.otherCarController.targetAccelderation},{DrivingScenarioManager.Instance.playerCarController.GetPlayerCarAcceleration()}," +
+                        $"{speedAndGearUIManager.aheadCarSpeed},{speedAndGearUIManager.playerCarSpeed}." + 
                         $"{DrivingScenarioManager.Instance.playerCarController.GetForwardInput0to1()},{DrivingScenarioManager.Instance.playerCarController.GetBrakeInput0to1()},{DrivingScenarioManager.Instance.GetCurrentDistance()}";
 
         using (StreamWriter writer = new StreamWriter(filePath, true, new System.Text.UTF8Encoding(true)))

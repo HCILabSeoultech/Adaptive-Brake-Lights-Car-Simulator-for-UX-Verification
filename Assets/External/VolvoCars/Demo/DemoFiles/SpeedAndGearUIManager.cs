@@ -17,6 +17,7 @@ public class SpeedAndGearUIManager : MonoBehaviour
     [SerializeField] private TMPro.TMP_Text playerCarSpeedText;
     [SerializeField] private TMPro.TMP_Text aheadCarSpeedText;
     [SerializeField] private TMPro.TMP_Text unityScreenText;
+    
     //private UnityEngine.UI.Text text;
 
     private string gearString = "";
@@ -24,6 +25,8 @@ public class SpeedAndGearUIManager : MonoBehaviour
     Action<float> velocityAction;
     Action<float> aheadVelocityAction;
 
+    public int aheadCarSpeed;
+    public int playerCarSpeed;
     // Start is called before the first frame update
     void Start()
     {
@@ -62,6 +65,7 @@ public class SpeedAndGearUIManager : MonoBehaviour
             else
             {
                 playerCarSpeedText.text = ((int)(3.6f * Mathf.Abs(v) + 0.9f)).ToString();
+                playerCarSpeed = (int)(3.6f * Mathf.Abs(v) + 0.9f);
             }
         };
         velocity.Subscribe(velocityAction);
@@ -80,6 +84,7 @@ public class SpeedAndGearUIManager : MonoBehaviour
                 else
                 {
                     aheadCarSpeedText.text = ((int)(3.6f * Mathf.Abs(v) + 0.9f)).ToString();
+                    aheadCarSpeed = (int)(3.6f * Mathf.Abs(v) + 0.9f);
                 }
             };
 
