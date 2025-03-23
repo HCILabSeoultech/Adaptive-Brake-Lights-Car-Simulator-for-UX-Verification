@@ -194,6 +194,8 @@ public class PreDrivingScenarioManager : MonoBehaviour
 
     public IEnumerator AlignVehiclesBy100KmHAndTargetDistance(float targetDistance)
     {
+        AudioManager.Instance.PlayRearrangementAudio();
+        
         Debug.Log($"선두 차량, 실험자 차량 정렬 시도 | 목표 속도: {startConditionSpeed_KmPerHour}km/h, 목표 간격: {targetDistance}");
         playerCarController.SetDriveMode(PlayerCarController.DrivingMode.Autonomous);
 
@@ -203,7 +205,6 @@ public class PreDrivingScenarioManager : MonoBehaviour
         yield return StartCoroutine(otherCarController.AccelerateToTargetSpeed(targetSpeedMS, 5));
         otherCarCoroutine_MaintainTargetSpeed = StartCoroutine(otherCarController.MaintainSpeed());
 
-        AudioManager.Instance.PlayRearrangementAudio();
         // 후방 차량 {startConditionSpeed_KmPerHour}km/h, 간격 {startConditionDistance}m 정렬
         yield return StartCoroutine(
             playerCarController.AlignTestCarToSpeedAndGap(targetSpeedMS, targetDistance, 10));
