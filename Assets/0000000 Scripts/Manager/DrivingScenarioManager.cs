@@ -22,6 +22,7 @@ public class DrivingScenarioManager : MonoBehaviour
 
     [Tooltip("시작 조건(속도, 거리) 완료 후 다음 시나리오 시작까지의 대기 시간")]
     public float startWaitingTime = 5f;
+
     public float reasonableDistance = 5;
 
     [Header("Car Conrtoller")] public OtherCarController otherCarController;
@@ -59,22 +60,23 @@ public class DrivingScenarioManager : MonoBehaviour
 
     private IEnumerator RoutineByBrakePatternTypes(BrakePatternType brakePatternType)
     {
-        switch (brakePatternType)
+        for (int i = 0; i < 5; i++)
         {
-            case BrakePatternType.기본제동등:
-                yield return StartCoroutine(Routine_A_StandardBrakeLight());
-                break;
-            case BrakePatternType.밝기변화제동등:
-                yield return StartCoroutine(Routine_B_BrightnessBrakeLight());
-                break;
-            case BrakePatternType.점멸주파수변화제동등:
-                yield return StartCoroutine(Routine_C_FrequencyBrakeLight());
-                break;
-            case BrakePatternType.면적변화제동등:
-                yield return StartCoroutine(Routine_D_AreaBrakeLight());
-                break;
-            default:
-                break;
+            switch (brakePatternType)
+            {
+                case BrakePatternType.기본제동등:
+                    yield return StartCoroutine(Routine_A_StandardBrakeLight());
+                    break;
+                case BrakePatternType.밝기변화제동등:
+                    yield return StartCoroutine(Routine_B_BrightnessBrakeLight());
+                    break;
+                case BrakePatternType.점멸주파수변화제동등:
+                    yield return StartCoroutine(Routine_C_FrequencyBrakeLight());
+                    break;
+                case BrakePatternType.면적변화제동등:
+                    yield return StartCoroutine(Routine_D_AreaBrakeLight());
+                    break;
+            }
         }
     }
 
@@ -202,7 +204,7 @@ public class DrivingScenarioManager : MonoBehaviour
     public IEnumerator AlignVehiclesBy100KmHAndTargetDistance(float targetDistance)
     {
         AudioManager.Instance.PlayRearrangementAudio();
-        
+
         Debug.Log($"선두 차량, 실험자 차량 정렬 시도 | 목표 속도: {startConditionSpeed_KmPerHour}km/h, 목표 간격: {targetDistance}");
         playerCarController.SetDriveMode(PlayerCarController.DrivingMode.Autonomous);
 
