@@ -8,6 +8,8 @@ public class ObjectController : MonoBehaviour
     [SerializeField] private Transform enviroment1;
     [SerializeField] private Transform enviroment2;
 
+    List<float> triggerTime = new List<float>();
+
     public void MoveEnviroment1()
     {
         enviroment1.position += new Vector3(0f, 0f, 4000f);
@@ -24,13 +26,31 @@ public class ObjectController : MonoBehaviour
     {
         if (other.CompareTag("half"))
         {
-            if (other.gameObject.name == "half1")
+            if (triggerTime.Count != 0)
             {
-                MoveEnviroment2();
+                if (other.gameObject.name == "half1")
+                {
+                    if (Time.time - (triggerTime[triggerTime.Count - 1]) < 1f) return; // 최근 트리거가
+                    MoveEnviroment2();
+                }
+                else if (other.gameObject.name == "half2")
+                {
+                    if (Time.time - (triggerTime[triggerTime.Count - 1]) < 1f) return;
+                    MoveEnviroment1();
+                }
+                triggerTime.Add(Time.time);
             }
-            else if (other.gameObject.name == "half2")
+            else
             {
-                MoveEnviroment1();
+                if (other.gameObject.name == "half1")
+                {                 
+                    MoveEnviroment2();
+                }
+                else if (other.gameObject.name == "half2")
+                {                    
+                    MoveEnviroment1();
+                }
+                triggerTime.Add(Time.time);
             }
         }
     }
