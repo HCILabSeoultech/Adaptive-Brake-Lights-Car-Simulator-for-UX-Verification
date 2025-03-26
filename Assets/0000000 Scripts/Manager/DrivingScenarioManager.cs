@@ -379,9 +379,7 @@ public enum Gender
 }
 
 public enum DrivingLevel
-{
-    UnderOne,
-    OneToTwo,
-    ThreeToFour,
-    OverFive
+{    
+    OneToTwo,    
+    OverTwo
 }
