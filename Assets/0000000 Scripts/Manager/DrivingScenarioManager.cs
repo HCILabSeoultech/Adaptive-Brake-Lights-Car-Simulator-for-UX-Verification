@@ -16,10 +16,11 @@ public class DrivingScenarioManager : MonoBehaviour
     [Header("Driving scenario settings")] public BrakePatternType[] brakePatternTypes;
     public Level level;
     public int _currentBrakePatternIndex;
+    public int count;
     [Header("Driving Condition")] public float startConditionSpeed_KmPerHour = 100f;
     public float durationSpeedDown = 2.5f;
     public float startConditionDistance = 20f;
-
+    
     [Tooltip("시작 조건(속도, 거리) 완료 후 다음 시나리오 시작까지의 대기 시간")]
     public float startWaitingTime = 5f;
 
@@ -49,12 +50,12 @@ public class DrivingScenarioManager : MonoBehaviour
         yield return new WaitForSeconds(3);
         SetCurrentScenarioIndex(0);
         yield return StartCoroutine(RoutineByBrakePatternTypes(brakePatternTypes[_currentBrakePatternIndex]));
-        SetCurrentScenarioIndex(1);
+        /*SetCurrentScenarioIndex(1);
         yield return StartCoroutine(RoutineByBrakePatternTypes(brakePatternTypes[_currentBrakePatternIndex]));
         SetCurrentScenarioIndex(2);
         yield return StartCoroutine(RoutineByBrakePatternTypes(brakePatternTypes[_currentBrakePatternIndex]));
         SetCurrentScenarioIndex(3);
-        yield return StartCoroutine(RoutineByBrakePatternTypes(brakePatternTypes[_currentBrakePatternIndex]));
+        yield return StartCoroutine(RoutineByBrakePatternTypes(brakePatternTypes[_currentBrakePatternIndex]));*/
         AudioManager.Instance.PlayEndDrivingAudio();
     }
 
@@ -62,18 +63,19 @@ public class DrivingScenarioManager : MonoBehaviour
     {
         for (int i = 0; i < 5; i++)
         {
+            count = i + 1;
             switch (brakePatternType)
             {
-                case BrakePatternType.기본제동등:
+                case BrakePatternType.기본제동등A:
                     yield return StartCoroutine(Routine_A_StandardBrakeLight());
                     break;
-                case BrakePatternType.밝기변화제동등:
+                case BrakePatternType.밝기변화제동등B:
                     yield return StartCoroutine(Routine_B_BrightnessBrakeLight());
                     break;
-                case BrakePatternType.점멸주파수변화제동등:
+                case BrakePatternType.점멸주파수변화제동등C:
                     yield return StartCoroutine(Routine_C_FrequencyBrakeLight());
                     break;
-                case BrakePatternType.면적변화제동등:
+                case BrakePatternType.면적변화제동등D:
                     yield return StartCoroutine(Routine_D_AreaBrakeLight());
                     break;
             }
@@ -91,7 +93,7 @@ public class DrivingScenarioManager : MonoBehaviour
         for (int i = 0; i < shuffledList.Count; i++)
         {
             UserDataLoggingManager.Instance.SetCanWrite(true);
-            yield return StartCoroutine(ExecuteScenarioRoutine(BrakePatternType.기본제동등, shuffledList[i]));
+            yield return StartCoroutine(ExecuteScenarioRoutine(BrakePatternType.기본제동등A, shuffledList[i]));
             if (i == shuffledList.Count - 1)
             {
                 yield return StartCoroutine(AlignVehiclesBy100KmHAndTargetDistance(20));
@@ -117,7 +119,7 @@ public class DrivingScenarioManager : MonoBehaviour
         {
             UserDataLoggingManager.Instance.SetCanWrite(true);
             yield return StartCoroutine(
-                ExecuteScenarioRoutine(BrakePatternType.밝기변화제동등, shuffledList[i]));
+                ExecuteScenarioRoutine(BrakePatternType.밝기변화제동등B, shuffledList[i]));
             if (i == shuffledList.Count - 1)
             {
                 yield return StartCoroutine(AlignVehiclesBy100KmHAndTargetDistance(20));
@@ -143,7 +145,7 @@ public class DrivingScenarioManager : MonoBehaviour
         for (int i = 0; i < shuffledList.Count; i++)
         {
             UserDataLoggingManager.Instance.SetCanWrite(true);
-            yield return StartCoroutine(ExecuteScenarioRoutine(BrakePatternType.점멸주파수변화제동등, shuffledList[i]));
+            yield return StartCoroutine(ExecuteScenarioRoutine(BrakePatternType.점멸주파수변화제동등C, shuffledList[i]));
             if (i == shuffledList.Count - 1)
             {
                 yield return StartCoroutine(AlignVehiclesBy100KmHAndTargetDistance(20));
@@ -169,7 +171,7 @@ public class DrivingScenarioManager : MonoBehaviour
         for (int i = 0; i < shuffledList.Count; i++)
         {
             UserDataLoggingManager.Instance.SetCanWrite(true);
-            yield return StartCoroutine(ExecuteScenarioRoutine(BrakePatternType.면적변화제동등, shuffledList[i]));
+            yield return StartCoroutine(ExecuteScenarioRoutine(BrakePatternType.면적변화제동등D, shuffledList[i]));
             if (i == shuffledList.Count - 1)
             {
                 yield return StartCoroutine(AlignVehiclesBy100KmHAndTargetDistance(20));
@@ -216,7 +218,7 @@ public class DrivingScenarioManager : MonoBehaviour
 
         // 후방 차량 {startConditionSpeed_KmPerHour}km/h, 간격 {startConditionDistance}m 정렬
         yield return StartCoroutine(
-            playerCarController.AlignTestCarToSpeedAndGap(targetSpeedMS, targetDistance, 10));
+            playerCarController.AlignTestCarToSpeedAndGap(targetSpeedMS, targetDistance, 7));
         playerCarCoroutine_MaintainTargetSpeed = StartCoroutine(playerCarController.MaintainSpeed());
 
         yield return StartCoroutine(WaitForScenarioReady(targetDistance));
@@ -260,7 +262,7 @@ public class DrivingScenarioManager : MonoBehaviour
         while (!IsScenarioReady(targetDistance))
         {
             failCount++;
-            if (failCount >= 50)
+            if (failCount >= 30)
             {
                 Debug.Log("시다리오 시작 조건 누적 실패, 거리 재조정 시도");
                 float targetSpeedMS = CarUtils.ConvertKmHToMS(startConditionSpeed_KmPerHour);
@@ -279,7 +281,7 @@ public class DrivingScenarioManager : MonoBehaviour
     public bool IsScenarioReady(float targetDistance)
     {
         float toleranceSpeed = 1f; // km/h 단위 허용 오차
-        float toleranceDistance = 0.5f; // m 단위 허용 오차
+        float toleranceDistance = 1.5f; // m 단위 허용 오차
 
         // 실험자 차량과 선두 차량의 속도 (m/s를 km/h로 변환: 1 m/s = 3.6 km/h)
         float playerSpeed = playerCarController.rb.velocity.magnitude * 3.6f;
@@ -346,8 +348,8 @@ public enum Level
 
 public enum BrakePatternType
 {
-    기본제동등,
-    밝기변화제동등,
-    점멸주파수변화제동등,
-    면적변화제동등,
+    기본제동등A,
+    밝기변화제동등B,
+    점멸주파수변화제동등C,
+    면적변화제동등D,
 }
