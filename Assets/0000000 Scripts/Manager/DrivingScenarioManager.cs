@@ -17,6 +17,7 @@ public class DrivingScenarioManager : MonoBehaviour
     public Level level;
     public int _currentBrakePatternIndex;
     public int count;
+    public int count2;
     [Header("Driving Condition")] public float startConditionSpeed_KmPerHour = 100f;
     public float durationSpeedDown = 2.5f;
     public float startConditionDistance = 20f;
@@ -92,6 +93,7 @@ public class DrivingScenarioManager : MonoBehaviour
         // 랜덤한 순서로 호출
         for (int i = 0; i < shuffledList.Count; i++)
         {
+            count2 = i + 1;
             UserDataLoggingManager.Instance.SetCanWrite(true);
             yield return StartCoroutine(ExecuteScenarioRoutine(BrakePatternType.기본제동등A, shuffledList[i]));
             if (i == shuffledList.Count - 1)
@@ -117,6 +119,7 @@ public class DrivingScenarioManager : MonoBehaviour
         // 랜덤한 순서로 호출
         for (int i = 0; i < shuffledList.Count; i++)
         {
+            count2 = i + 1;
             UserDataLoggingManager.Instance.SetCanWrite(true);
             yield return StartCoroutine(
                 ExecuteScenarioRoutine(BrakePatternType.밝기변화제동등B, shuffledList[i]));
@@ -144,6 +147,7 @@ public class DrivingScenarioManager : MonoBehaviour
         // 랜덤한 순서로 호출
         for (int i = 0; i < shuffledList.Count; i++)
         {
+            count2 = i + 1;
             UserDataLoggingManager.Instance.SetCanWrite(true);
             yield return StartCoroutine(ExecuteScenarioRoutine(BrakePatternType.점멸주파수변화제동등C, shuffledList[i]));
             if (i == shuffledList.Count - 1)
@@ -170,6 +174,7 @@ public class DrivingScenarioManager : MonoBehaviour
         // 랜덤한 순서로 호출
         for (int i = 0; i < shuffledList.Count; i++)
         {
+            count2 = i + 1;
             UserDataLoggingManager.Instance.SetCanWrite(true);
             yield return StartCoroutine(ExecuteScenarioRoutine(BrakePatternType.면적변화제동등D, shuffledList[i]));
             if (i == shuffledList.Count - 1)
@@ -267,8 +272,8 @@ public class DrivingScenarioManager : MonoBehaviour
                 Debug.Log("시다리오 시작 조건 누적 실패, 거리 재조정 시도");
                 float targetSpeedMS = CarUtils.ConvertKmHToMS(startConditionSpeed_KmPerHour);
                 yield return StartCoroutine(
-                    playerCarController.AlignTestCarToSpeedAndGap(targetSpeedMS, targetDistance, 5));
-                break;
+                    playerCarController.AlignTestCarToSpeedAndGap(targetSpeedMS, targetDistance, 3));
+                break;  
             }
 
             yield return null;
@@ -281,7 +286,7 @@ public class DrivingScenarioManager : MonoBehaviour
     public bool IsScenarioReady(float targetDistance)
     {
         float toleranceSpeed = 1f; // km/h 단위 허용 오차
-        float toleranceDistance = 1.5f; // m 단위 허용 오차
+        float toleranceDistance = 2f; // m 단위 허용 오차
 
         // 실험자 차량과 선두 차량의 속도 (m/s를 km/h로 변환: 1 m/s = 3.6 km/h)
         float playerSpeed = playerCarController.rb.velocity.magnitude * 3.6f;
