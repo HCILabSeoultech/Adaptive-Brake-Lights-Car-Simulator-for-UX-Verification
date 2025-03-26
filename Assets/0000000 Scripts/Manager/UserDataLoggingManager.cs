@@ -67,7 +67,10 @@ public class UserDataLoggingManager : MonoBehaviour
         // TODO: {참가자 번호}_{참가자 이름}.csv 파일 생성
         // DrivingScenarioManager.Instance.userName
         // DrivingScenarioManager.Instance.userNumber
-        string fileName = DrivingScenarioManager.Instance.userNumber + "_" + DrivingScenarioManager.Instance.userName+".csv";  
+        string fileName = DrivingScenarioManager.Instance.userNumber + "_" + 
+                          DrivingScenarioManager.Instance.userName + "_" +
+                          DrivingScenarioManager.Instance.gender + "_" +
+                          DrivingScenarioManager.Instance.drivingLevel + ".csv";  
         filePath = Path.Combine(Application.persistentDataPath, fileName);
 
         if (!File.Exists(filePath))

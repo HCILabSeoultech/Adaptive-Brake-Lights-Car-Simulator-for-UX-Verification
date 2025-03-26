@@ -13,6 +13,8 @@ public class DrivingScenarioManager : MonoBehaviour
 
     public string userName = "";
     public string userNumber = "";
+    public Gender gender;
+    public DrivingLevel drivingLevel;
     [Header("Driving scenario settings")] public BrakePatternType[] brakePatternTypes;
     public Level level;
     public int _currentBrakePatternIndex;
@@ -368,4 +370,18 @@ public enum BrakePatternType
     밝기변화제동등B,
     점멸주파수변화제동등C,
     면적변화제동등D,
+}
+
+public enum Gender
+{
+    남자,
+    여자
+}
+
+public enum DrivingLevel
+{
+    UnderOne,
+    OneToTwo,
+    ThreeToFour,
+    OverFive
 }
