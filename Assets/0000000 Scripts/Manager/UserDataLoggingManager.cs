@@ -8,7 +8,7 @@ public class UserDataLoggingManager : MonoBehaviour
 {
     public static UserDataLoggingManager Instance;
     public string filePath = "";
-    public float dataSaveTime = 2.5f; // CanWrite을 유지할 시간 (초)
+    public float dataSaveTime = 4.5f; // CanWrite을 유지할 시간 (초)
     private bool canWrite = false;
     private float canWriteStartTime; // CanWrite이 true가 된 시간
     public SpeedAndGearUIManager speedAndGearUIManager;
