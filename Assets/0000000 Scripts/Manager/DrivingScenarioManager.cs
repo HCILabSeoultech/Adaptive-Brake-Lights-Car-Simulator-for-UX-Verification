@@ -324,6 +324,17 @@ public class DrivingScenarioManager : MonoBehaviour
             return false;
         }
     }
+    public bool IsSafeDistanceWithOtherCar()
+    {
+        if (GetCurrentDistance() > 10f)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 
     public bool IsReasonableDistance()
     {

@@ -85,7 +85,7 @@ public class UserDataLoggingManager : MonoBehaviour
     {
         List<string> lines = new List<string>()
         {
-            "수준,브레이크 유형,간격,현재 시간,충돌여부,선두 차량 가속도,실험 차량 가속도,선두 차량 속도,실험 차량 속도,엑셀 세기,브레이크 세기,차량 간 거리"
+            "수준,브레이크 유형,간격,현재 시간,충돌여부,최소 안전 거리,선두 차량 가속도,실험 차량 가속도,선두 차량 속도,실험 차량 속도,엑셀 세기,브레이크 세기,차량 간 거리"
         };
 
         using (StreamWriter writer = new StreamWriter(filePath, false, new System.Text.UTF8Encoding(true)))
@@ -102,7 +102,7 @@ public class UserDataLoggingManager : MonoBehaviour
     public void WriteCsvRow()
     {
         string csvRow = $"{DrivingScenarioManager.Instance.level},{DrivingScenarioManager.Instance.brakePatternTypes[DrivingScenarioManager.Instance._currentBrakePatternIndex]}, {DrivingScenarioManager.Instance.startConditionDistance}," +
-                        $"{DateTime.Now:HH:mm:ss:fff},{DrivingScenarioManager.Instance.IsConflictWithOtherCar()},{DrivingScenarioManager.Instance.otherCarController.targetAccelderation},{DrivingScenarioManager.Instance.playerCarController.GetPlayerCarAcceleration()}," +
+                        $"{DateTime.Now:HH:mm:ss:fff},{DrivingScenarioManager.Instance.IsConflictWithOtherCar()},{DrivingScenarioManager.Instance.IsSafeDistanceWithOtherCar()},{DrivingScenarioManager.Instance.otherCarController.targetAccelderation},{DrivingScenarioManager.Instance.playerCarController.GetPlayerCarAcceleration()}," +
                         $"{speedAndGearUIManager.aheadCarSpeed},{speedAndGearUIManager.playerCarSpeed}," + 
                         $"{DrivingScenarioManager.Instance.playerCarController.GetForwardInput0to1()},{DrivingScenarioManager.Instance.playerCarController.GetBrakeInput0to1()},{DrivingScenarioManager.Instance.GetCurrentDistance()}";
 
