@@ -245,25 +245,34 @@ public class PreDrivingScenarioManager : MonoBehaviour
     public IEnumerator AlignVehiclesBy100KmHAndTargetDistance(float targetDistance)
     {
         AudioManager.Instance.PlayRearrangementAudio();
-        
+
         Debug.Log($"선두 차량, 실험자 차량 정렬 시도 | 목표 속도: {startConditionSpeed_KmPerHour}km/h, 목표 간격: {targetDistance}");
         playerCarController.SetDriveMode(PlayerCarController.DrivingMode.Autonomous);
-
-        // 선두 차량 100km/h 정렬
+        
+        // 선두 차량 120km/h 5s
+        Debug.Log("선두 차량 120km/h 5s");
         float targetSpeedMS = CarUtils.ConvertKmHToMS(startConditionSpeed_KmPerHour);
-        StartCoroutine(playerCarController.AccelerateToTargetSpeed(targetSpeedMS - 2, 5));
-        yield return StartCoroutine(otherCarController.AccelerateToTargetSpeed(targetSpeedMS, 5));
-        otherCarCoroutine_MaintainTargetSpeed = StartCoroutine(otherCarController.MaintainSpeed());
-
-        // 후방 차량 {startConditionSpeed_KmPerHour}km/h, 간격 {startConditionDistance}m 정렬
-        yield return StartCoroutine(
-            playerCarController.AlignTestCarToSpeedAndGap(targetSpeedMS, targetDistance, 10));
+        StartCoroutine(otherCarController.AccelerateToTargetSpeed(targetSpeedMS + 4, 5));
+        
+        // 후방 차량 100km/h 5s
+        Debug.Log("선두 차량 120km/h 5s");
+        yield return StartCoroutine(playerCarController.AccelerateToTargetSpeed(targetSpeedMS, 5));
+        
+        // 선두 차량 120km/h 5s, 후방 차량 100km/h 5s 정렬 완료, 후방 차량 속도 유지
+        Debug.Log("선두 차량 120km/h 5s, 후방 차량 100km/h 5s 정렬 완료");
+        Debug.Log("후방 차량 속도 유지 시작");
         playerCarCoroutine_MaintainTargetSpeed = StartCoroutine(playerCarController.MaintainSpeed());
+        
+        // 선두 차량 {120}km/h, 간격 {targetDistance}m 정렬
+        yield return StartCoroutine(
+            otherCarController.AlignTestCarToSpeedAndGap(targetSpeedMS, targetDistance, 7));
+        otherCarCoroutine_MaintainTargetSpeed = StartCoroutine(otherCarController.MaintainSpeed());
 
         yield return StartCoroutine(WaitForScenarioReady(targetDistance));
         Debug.Log(
             $"선두 차량, 실험자 차량 정렬 완료 | 목표 속도: {startConditionSpeed_KmPerHour}km/h, 목표 간격: {startConditionDistance}");
     }
+    
 
     public IEnumerator WaitForScenarioStart(float randomTime = 0)
     {
@@ -301,13 +310,13 @@ public class PreDrivingScenarioManager : MonoBehaviour
         while (!IsScenarioReady(targetDistance))
         {
             failCount++;
-            if (failCount >= 50)
+            if (failCount >= 30)
             {
                 Debug.Log("시다리오 시작 조건 누적 실패, 거리 재조정 시도");
                 float targetSpeedMS = CarUtils.ConvertKmHToMS(startConditionSpeed_KmPerHour);
                 yield return StartCoroutine(
-                    playerCarController.AlignTestCarToSpeedAndGap(targetSpeedMS, targetDistance, 5));
-                break;
+                    otherCarController.AlignTestCarToSpeedAndGap(targetSpeedMS, targetDistance, 3));
+                break;  
             }
 
             yield return null;
