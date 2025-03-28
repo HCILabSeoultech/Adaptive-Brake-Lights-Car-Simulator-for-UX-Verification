@@ -6,9 +6,9 @@ public class C_FrequencyBrakeLight : ILightBehavior
 {
     private const float FIXED_FREQUENCY = 0.2f; // 🔥 고정 주파수 (Hz) - 1초에 0.2번 깜빡임 (5초 주기)
 
-    private float highFrequencyValue = 0.1f;
-    private float midFrequencyValue = 0.2f;
     private float lowFrequencyValue = 0.3f;
+    private float midFrequencyValue = 0.1f;
+    private float highFrequencyValue = 0.033f;
 
     public IEnumerator ApplyLighting(MeshRenderer mainBrakeRenderer, List<MeshRenderer> subBrakeRenderers,
         float acceleration, float duration)

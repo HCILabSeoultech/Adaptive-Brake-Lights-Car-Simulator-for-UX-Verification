@@ -26,12 +26,12 @@ public class B_BrightnessBrakeLight : ILightBehavior
         {
             if (acceleration >= -3f)
             {
-                lightColor = new Color(0.6f, 0, 0);
+                lightColor = new Color(0.4f, 0, 0);
                 // 150
             }
             else if (acceleration >= -5f)
             {
-                lightColor = new Color(0.75f, 0, 0);
+                lightColor = new Color(0.65f, 0, 0);
                 // 190
             }
             else
