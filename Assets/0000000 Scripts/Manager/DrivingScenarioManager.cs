@@ -64,7 +64,7 @@ public class DrivingScenarioManager : MonoBehaviour
 
     private IEnumerator RoutineByBrakePatternTypes(BrakePatternType brakePatternType)
     {
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 4; i++)
         {
             count = i + 1;
             switch (brakePatternType)
