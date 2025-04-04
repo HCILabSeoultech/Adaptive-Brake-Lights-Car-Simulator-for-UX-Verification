@@ -70,7 +70,7 @@ public class UserDataLoggingManager : MonoBehaviour
         string fileName = DrivingScenarioManager.Instance.userNumber + "_" + 
                           DrivingScenarioManager.Instance.userName + "_" +
                           DrivingScenarioManager.Instance.gender + "_" +
-                          DrivingScenarioManager.Instance.drivingLevel + ".csv";  
+                          DrivingScenarioManager.Instance.drivingLevel + "_Unity.csv";  
         filePath = Path.Combine(Application.persistentDataPath, fileName);
 
         if (!File.Exists(filePath))
