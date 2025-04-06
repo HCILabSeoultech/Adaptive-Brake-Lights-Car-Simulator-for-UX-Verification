@@ -11,6 +11,7 @@ namespace com.unity.testtrack.vehicle
     public class TireRollPhysicalMaterialResponse : MonoBehaviour
     {
         [SerializeField] AudioSource m_audioSourceTemplate;
+        [SerializeField] AudioSource m_audioSourceAccel; 
         [SerializeField] VolvoCars.Data.WheelVelocity m_wheelVelocity = default;
         [Range(0, 1000)]
         [SerializeField] float m_volumeAt0WheelVelocity = 0;
@@ -32,6 +33,10 @@ namespace com.unity.testtrack.vehicle
             // Remap the average wheel velocity to a volume level
             float volume = Remap(averageWheelVelocity, 0, 1000, 0, 1);
             m_audioSourceTemplate.volume = Mathf.Clamp(volume, 0, 1.0f);
+            if (m_audioSourceAccel != null)
+            {
+                m_audioSourceAccel.volume = Mathf.Clamp(volume, 0, 1.0f);
+            }
         }
 
         // Function to get the average wheel velocity
