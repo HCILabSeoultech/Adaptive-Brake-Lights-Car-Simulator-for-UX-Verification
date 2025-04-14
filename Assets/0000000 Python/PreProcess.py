@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 import os
 
 # --- 1. 데이터 불러오기 ---
-fileName = "05_이주현_merged.csv"  # 사용할 파일명 (예시)
+fileName = "06_윤의진_merged.csv"  # 사용할 파일명 (예시)
 current_folder = os.path.dirname(__file__)
 csv_path = os.path.join(current_folder, fileName)
 column_names = [
@@ -68,7 +68,7 @@ def calc_block_features(block):
     if rt_start is None:
         rt_start = block["parsed_time"].iloc[0]
         reaction_duration = 0
-        reaction_start_time = 0
+        reaction_start_time = 2500  # 기본값으로 설정 (2.5초)
     else:
         rt_end_rows = block[(block["parsed_time"] > rt_start) & (block["브레이크 세기"] <= 0.1)]
         rt_end_time = rt_end_rows["parsed_time"].iloc[-1] if not rt_end_rows.empty else block["parsed_time"].iloc[-1]
@@ -83,9 +83,16 @@ def calc_block_features(block):
         accel_min = 0
         accel_max = 0
     else:
-        accel_mean = accel_during_reaction.mean()
+        accel_mean = block["실험 차량 가속도"].clip(lower=-7.677078, upper=8.042717).mean()
         accel_min = accel_during_reaction.min()
         accel_max = accel_during_reaction.max()
+
+    # 추가: 선두 차량 속도와 실험 차량 속도의 평균 계산
+    leader_speed_mean = block["선두 차량 속도"].mean()
+    if(block["실험 차량 속도"].mean() > 99):
+        experiment_speed_mean = 100
+    else:
+        experiment_speed_mean = block["실험 차량 속도"].mean()
 
     return pd.Series({
         "브레이크 유형": meta["브레이크 유형"],
@@ -93,12 +100,14 @@ def calc_block_features(block):
         "간격": meta["간격"],
         "선두 차량 감속률": meta["감속률"],
         "충돌여부": collision,
-        "최소 안전 거리": safe_distance,  # 추가된 부분
+        "최소 안전 거리": safe_distance,
         "반응 시간": reaction_start_time,
         "Reaction_Duration": reaction_duration,
         "실험 차량 평균 감속률": accel_mean,
         "실험 차량 최소 감속률": accel_min,
         "실험 차량 최대 감속률": accel_max,
+        "선두 차량 평균 속도": leader_speed_mean,  # 추가된 부분
+        "실험 차량 평균 속도": experiment_speed_mean,  # 추가된 부분
         "block_id": block_id
     })
 
@@ -112,7 +121,7 @@ block_data["시도 번호"] = block_data.groupby(["브레이크 유형", "수준
 # --- 8. 열 순서 정리 및 새로운 열 추가 ---
 # 브레이크 평균 세기 계산
 def calc_brake_mean(block):
-    if block["반응 시간"] == 0 and block["Reaction_Duration"] == 0:
+    if block["Reaction_Duration"] == 0:
         return 0
     else:
         return df[df["block_id"] == block["block_id"]]["브레이크 세기"].mean()
@@ -124,7 +133,7 @@ block_data = block_data.rename(columns={"최소 안전 거리": "최소 안전 �
 
 # 열 순서 정리
 sorted_columns = [
-    "브레이크 유형", "수준", "간격", "시도 번호", "선두 차량 감속률", "실험 차량 평균 감속률",
+    "브레이크 유형", "수준", "간격", "시도 번호", "선두 차량 감속률", "실험 차량 평균 감속률", "선두 차량 평균 속도", "실험 차량 평균 속도",
     "브레이크 평균 세기", "반응 시간", "Reaction_Duration", "충돌여부", "최소 안전 거리 유지", "block_id"
 ]
 final_df = block_data[sorted_columns]
