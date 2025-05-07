@@ -101,7 +101,7 @@ def calc_block_features_with_bio(block):
 # --- 3. 전체 실행 코드 (6~10 포함) ---
 # 경로 및 데이터 로딩
 # --- 1. 데이터 불러오기 ---
-fileName = "06_윤의진_merged.csv"  # 사용할 파일명 (예시)
+fileName = "05_이주현_merged.csv"  # 사용할 파일명 (예시)
 current_folder = os.path.dirname(__file__)
 csv_path = os.path.join(current_folder, fileName)
 column_names = [
