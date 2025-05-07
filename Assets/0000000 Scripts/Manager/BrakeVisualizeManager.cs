@@ -4,11 +4,6 @@ using UnityEngine;
 
 public class BrakeVisualizeManager : MonoBehaviour
 {
-    public Material mainBrakeDefaultMaterial;
-    public Material subBrakeDefaultMaterial;
-    public Material mainBrakeActivatedMaterial;
-    public Material subBrakeActivatedMaterial;
- 
     public static BrakeVisualizeManager instance;
     private ILightBehavior standard, frequency, brightness, area;
     private void Awake()
@@ -20,6 +15,37 @@ public class BrakeVisualizeManager : MonoBehaviour
         area = new D_AreaBrakeLight();
     }
     
+    // ============================= Exp 2 version =======================================
+    public void ActiveStandardBrakeLight(float acceleration, float duration)
+    {
+        LEDController.instance.ResetBrakeLight();
+        LEDController.instance.SetLightBehavior(standard);
+        LEDController.instance.ApplyBrakeLight(acceleration, duration);
+    }
+
+    public void ActiveFrequencyBrakeLight(float acceleration, float duration)
+    {
+        LEDController.instance.ResetBrakeLight();
+        LEDController.instance.SetLightBehavior(frequency);
+        LEDController.instance.ApplyBrakeLight(acceleration, duration);
+    }
+
+    public void ActiveBrightnessBrakeLight(float acceleration, float duration)
+    {
+        LEDController.instance.ResetBrakeLight();
+        LEDController.instance.SetLightBehavior(brightness);
+        LEDController.instance.ApplyBrakeLight(acceleration, duration);
+    }
+
+    public void ActiveAreaBrakeLight(float acceleration, float duration)
+    {
+        LEDController.instance.ResetBrakeLight();
+        LEDController.instance.SetLightBehavior(area);
+        LEDController.instance.ApplyBrakeLight(acceleration, duration);
+    }
+    
+    
+    // ============================= Exp 1 version =======================================
     public void ActiveStandardBrakeLight(float acceleration)
     {
         LEDController.instance.ResetBrakeLight();

@@ -12,21 +12,21 @@ public class OtherCarController : MonoBehaviour
     private Coroutine currentCoroutine; // 현재 실행 중인 코루틴 저장
     public GameObject playerCar;
 
-    public IEnumerator ExecuteBehaviourByScenario(BrakePatternType brakePatternType, float acceleration)
+    public IEnumerator ExecuteBehaviourByScenario(BrakeLightType brakeLightType, float acceleration)
     {
         targetAccelderation = acceleration;
-        switch (brakePatternType)
+        switch (brakeLightType)
         {
-            case BrakePatternType.기본제동등A:
+            case BrakeLightType.기본제동등A:
                 BrakeVisualizeManager.instance.ActiveStandardBrakeLight(acceleration);
                 break;
-            case BrakePatternType.밝기변화제동등B:
+            case BrakeLightType.밝기변화제동등B:
                 BrakeVisualizeManager.instance.ActiveBrightnessBrakeLight(acceleration);
                 break;
-            case BrakePatternType.점멸주파수변화제동등C:
+            case BrakeLightType.점멸주파수변화제동등C:
                 BrakeVisualizeManager.instance.ActiveFrequencyBrakeLight(acceleration);
                 break;
-            case BrakePatternType.면적변화제동등D:
+            case BrakeLightType.면적변화제동등D:
                 BrakeVisualizeManager.instance.ActiveAreaBrakeLight(acceleration);
                 break;
             default:

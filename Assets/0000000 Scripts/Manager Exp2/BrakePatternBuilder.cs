@@ -7,6 +7,12 @@ public class BrakePatternBuilder : MonoBehaviour
 {
     [Header("여러 개의 브레이크 패턴을 정의할 수 있음.")]
     public BrakePattern[] brakePatterns;
+
+    public BrakePattern GetPattern(int index)
+    {
+        if (index < 0 || index >= brakePatterns.Length) return null;
+        return brakePatterns[index];
+    }
 }
 
 [Serializable]
