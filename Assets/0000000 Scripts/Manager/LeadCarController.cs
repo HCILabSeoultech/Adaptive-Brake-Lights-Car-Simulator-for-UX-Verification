@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-public class OtherCarController : MonoBehaviour
+public class LeadCarController : MonoBehaviour
 {
     public Rigidbody rb; // Rigidbody 참조
     public float targetAccelderation; // 목표 가속도 (m/s²)
@@ -125,12 +125,12 @@ public class OtherCarController : MonoBehaviour
             if (DrivingScenarioManager.Instance != null)
             {
                 currentGap = DrivingScenarioManager.Instance.playerCarController.transform.position.z
-                             - DrivingScenarioManager.Instance.otherCarController.transform.position.z;
+                             - DrivingScenarioManager.Instance.leadCarController.transform.position.z;
             }
             else if (PreDrivingScenarioManager.Instance != null)
             {
                 currentGap = PreDrivingScenarioManager.Instance.playerCarController.transform.position.z
-                             - PreDrivingScenarioManager.Instance.otherCarController.transform.position.z;
+                             - PreDrivingScenarioManager.Instance.leadCarController.transform.position.z;
             }
 
             // 속도 적용
@@ -160,11 +160,11 @@ public class OtherCarController : MonoBehaviour
     {
         if (DrivingScenarioManager.Instance != null)
         {
-            return DrivingScenarioManager.Instance.otherCarController.transform.position.z;
+            return DrivingScenarioManager.Instance.leadCarController.transform.position.z;
         }
         else if (PreDrivingScenarioManager.Instance != null)
         {
-            return PreDrivingScenarioManager.Instance.otherCarController.transform.position.z;
+            return PreDrivingScenarioManager.Instance.leadCarController.transform.position.z;
         }
         return -1;
     }
@@ -199,7 +199,7 @@ public class OtherCarController : MonoBehaviour
     /// </summary>
     public IEnumerator AccelerateWithFixedAcceleration(float targetAcceleration, float duration)
     {
-        Debug.Log($"선두 차량 감속 시작, {targetAcceleration} m/s²");
+        Debug.Log($"선두 차량 가속 시작, {targetAcceleration} m/s²");
         float elapsedTime = 0f;
         Vector3 initialVelocity = rb.velocity;
         Vector3 targetVelocity = initialVelocity + new Vector3(0, 0, targetAcceleration * duration); // v = v0 + at

@@ -105,7 +105,7 @@ public class UserDataLoggingManager : MonoBehaviour
     public void WriteCsvRow()
     {
         string csvRow = $"{DrivingScenarioManager.Instance.level},{DrivingScenarioManager.Instance.brakePatternTypes[DrivingScenarioManager.Instance._currentBrakePatternIndex]}, {DrivingScenarioManager.Instance.startConditionDistance}," +
-                        $"{DateTime.Now:HH:mm:ss:fff},{DrivingScenarioManager.Instance.IsConflictWithOtherCar()},{DrivingScenarioManager.Instance.IsSafeDistanceWithOtherCar()},{DrivingScenarioManager.Instance.otherCarController.targetAccelderation},{DrivingScenarioManager.Instance.playerCarController.GetPlayerCarAcceleration()}," +
+                        $"{DateTime.Now:HH:mm:ss:fff},{DrivingScenarioManager.Instance.IsConflictWithOtherCar()},{DrivingScenarioManager.Instance.IsSafeDistanceWithOtherCar()},{DrivingScenarioManager.Instance.leadCarController.targetAccelderation},{DrivingScenarioManager.Instance.playerCarController.GetPlayerCarAcceleration()}," +
                         $"{speedAndGearUIManager.aheadCarSpeed},{speedAndGearUIManager.playerCarSpeed}," + 
                         $"{DrivingScenarioManager.Instance.playerCarController.GetForwardInput0to1()},{DrivingScenarioManager.Instance.playerCarController.GetBrakeInput0to1()},{DrivingScenarioManager.Instance.GetCurrentDistance()}";
 

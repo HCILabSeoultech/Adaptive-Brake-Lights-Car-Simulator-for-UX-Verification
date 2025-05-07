@@ -22,7 +22,7 @@ public class PreDrivingScenarioManager : MonoBehaviour
     public float startWaitingTime = 5f;
     public float reasonableDistance = 5;
 
-    [Header("Car Conrtoller")] public OtherCarController otherCarController;
+    [FormerlySerializedAs("otherCarController")] [Header("Car Conrtoller")] public LeadCarController leadCarController;
     public PlayerCarController playerCarController;
     private Coroutine otherCarCoroutine_MaintainTargetSpeed;
     private Coroutine playerCarCoroutine_MaintainTargetSpeed;
@@ -199,7 +199,7 @@ public class PreDrivingScenarioManager : MonoBehaviour
         startConditionDistance = accelerationAndDistance.Item2;
         StartCoroutine(playerCarController.SetCanDriveState()); 
         yield return StartCoroutine(
-            otherCarController.ExecuteBehaviourByScenario(brakeLightType, accelerationAndDistance.Item1));
+            leadCarController.ExecuteBehaviourByScenario(brakeLightType, accelerationAndDistance.Item1));
 
         Debug.Log("시나리오 종료합니다.");
     }
@@ -252,7 +252,7 @@ public class PreDrivingScenarioManager : MonoBehaviour
         // 선두 차량 120km/h 5s
         Debug.Log("선두 차량 120km/h 5s");
         float targetSpeedMS = CarUtils.ConvertKmHToMS(startConditionSpeed_KmPerHour);
-        StartCoroutine(otherCarController.AccelerateToTargetSpeed(targetSpeedMS + 4, 5));
+        StartCoroutine(leadCarController.AccelerateToTargetSpeed(targetSpeedMS + 4, 5));
         
         // 후방 차량 100km/h 5s
         Debug.Log("선두 차량 120km/h 5s");
@@ -265,8 +265,8 @@ public class PreDrivingScenarioManager : MonoBehaviour
         
         // 선두 차량 {120}km/h, 간격 {targetDistance}m 정렬
         yield return StartCoroutine(
-            otherCarController.AlignTestCarToSpeedAndGap(targetSpeedMS, targetDistance, 7));
-        otherCarCoroutine_MaintainTargetSpeed = StartCoroutine(otherCarController.MaintainSpeed());
+            leadCarController.AlignTestCarToSpeedAndGap(targetSpeedMS, targetDistance, 7));
+        otherCarCoroutine_MaintainTargetSpeed = StartCoroutine(leadCarController.MaintainSpeed());
 
         yield return StartCoroutine(WaitForScenarioReady(targetDistance));
         Debug.Log(
@@ -282,7 +282,7 @@ public class PreDrivingScenarioManager : MonoBehaviour
 
         Debug.Log($"선두 차량, 실험자 차량 {startWaitingTime}초 동안 속도 유지");
         otherCarCoroutine_MaintainTargetSpeed =
-            StartCoroutine(otherCarController.MaintainSpeedForWaitTime(startWaitingTime));
+            StartCoroutine(leadCarController.MaintainSpeedForWaitTime(startWaitingTime));
         playerCarCoroutine_MaintainTargetSpeed =
             StartCoroutine(playerCarController.MaintainSpeedForWaitTime(startWaitingTime));
         if (randomTime == 0f)
@@ -315,7 +315,7 @@ public class PreDrivingScenarioManager : MonoBehaviour
                 Debug.Log("시다리오 시작 조건 누적 실패, 거리 재조정 시도");
                 float targetSpeedMS = CarUtils.ConvertKmHToMS(startConditionSpeed_KmPerHour);
                 yield return StartCoroutine(
-                    otherCarController.AlignTestCarToSpeedAndGap(targetSpeedMS, targetDistance, 3));
+                    leadCarController.AlignTestCarToSpeedAndGap(targetSpeedMS, targetDistance, 3));
                 break;  
             }
 
@@ -333,7 +333,7 @@ public class PreDrivingScenarioManager : MonoBehaviour
 
         // 실험자 차량과 선두 차량의 속도 (m/s를 km/h로 변환: 1 m/s = 3.6 km/h)
         float playerSpeed = playerCarController.rb.velocity.magnitude * 3.6f;
-        float otherSpeed = otherCarController.rb.velocity.magnitude * 3.6f;
+        float otherSpeed = leadCarController.rb.velocity.magnitude * 3.6f;
 
         bool speedAligned = (Mathf.Abs(playerSpeed - startConditionSpeed_KmPerHour) <= toleranceSpeed) &&
                             (Mathf.Abs(otherSpeed - startConditionSpeed_KmPerHour) <= toleranceSpeed);
@@ -353,7 +353,7 @@ public class PreDrivingScenarioManager : MonoBehaviour
 
     public float GetCurrentDistance()
     {
-        return Vector3.Distance(otherCarController.transform.position, playerCarController.transform.position);
+        return Vector3.Distance(leadCarController.transform.position, playerCarController.transform.position);
     }
 
     public bool IsConflictWithOtherCar()

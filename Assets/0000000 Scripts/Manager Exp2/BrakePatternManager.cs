@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 /// <summary>
 /// 브레이크 패턴(조합)에 따른 선두 차량 제어를 위한 매니저 클래스
@@ -11,9 +12,13 @@ public class BrakePatternManager : MonoBehaviour
 {
     // TODO: Queue 자료구조로 동작해야 할 행동을 제어, BrakePatternBuilder의 brakePatterns를 랜덤으로
     // TODO: 일시정지 후 다시 재생이 가능해야 함.
+    [Header("브레이크 패턴(조합)")]
     public BrakePatternBuilder brakePatternBuilder;
     public int[] randomizedOrder;
-
+    public int startPatternIndex = 0;
+    
+    [SerializeField] LeadCarController leadCarController;
+    
     #region Initialize
     private void Awake()
     {
@@ -23,7 +28,7 @@ public class BrakePatternManager : MonoBehaviour
     void Init()
     {
         SetRandomizedOrder();
-        LoadPattern(startPatternIndex);
+        LoadPattern(randomizedOrder[startPatternIndex]);
     }
 
     /// <summary>
@@ -43,10 +48,14 @@ public class BrakePatternManager : MonoBehaviour
         foreach (int idx in randomizedOrder) Debug.Log(idx);
     }
     #endregion
-    
-    [Tooltip("처음 실행할 패턴 인덱스")]
-    public int startPatternIndex = 0;
 
+    private void Start()
+    {
+        // StartPattern();
+    }
+    
+    #region BrakePattern
+    
     private Queue<BrakeStep> stepQueue;
     private Coroutine playCoroutine;
 
@@ -65,6 +74,9 @@ public class BrakePatternManager : MonoBehaviour
         stepQueue = new Queue<BrakeStep>(brakePattern.steps);
     }
 
+    /// <summary>
+    /// 패턴에 따른 주행을 시작한다.
+    /// </summary>
     public void StartPattern()
     {
         if (stepQueue == null || stepQueue.Count == 0)
@@ -130,28 +142,35 @@ public class BrakePatternManager : MonoBehaviour
                 Debug.LogWarning("다음 브레이크 패턴(조합)이 없습니다. 루프 종료");
                 yield break;
             }
+            
+            // 3) 다음 패턴 재생까지 랜덤 대기 시간
+            yield return new WaitForSeconds(Random.Range(3, 7));
         }
     }
 
     private void ApplyStep(BrakeStep step)
     {
-        /*switch (step.action)
+        Debug.Log($"Action: {step.action}, Duration: {step.duration}, Magnitude: {step.magnitude}");
+        switch (step.action)
         {
             case BrakeAction.Brake:
-                otherCarController.Accelerate(step.magnitude);
+                StartCoroutine(leadCarController.AccelerateWithFixedAcceleration(step.magnitude, step.duration));
                 break;
             case BrakeAction.Maintain:
-                otherCarController.MaintainSpeed();
+                StartCoroutine(leadCarController.MaintainSpeedForWaitTime(step.duration));
                 break;
             case BrakeAction.Accelerate:
-                otherCarController.Accelerate(step.magnitude);
+                StartCoroutine(leadCarController.AccelerateWithFixedAcceleration(step.magnitude, step.duration));
                 break;
-        }*/
+        }
     }
 
     public void LoadNextPattern()
     {
-        startPatternIndex = (startPatternIndex + 1) % brakePatternBuilder.brakePatterns.Length;
-        LoadPattern(startPatternIndex);
+        startPatternIndex++;
+        if(startPatternIndex >= randomizedOrder.Length) return;
+        LoadPattern(randomizedOrder[startPatternIndex]);
     }
+    
+    #endregion
 }

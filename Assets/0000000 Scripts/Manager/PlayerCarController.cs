@@ -189,12 +189,12 @@ public class PlayerCarController : MonoBehaviour
             float currentGap = 0;
             if (DrivingScenarioManager.Instance != null)
             {
-                currentGap = DrivingScenarioManager.Instance.otherCarController.transform.position.z
+                currentGap = DrivingScenarioManager.Instance.leadCarController.transform.position.z
                              - DrivingScenarioManager.Instance.playerCarController.transform.position.z;
             }
             else if (PreDrivingScenarioManager.Instance != null)
             {
-                currentGap = PreDrivingScenarioManager.Instance.otherCarController.transform.position.z
+                currentGap = PreDrivingScenarioManager.Instance.leadCarController.transform.position.z
                              - PreDrivingScenarioManager.Instance.playerCarController.transform.position.z;
             }
 
