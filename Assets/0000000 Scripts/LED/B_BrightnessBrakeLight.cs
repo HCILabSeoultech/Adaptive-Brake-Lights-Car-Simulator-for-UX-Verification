@@ -9,7 +9,20 @@ public class B_BrightnessBrakeLight : ILightBehavior
     {
         mainBrakeRenderer.material.color = Color.red;
         Color lightColor = Color.black;
-        if (DrivingScenarioManager.Instance.level == Level.수준2)
+        
+        // ============================= Exp 2 version =======================================
+        if (acceleration >= -4f)
+        {
+            lightColor = new Color(0.4f, 0, 0);
+            // 180
+        }
+        else
+        {
+            lightColor = new Color(1f, 0, 0); 
+            // 255
+        }
+        
+        /*if (DrivingScenarioManager.Instance.level == Level.수준2)
         {
             if (acceleration >= -4f)
             {
@@ -39,7 +52,7 @@ public class B_BrightnessBrakeLight : ILightBehavior
                 lightColor = new Color(1f, 0, 0);
                 // 255
             }
-        }
+        }*/
 
         // Color lightColor = Color.Lerp(Color.black, Color.red, acceleration);
         foreach (var led in subBrakeRenderers)

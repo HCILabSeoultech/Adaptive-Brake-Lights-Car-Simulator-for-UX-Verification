@@ -6,7 +6,7 @@ public class C_FrequencyBrakeLight : ILightBehavior
 {
     private const float FIXED_FREQUENCY = 0.2f; // 🔥 고정 주파수 (Hz) - 1초에 0.2번 깜빡임 (5초 주기)
 
-    private float lowFrequencyValue = 0.3f;
+    private float lowFrequencyValue = 0.15f;
     private float midFrequencyValue = 0.1f;
     private float highFrequencyValue = 0.033f;
 
@@ -14,11 +14,19 @@ public class C_FrequencyBrakeLight : ILightBehavior
         float acceleration, float duration)
     {
         mainBrakeRenderer.material.color = Color.red;
-
-
+        
         float blinkInterval=0; // = 1 / BrakeSystem.instance.frequencyValue;
-
-        if (DrivingScenarioManager.Instance.level == Level.수준2)
+        // ============================= Exp 2 version =======================================
+        if (acceleration >= -4f)
+        {
+            blinkInterval = lowFrequencyValue;
+        }
+        else
+        {
+            blinkInterval = highFrequencyValue;
+        }
+        
+        /*if (DrivingScenarioManager.Instance.level == Level.수준2)
         {
             if (acceleration >= -4f)
             {
@@ -43,7 +51,7 @@ public class C_FrequencyBrakeLight : ILightBehavior
             {
                 blinkInterval = highFrequencyValue;
             }
-        }
+        }*/
         Debug.Log(blinkInterval + " 초 주기로 blink");
         float time = 0;
         while (time < duration) // 새로운 상태가 설정되면 LEDController에서 종료됨

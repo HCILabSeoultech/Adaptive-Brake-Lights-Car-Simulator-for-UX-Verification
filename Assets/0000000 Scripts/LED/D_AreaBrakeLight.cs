@@ -11,8 +11,26 @@ public class D_AreaBrakeLight : ILightBehavior
         DeActivateLighting(subBrakeRenderers, mainBrakeRenderer);
         mainBrakeRenderer.material.color = Color.red;
 
+        // ============================= Exp 2 version =======================================
+        if (acceleration >= -4f)
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                subBrakeRenderers[i].material.color = Color.red;
+            }
+            Debug.Log("3개 켬");
+        }
+        else
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                subBrakeRenderers[i].material.color = Color.red;
+            }
+            Debug.Log("6개 켬");
+        }
+        
         // TODO: acceleration(감속률)에 따른 범위 변화로 변경
-        if (DrivingScenarioManager.Instance.level == Level.수준2)
+        /*if (DrivingScenarioManager.Instance.level == Level.수준2)
         {
             if (acceleration >= -4f)
             {
@@ -57,7 +75,7 @@ public class D_AreaBrakeLight : ILightBehavior
                 }
                 Debug.Log("6개 켬");
             }
-        }
+        }*/
 
         yield return new WaitForSeconds(duration);
         DeActivateLighting(subBrakeRenderers, mainBrakeRenderer);
