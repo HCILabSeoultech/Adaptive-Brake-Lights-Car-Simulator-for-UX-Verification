@@ -122,12 +122,26 @@ public class LeadCarStateMachine : MonoBehaviour
     DistanceState GetCurrentState()
     {
         float dist = GetCurrentDistance();
-        distanceText.text =  "Distance: " + dist.ToString("0.00");
-        if (dist < collisionThreshold) return DistanceState.Collision;
-        
-        if (dist < closeThreshold) return DistanceState.tooClose;
-        else if (dist > farThreshold) return DistanceState.tooFar;
-        else return DistanceState.normal;   
+
+        if (dist < collisionThreshold) {
+            distanceText.text = "Distance: " + dist.ToString("0.00") + " Collision!";
+            return DistanceState.Collision; 
+        }
+
+        if (dist < closeThreshold)
+        {
+            distanceText.text = "Distance: " + dist.ToString("0.00") + " Too Close!";
+            return DistanceState.tooClose;
+        }
+        else if (dist > farThreshold)
+        {
+            distanceText.text = "Distance: " + dist.ToString("0.00") + " Too Far!";
+            return DistanceState.tooFar;
+        }
+        else {
+            distanceText.text = "Distance: " + dist.ToString("0.00") + " Normal";
+            return DistanceState.normal; 
+        }
     }
     
     /// <summary>
