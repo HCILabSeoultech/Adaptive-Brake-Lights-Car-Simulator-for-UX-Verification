@@ -1,0 +1,190 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+// FSM 상태용 enum
+public enum DistanceState
+{
+    Collision,  // 사고 발생
+    tooClose,   // 잘 따라옴
+    normal,     // 평범
+    tooFar      // 못 따라옴
+}
+public class LeadCarStateMachine : MonoBehaviour
+{
+    public static LeadCarStateMachine Instance;
+    [Header("차량 제어기")]
+    public Controller playerCarController;
+    public LeadCarController leadCarController;
+    
+    [Header("거리 임계값 설정")]
+    public float collisionThreshold = 4.5f;
+    public float closeThreshold = 20f;
+    public float farThreshold = 50f;
+
+    [Header("상태 전환 지연 시간(초)")] 
+    public float stateChangeDelay = 10f;
+    
+    [Header("현재 상태, 후보 상태")]
+    public DistanceState currentState = DistanceState.normal;
+    public DistanceState candidateState;
+
+    [Header("상태에 따른 조절할 거리의 크기")] 
+    [SerializeField]
+    private float tooCloseDistanceOffset = 50f;  // tooClose 상태일 때 뒤로 물러날 거리 (m)
+
+    [SerializeField]
+    private float tooFarDistanceOffset = 30f;    // tooFar 상태일 때 다가갈 거리 (m)
+
+    // 후보 상태와 그 지속 시간
+    private float stateTimer = 0f;
+
+    private Dictionary<DistanceState, Func<IEnumerator>> stateRoutines;
+    private Coroutine stateCoroutine;
+    public Coroutine otherCarCoroutine_MaintainTargetSpeed;
+    public bool canStartRoutine = false;
+    
+    private void Awake()
+    {
+        Init();
+    }
+    void Init()
+    {
+        if(Instance == null) Instance = this;
+        
+        // 상태 -> 코루틴 매핑
+        stateRoutines = new Dictionary<DistanceState, Func<IEnumerator>>()
+        {
+            { DistanceState.tooClose, TooCloseRoutine },
+            { DistanceState.normal, NormalRoutine },
+            { DistanceState.tooFar, TooFarRoutine },
+            { DistanceState.Collision, CollisonRoutine }
+        };
+        
+        // 처음의 후보 상태를 현재 상태로 초기화
+        candidateState = currentState;
+    }
+
+    private void Start()
+    {
+        StartCoroutine(LeadCarStartRoutine());
+    }
+
+    public void SetCanStartRoutine(bool canStart)
+    {
+        canStartRoutine = canStart;
+    }
+
+    public IEnumerator LeadCarStartRoutine()
+    {
+        float targetSpeedMS = CarUtils.ConvertKmHToMS(100);
+        yield return leadCarController.AccelerateToTargetSpeed(targetSpeedMS, 10);
+        otherCarCoroutine_MaintainTargetSpeed = StartCoroutine(leadCarController.MaintainSpeed());
+        BrakePatternManager.Instance.StartPattern();   
+    }
+    public IEnumerator LeadCarRearrangeRoutine(float duration)
+    {
+        float targetSpeedMS = CarUtils.ConvertKmHToMS(100);
+        yield return leadCarController.AccelerateToTargetSpeed(targetSpeedMS, duration);
+        otherCarCoroutine_MaintainTargetSpeed = StartCoroutine(leadCarController.MaintainSpeed());
+    }
+    #region FSM
+
+    private void Update()
+    {
+        // 매 프레임, 거리 기반으로 즉시 판단되는 상태
+        DistanceState rawState = GetCurrentState();
+        
+        if (candidateState != rawState) // 후보 상태와 현재 상태 다름. 후보 상태 변경
+        {
+            // 후보 상태가 바뀌면 타이머 리셋
+            candidateState = rawState;
+            stateTimer = 0;
+        }
+        else if (candidateState != currentState) // 후보 상태와 현재 상태 같음.
+        {
+            // 같은 후보 상태가 유지되는 동안 타이머 증가
+            stateTimer += Time.deltaTime;
+            if (stateTimer >= stateChangeDelay)
+            {
+                // 지정된 시간이 지나면 candidateState로 변경
+                SwitchState(candidateState);
+            }
+        }
+        // else: rawState == candidateState == currentState -> 아무 작업 없음
+    }
+
+    DistanceState GetCurrentState()
+    {
+        float dist = GetCurrentDistance();
+
+        if (dist < collisionThreshold) return DistanceState.Collision;
+        
+        if (dist < closeThreshold) return DistanceState.tooClose;
+        else if (dist > farThreshold) return DistanceState.tooFar;
+        else return DistanceState.normal;   
+    }
+    
+    /// <summary>
+    /// 거리 값으로 즉시 상태만 판단해서 반환
+    /// </summary>
+    float GetCurrentDistance()
+    {
+        return Vector3.Distance(leadCarController.transform.position, playerCarController.transform.position);
+    }
+
+    void SwitchState(DistanceState nextState)
+    {
+        // 1) 이전 코루틴 중단
+        if(stateCoroutine != null) StopCoroutine(stateCoroutine);
+        
+        // 2) BrakePatternManager에 Pause 요청
+        BrakePatternManager.Instance.RequestPause();
+        
+        // 3) 실제 상태 전환
+        currentState = nextState;
+        stateTimer = 0;                 // 전환 직후 타이머 리셋
+        candidateState = nextState;     // 후보 상태도 동기화
+        stateCoroutine = StartCoroutine(stateRoutines[nextState].Invoke());
+        Debug.Log($"[FSM] State switched to {nextState}");
+    }
+    
+    #endregion
+    
+    #region DistanceState Routines
+  
+    // 잘 따라오는 상태 진입, 간격 벌리기
+    IEnumerator TooCloseRoutine()
+    {
+        yield return new WaitUntil(() => canStartRoutine);
+        yield return StartCoroutine(leadCarController.AlignTestCarToSpeedAndGap(100, tooCloseDistanceOffset, 3));
+        BrakePatternManager.Instance.RequestResume();
+    }
+
+    // 정상 상태 진입
+    IEnumerator NormalRoutine()
+    {
+        yield return new WaitUntil(() => canStartRoutine);
+        // 처리하지 않음.
+        BrakePatternManager.Instance.RequestResume();
+    }
+    
+    // 못 따라오는 상태 진입, 간격 줄이기
+    IEnumerator TooFarRoutine()
+    {
+        yield return new WaitUntil(() => canStartRoutine);
+        yield return StartCoroutine(leadCarController.AlignTestCarToSpeedAndGap(100, tooFarDistanceOffset, 3));
+        BrakePatternManager.Instance.RequestResume();
+    }
+
+    IEnumerator CollisonRoutine()
+    {
+        // TODO: 사고 처리에 대한 논의 필요, 기존 차량의 패턴 초기화? 
+        // yield return new WaitUntil(() => canStartRoutine);
+        yield return null;
+    }
+    
+    #endregion
+
+}

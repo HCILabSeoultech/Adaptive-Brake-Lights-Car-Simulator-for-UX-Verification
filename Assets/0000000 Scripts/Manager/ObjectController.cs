@@ -13,13 +13,13 @@ public class ObjectController : MonoBehaviour
     public void MoveEnviroment1()
     {
         enviroment1.position += new Vector3(0f, 0f, 4000f);
-        Debug.Log("Move 1");
+        // Debug.Log("Move 1");
     }
 
     public void MoveEnviroment2()
     {
         enviroment2.position += new Vector3(0f, 0f, 4000f);
-        Debug.Log("Move 2");
+        // Debug.Log("Move 2");
     }
 
     private void OnTriggerEnter(Collider other)
@@ -30,7 +30,7 @@ public class ObjectController : MonoBehaviour
             {
                 if (other.gameObject.name == "half1")
                 {
-                    if (Time.time - (triggerTime[triggerTime.Count - 1]) < 1f) return; // ÃÖ±Ù Æ®¸®°Å°¡
+                    if (Time.time - (triggerTime[triggerTime.Count - 1]) < 1f) return; // ï¿½Ö±ï¿½ Æ®ï¿½ï¿½ï¿½Å°ï¿½
                     MoveEnviroment2();
                 }
                 else if (other.gameObject.name == "half2")

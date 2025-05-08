@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -10,14 +11,13 @@ using Random = UnityEngine.Random;
 /// </summary>
 public class BrakePatternManager : MonoBehaviour
 {
-    // TODO: Queue 자료구조로 동작해야 할 행동을 제어, BrakePatternBuilder의 brakePatterns를 랜덤으로
-    // TODO: 일시정지 후 다시 재생이 가능해야 함.
+    public static BrakePatternManager Instance;
+    
     [Header("브레이크 패턴(조합)")]
     public BrakePatternBuilder brakePatternBuilder;
     public int[] randomizedOrder;
     public int startPatternIndex = 0;
-    
-    [SerializeField] LeadCarController leadCarController;
+    [Header("DEBUG")] public TextMeshProUGUI descriptionText;
     
     #region Initialize
     private void Awake()
@@ -27,10 +27,15 @@ public class BrakePatternManager : MonoBehaviour
     
     void Init()
     {
+        SetInstance();
         SetRandomizedOrder();
         LoadPattern(randomizedOrder[startPatternIndex]);
     }
 
+    void SetInstance()
+    {
+        if(Instance == null) Instance = this;
+    }
     /// <summary>
     /// brakePatterns의 길이에 따라 랜덤화된 순서로 초기화
     /// </summary>
@@ -118,7 +123,15 @@ public class BrakePatternManager : MonoBehaviour
             while (stepQueue.Count > 0)
             {
                 var step = stepQueue.Dequeue();
-                ApplyStep(step);
+                try
+                {
+                    StartCoroutine(ApplyStep(step));
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError(e);
+                    throw;
+                }
                 
                 // duration 만큼 대기
                 yield return new WaitForSeconds(step.duration);
@@ -126,9 +139,12 @@ public class BrakePatternManager : MonoBehaviour
                 // Pause 요청 처리
                 if (pauseRequested)
                 {
-                    Debug.Log("일시정지 대기 중...");
+                    Debug.Log("BrakePatternManager: 일시정지 대기 중...");
                     // 현재 스탭까지 실행 후, Resume 신호 올 때까지 대기
+                    // TODO: LeadCarStateMachine의 DistanceState에 따른 루틴 처리, 루틴이 완료되면 RequestResume 호출
+                    LeadCarStateMachine.Instance.SetCanStartRoutine(true);
                     yield return new WaitUntil(() => resumeRequested);
+                    LeadCarStateMachine.Instance.SetCanStartRoutine(false);
                     pauseRequested = false;
                     resumeRequested = false;
                 }
@@ -144,23 +160,28 @@ public class BrakePatternManager : MonoBehaviour
             }
             
             // 3) 다음 패턴 재생까지 랜덤 대기 시간
+            StartCoroutine(LeadCarStateMachine.Instance.LeadCarRearrangeRoutine(3));
             yield return new WaitForSeconds(Random.Range(3, 7));
         }
     }
 
-    private void ApplyStep(BrakeStep step)
+    private IEnumerator ApplyStep(BrakeStep step)
     {
+        // 속도 유지 루틴이 있으면 정지
+        if (LeadCarStateMachine.Instance.otherCarCoroutine_MaintainTargetSpeed != null) 
+            StopCoroutine(LeadCarStateMachine.Instance.otherCarCoroutine_MaintainTargetSpeed);
+        descriptionText.text = $"Action: {step.action}, \nDuration: {step.duration}, \nMagnitude: {step.magnitude}"; 
         Debug.Log($"Action: {step.action}, Duration: {step.duration}, Magnitude: {step.magnitude}");
         switch (step.action)
         {
             case BrakeAction.Brake:
-                StartCoroutine(leadCarController.AccelerateWithFixedAcceleration(step.magnitude, step.duration));
+                yield return StartCoroutine(LeadCarStateMachine.Instance.leadCarController.AccelerateWithFixedAcceleration(step.magnitude, step.duration));
                 break;
             case BrakeAction.Maintain:
-                StartCoroutine(leadCarController.MaintainSpeedForWaitTime(step.duration));
+                yield return StartCoroutine(LeadCarStateMachine.Instance.leadCarController.MaintainSpeedForWaitTime(step.duration));
                 break;
             case BrakeAction.Accelerate:
-                StartCoroutine(leadCarController.AccelerateWithFixedAcceleration(step.magnitude, step.duration));
+                yield return StartCoroutine(LeadCarStateMachine.Instance.leadCarController.AccelerateWithFixedAcceleration(step.magnitude, step.duration));
                 break;
         }
     }

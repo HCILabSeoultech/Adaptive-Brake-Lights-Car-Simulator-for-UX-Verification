@@ -8,13 +8,15 @@ using UnityEngine.Serialization;
 public class LeadCarController : MonoBehaviour
 {
     public Rigidbody rb; // Rigidbody 참조
-    public float targetAccelderation; // 목표 가속도 (m/s²)
+    public float targetAcceleration; // 목표 가속도 (m/s²)
     private Coroutine currentCoroutine; // 현재 실행 중인 코루틴 저장
-    public GameObject playerCar;
 
+    // Exp1에서 사용한 메서드 (더이상 사용하지 않음)
+    #region Legacy
+    
     public IEnumerator ExecuteBehaviourByScenario(BrakeLightType brakeLightType, float acceleration)
     {
-        targetAccelderation = acceleration;
+        targetAcceleration = acceleration;
         switch (brakeLightType)
         {
             case BrakeLightType.기본제동등A:
@@ -38,9 +40,11 @@ public class LeadCarController : MonoBehaviour
                 ? DrivingScenarioManager.Instance.durationSpeedDown
                 : PreDrivingScenarioManager.Instance.durationSpeedDown));
         yield return StartCoroutine(MaintainSpeedForWaitTime(2));
-        targetAccelderation = 0;
+        targetAcceleration = 0;
     }
 
+    #endregion
+    
     /// <summary>
     /// 목표 속도와 목표 시간이 주어지면, Lerp를 활용하여 등가속도 운동을 수행합니다.
     /// </summary>
@@ -122,15 +126,10 @@ public class LeadCarController : MonoBehaviour
 
             // 현재 간격 계산
             float currentGap = 0;
-            if (DrivingScenarioManager.Instance != null)
+            if (LeadCarStateMachine.Instance != null)
             {
-                currentGap = DrivingScenarioManager.Instance.playerCarController.transform.position.z
-                             - DrivingScenarioManager.Instance.leadCarController.transform.position.z;
-            }
-            else if (PreDrivingScenarioManager.Instance != null)
-            {
-                currentGap = PreDrivingScenarioManager.Instance.playerCarController.transform.position.z
-                             - PreDrivingScenarioManager.Instance.leadCarController.transform.position.z;
+                currentGap = LeadCarStateMachine.Instance.playerCarController.transform.position.z
+                             - LeadCarStateMachine.Instance.leadCarController.transform.position.z;
             }
 
             // 속도 적용
@@ -146,26 +145,20 @@ public class LeadCarController : MonoBehaviour
 
     public float GetPlayerCarPosZ()
     {
-        if (DrivingScenarioManager.Instance != null)
+        if (LeadCarStateMachine.Instance != null)
         {
-            return DrivingScenarioManager.Instance.playerCarController.transform.position.z;
+            return LeadCarStateMachine.Instance.playerCarController.transform.position.z;
         }
-        else if (PreDrivingScenarioManager.Instance != null)
-        {
-            return PreDrivingScenarioManager.Instance.playerCarController.transform.position.z;
-        }
+        
         return -1;
     }
     public float GetOtherCarPosZ()
     {
-        if (DrivingScenarioManager.Instance != null)
+        if (LeadCarStateMachine.Instance != null)
         {
-            return DrivingScenarioManager.Instance.leadCarController.transform.position.z;
+            return LeadCarStateMachine.Instance.leadCarController.transform.position.z;
         }
-        else if (PreDrivingScenarioManager.Instance != null)
-        {
-            return PreDrivingScenarioManager.Instance.leadCarController.transform.position.z;
-        }
+        
         return -1;
     }
     /// <summary>
