@@ -192,13 +192,11 @@ public class LeadCarController : MonoBehaviour
     /// </summary>
     public IEnumerator AccelerateWithFixedAcceleration(float targetAcceleration, float duration)
     {
-        Debug.Log($"선두 차량 가속 시작, {targetAcceleration} m/s²");
         float elapsedTime = 0f;
         Vector3 initialVelocity = rb.velocity;
         Vector3 targetVelocity = initialVelocity + new Vector3(0, 0, targetAcceleration * duration); // v = v0 + at
 
-        Debug.Log($"목표 가속도 설정: {targetAcceleration} m/s² | 목표 시간: {duration}s | 목표 속도: {targetVelocity}m/s");
-
+        Debug.Log($"선두 차량 가속, 목표 가속도: {targetAcceleration} m/s² | 목표 시간: {duration}s | 목표 속도: {targetVelocity}m/s");
 
         float previousVelocityZ = initialVelocity.z; // 이전 속도 저장
         float measuredAcceleration = 0f; // 실제 측정된 가속도
@@ -217,6 +215,7 @@ public class LeadCarController : MonoBehaviour
 
             elapsedTime += Time.deltaTime;
             count++;
+
             accelerations.Add(measuredAcceleration);
             yield return null;
         }
@@ -257,10 +256,9 @@ public class LeadCarController : MonoBehaviour
         Debug.Log($"현재 속도를 유지한 채 대기. {constantVelocity.z:F3} m/s");
         while (true)
         {
+            Debug.Log("현재 속도 유지 중...");
             rb.velocity = constantVelocity; // 속도 유지
             yield return null;
         }
-
-        yield return null;
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 // FSM 상태용 enum
@@ -22,9 +23,13 @@ public class LeadCarStateMachine : MonoBehaviour
     public float collisionThreshold = 4.5f;
     public float closeThreshold = 20f;
     public float farThreshold = 50f;
-
+    public TextMeshProUGUI distanceText;
+    
     [Header("상태 전환 지연 시간(초)")] 
     public float stateChangeDelay = 10f;
+    // 후보 상태와 그 지속 시간
+    [SerializeField] private float stateTimer = 0f;
+    // public float recentSwitchedTime = 0f;
     
     [Header("현재 상태, 후보 상태")]
     public DistanceState currentState = DistanceState.normal;
@@ -37,8 +42,6 @@ public class LeadCarStateMachine : MonoBehaviour
     [SerializeField]
     private float tooFarDistanceOffset = 30f;    // tooFar 상태일 때 다가갈 거리 (m)
 
-    // 후보 상태와 그 지속 시간
-    private float stateTimer = 0f;
 
     private Dictionary<DistanceState, Func<IEnumerator>> stateRoutines;
     private Coroutine stateCoroutine;
@@ -78,6 +81,7 @@ public class LeadCarStateMachine : MonoBehaviour
 
     public IEnumerator LeadCarStartRoutine()
     {
+        AudioManager.Instance.PlayStartDrivingAudio();
         float targetSpeedMS = CarUtils.ConvertKmHToMS(100);
         yield return leadCarController.AccelerateToTargetSpeed(targetSpeedMS, 10);
         otherCarCoroutine_MaintainTargetSpeed = StartCoroutine(leadCarController.MaintainSpeed());
@@ -118,7 +122,7 @@ public class LeadCarStateMachine : MonoBehaviour
     DistanceState GetCurrentState()
     {
         float dist = GetCurrentDistance();
-
+        distanceText.text =  "Distance: " + dist.ToString("0.00");
         if (dist < collisionThreshold) return DistanceState.Collision;
         
         if (dist < closeThreshold) return DistanceState.tooClose;
@@ -148,6 +152,7 @@ public class LeadCarStateMachine : MonoBehaviour
         candidateState = nextState;     // 후보 상태도 동기화
         stateCoroutine = StartCoroutine(stateRoutines[nextState].Invoke());
         Debug.Log($"[FSM] State switched to {nextState}");
+        
     }
     
     #endregion
@@ -158,8 +163,12 @@ public class LeadCarStateMachine : MonoBehaviour
     IEnumerator TooCloseRoutine()
     {
         yield return new WaitUntil(() => canStartRoutine);
-        yield return StartCoroutine(leadCarController.AlignTestCarToSpeedAndGap(100, tooCloseDistanceOffset, 3));
+        float targetSpeedMS = CarUtils.ConvertKmHToMS(100);
+        yield return StartCoroutine(leadCarController.AlignTestCarToSpeedAndGap(targetSpeedMS, tooCloseDistanceOffset, 3));
         BrakePatternManager.Instance.RequestResume();
+
+        // 간격 줄인 다음 Normal 상태로 초기화
+        currentState = DistanceState.normal;
     }
 
     // 정상 상태 진입
@@ -174,8 +183,12 @@ public class LeadCarStateMachine : MonoBehaviour
     IEnumerator TooFarRoutine()
     {
         yield return new WaitUntil(() => canStartRoutine);
-        yield return StartCoroutine(leadCarController.AlignTestCarToSpeedAndGap(100, tooFarDistanceOffset, 3));
+        float targetSpeedMS = CarUtils.ConvertKmHToMS(100);
+        yield return StartCoroutine(leadCarController.AlignTestCarToSpeedAndGap(targetSpeedMS, tooFarDistanceOffset, 3));
         BrakePatternManager.Instance.RequestResume();
+        
+        // 간격 줄인 다음 Normal 상태로 초기화
+        currentState = DistanceState.normal;
     }
 
     IEnumerator CollisonRoutine()

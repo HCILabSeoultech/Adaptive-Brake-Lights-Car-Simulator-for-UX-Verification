@@ -168,20 +168,37 @@ public class BrakePatternManager : MonoBehaviour
     private IEnumerator ApplyStep(BrakeStep step)
     {
         // 속도 유지 루틴이 있으면 정지
-        if (LeadCarStateMachine.Instance.otherCarCoroutine_MaintainTargetSpeed != null) 
+        if (LeadCarStateMachine.Instance.otherCarCoroutine_MaintainTargetSpeed != null)
+        {
             StopCoroutine(LeadCarStateMachine.Instance.otherCarCoroutine_MaintainTargetSpeed);
+            LeadCarStateMachine.Instance.otherCarCoroutine_MaintainTargetSpeed = null;
+        }
         descriptionText.text = $"Action: {step.action}, \nDuration: {step.duration}, \nMagnitude: {step.magnitude}"; 
         Debug.Log($"Action: {step.action}, Duration: {step.duration}, Magnitude: {step.magnitude}");
+
+        IEnumerator movementRoutine;
         switch (step.action)
         {
             case BrakeAction.Brake:
-                yield return StartCoroutine(LeadCarStateMachine.Instance.leadCarController.AccelerateWithFixedAcceleration(step.magnitude, step.duration));
+                BrakeVisualizeManager.instance.
+                    ActiveLight(DrivingDataManager.Instance.brakeLightType, step.magnitude, step.duration);
+                movementRoutine =
+                    LeadCarStateMachine.Instance.leadCarController
+                        .AccelerateWithFixedAcceleration(step.magnitude, step.duration);
+                yield return movementRoutine;
                 break;
             case BrakeAction.Maintain:
-                yield return StartCoroutine(LeadCarStateMachine.Instance.leadCarController.MaintainSpeedForWaitTime(step.duration));
+                movementRoutine =
+                    LeadCarStateMachine.Instance.leadCarController
+                        .MaintainSpeedForWaitTime(step.duration);
+                yield return movementRoutine;
+                
                 break;
             case BrakeAction.Accelerate:
-                yield return StartCoroutine(LeadCarStateMachine.Instance.leadCarController.AccelerateWithFixedAcceleration(step.magnitude, step.duration));
+                movementRoutine =
+                    LeadCarStateMachine.Instance.leadCarController
+                        .AccelerateWithFixedAcceleration(step.magnitude, step.duration);
+                yield return movementRoutine;
                 break;
         }
     }
