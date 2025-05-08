@@ -15,7 +15,7 @@ public class Setting_Manager : MonoBehaviour
     public bool set = true;
 
     [SerializeField] Test Setting;
-    [SerializeField] Timer Timer;
+    [SerializeField] TimerController Timer;
     
 
     public void Update()
