@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,7 +15,27 @@ public class BrakeVisualizeManager : MonoBehaviour
         frequency = new C_FrequencyBrakeLight();
         area = new D_AreaBrakeLight();
     }
-    
+
+    public void ActiveLight(BrakeLightType lightType, float acceleration, float duration)
+    {
+        switch (lightType)
+        {
+            case BrakeLightType.기본제동등A:
+                ActiveStandardBrakeLight(acceleration, duration);
+                break;
+            case BrakeLightType.밝기변화제동등B:
+                ActiveBrightnessBrakeLight(acceleration, duration);
+                break;
+            case BrakeLightType.점멸주파수변화제동등C:
+                ActiveFrequencyBrakeLight(acceleration, duration);
+                break;
+            case BrakeLightType.면적변화제동등D:
+                ActiveAreaBrakeLight(acceleration, duration);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(lightType), lightType, null);
+        }
+    }
     // ============================= Exp 2 version =======================================
     public void ActiveStandardBrakeLight(float acceleration, float duration)
     {
