@@ -17,7 +17,7 @@ public class SpeedAndGearUIManager : MonoBehaviour
     [SerializeField] private TMPro.TMP_Text playerCarSpeedText;
     [SerializeField] private TMPro.TMP_Text aheadCarSpeedText;
     [SerializeField] private TMPro.TMP_Text unityScreenText;
-    
+    public DistanceTracker distanceTracker;
     //private UnityEngine.UI.Text text;
 
     private string gearString = "";
@@ -66,6 +66,7 @@ public class SpeedAndGearUIManager : MonoBehaviour
             {
                 playerCarSpeedText.text = ((int)(3.6f * Mathf.Abs(v) + 0.9f)).ToString();
                 playerCarSpeed = (int)(3.6f * Mathf.Abs(v) + 0.9f);
+                distanceTracker.speedKmh = (int)(3.6f * Mathf.Abs(v) + 0.9f); 
             }
         };
         velocity.Subscribe(velocityAction);
