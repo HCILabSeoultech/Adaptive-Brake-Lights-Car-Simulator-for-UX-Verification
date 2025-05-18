@@ -128,29 +128,43 @@ public class LeadCarStateMachine : MonoBehaviour
             candidateState = rawState;
             stateTimer = 0;
         }
-        else if (candidateState != currentState) // 후보 상태와 현재 상태 같음.
+        else if (candidateState != currentState)
         {
             // 같은 후보 상태가 유지되는 동안 타이머 증가
             stateTimer += Time.deltaTime;
-            if (stateTimer >= stateChangeDelay)
+
+            // 상태별로 사용할 딜레이 결정
+            float delay;
+            switch (candidateState)
             {
-                // 지정된 시간이 지나면 candidateState로 변경
+                case DistanceState.Collision:
+                    delay = 0.1f;
+                    break;
+                case DistanceState.normal:
+                    delay = 1.0f;
+                    break;
+                default:
+                    delay = stateChangeDelay;  // 원래 값 (예: 5초)
+                    break;
+            }
+
+            // 정해진 시간이 지나면 상태 전환
+            if (stateTimer >= delay && (candidateState == DistanceState.Collision || candidateState == DistanceState.normal))
+            {
                 SwitchState(candidateState);
             }
         }
-        // else: rawState == candidateState == currentState -> 아무 작업 없음
     }
 
     DistanceState GetCurrentState()
     {
         float dist = GetCurrentDistance();
 
-        if (dist < collisionThreshold) {
+        if (dist < collisionThreshold || dist > 70 - closeThreshold) {
             distanceText.text = "Distance: " + dist.ToString("0.00") + " Collision!";
             return DistanceState.Collision; 
         }
-
-        if (dist < closeThreshold)
+        /*if (dist < closeThreshold)
         {
             distanceText.text = "Distance: " + dist.ToString("0.00") + " Too Close!";
             return DistanceState.tooClose;
@@ -159,7 +173,7 @@ public class LeadCarStateMachine : MonoBehaviour
         {
             distanceText.text = "Distance: " + dist.ToString("0.00") + " Too Far!";
             return DistanceState.tooFar;
-        }
+        }*/
         else {
             distanceText.text = "Distance: " + dist.ToString("0.00") + " Normal";
             return DistanceState.normal; 
@@ -230,8 +244,14 @@ public class LeadCarStateMachine : MonoBehaviour
     IEnumerator CollisonRoutine()
     {
         // TODO: 사고 처리에 대한 논의 필요, 기존 차량의 패턴 초기화? 
-        // yield return new WaitUntil(() => canStartRoutine);
-        yield return null;
+        yield return new WaitUntil(() => canStartRoutine);
+        Debug.Log("사고 처리 시작");
+        
+        
+        Debug.Log("사고 처리 종료");
+        BrakePatternManager.Instance.RequestResume();
+        
+        currentState = DistanceState.normal;
     }
     
     #endregion

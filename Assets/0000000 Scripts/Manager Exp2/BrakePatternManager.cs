@@ -145,19 +145,16 @@ public class BrakePatternManager : MonoBehaviour
                 yield return new WaitForSeconds(step.duration);
                 
                 // TODO: 기존 Pasue 처리를 충돌 처리 로직으로 대체
-                // 로직에서 FSM 제거 
-                /*// Pause 요청 처리
                 if (pauseRequested)
                 {
                     Debug.Log("BrakePatternManager: 일시정지 대기 중...");
                     // 현재 스탭까지 실행 후, Resume 신호 올 때까지 대기
-                    // TODO: LeadCarStateMachine의 DistanceState에 따른 루틴 처리, 루틴이 완료되면 RequestResume 호출
                     LeadCarStateMachine.Instance.SetCanStartRoutine(true);
                     yield return new WaitUntil(() => resumeRequested);
                     LeadCarStateMachine.Instance.SetCanStartRoutine(false);
                     pauseRequested = false;
                     resumeRequested = false;
-                }*/
+                }
             }
             Debug.Log("패턴 소진 완료");
 
