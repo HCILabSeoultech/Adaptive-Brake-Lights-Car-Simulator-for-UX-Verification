@@ -109,9 +109,9 @@ public class LeadCarStateMachine : MonoBehaviour
         otherCarCoroutine_MaintainTargetSpeed = StartCoroutine(leadCarController.MaintainSpeed());
         BrakePatternManager.Instance.StartPattern();   
     }
-    public IEnumerator LeadCarRearrangeRoutine(float duration)
+    public IEnumerator LeadCarRearrangeRoutine(float duration, float targetSpeedKmh = 100)
     {
-        float targetSpeedMS = CarUtils.ConvertKmHToMS(100);
+        float targetSpeedMS = CarUtils.ConvertKmHToMS(targetSpeedKmh);
         yield return leadCarController.AccelerateToTargetSpeed(targetSpeedMS, duration);
         otherCarCoroutine_MaintainTargetSpeed = StartCoroutine(leadCarController.MaintainSpeed());
     }
@@ -141,7 +141,7 @@ public class LeadCarStateMachine : MonoBehaviour
                     delay = 0.1f;
                     break;
                 case DistanceState.normal:
-                    delay = 1.0f;
+                    delay = 3.0f;
                     break;
                 default:
                     delay = stateChangeDelay;  // 원래 값 (예: 5초)
@@ -149,7 +149,7 @@ public class LeadCarStateMachine : MonoBehaviour
             }
 
             // 정해진 시간이 지나면 상태 전환
-            if (stateTimer >= delay && (candidateState == DistanceState.Collision || candidateState == DistanceState.normal))
+            if (stateTimer >= delay && (candidateState == DistanceState.Collision))
             {
                 SwitchState(candidateState);
             }
@@ -246,7 +246,9 @@ public class LeadCarStateMachine : MonoBehaviour
         // TODO: 사고 처리에 대한 논의 필요, 기존 차량의 패턴 초기화? 
         yield return new WaitUntil(() => canStartRoutine);
         Debug.Log("사고 처리 시작");
-        
+        AudioManager.Instance.PlayRearrangementAudio();
+        StartCoroutine(LeadCarRearrangeRoutine(5, 80));
+        yield return new WaitForSeconds(5);
         
         Debug.Log("사고 처리 종료");
         BrakePatternManager.Instance.RequestResume();
