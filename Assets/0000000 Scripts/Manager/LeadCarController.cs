@@ -256,7 +256,7 @@ public class LeadCarController : MonoBehaviour
         Debug.Log($"현재 속도를 유지한 채 대기. {constantVelocity.z:F3} m/s");
         while (true)
         {
-            Debug.Log("현재 속도 유지 중...");
+            // Debug.Log("현재 속도 유지 중...");
             rb.velocity = constantVelocity; // 속도 유지
             yield return null;
         }

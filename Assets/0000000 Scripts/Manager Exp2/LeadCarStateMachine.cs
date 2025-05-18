@@ -138,7 +138,7 @@ public class LeadCarStateMachine : MonoBehaviour
             switch (candidateState)
             {
                 case DistanceState.Collision:
-                    delay = 0.1f;
+                    delay = 0.05f;
                     break;
                 case DistanceState.normal:
                     delay = 3.0f;
@@ -162,6 +162,12 @@ public class LeadCarStateMachine : MonoBehaviour
 
         if (dist < collisionThreshold || dist > 70 - closeThreshold) {
             distanceText.text = "Distance: " + dist.ToString("0.00") + " Collision!";
+            Rigidbody rb = playerCarController.transform.GetComponent<Rigidbody>();
+            rb.constraints |= RigidbodyConstraints.FreezePositionX;
+            rb.constraints |= RigidbodyConstraints.FreezeRotationX;
+            rb.constraints |= RigidbodyConstraints.FreezeRotationY;
+            rb.constraints |= RigidbodyConstraints.FreezeRotationZ;
+            
             return DistanceState.Collision; 
         }
         /*if (dist < closeThreshold)
@@ -247,12 +253,40 @@ public class LeadCarStateMachine : MonoBehaviour
         yield return new WaitUntil(() => canStartRoutine);
         Debug.Log("사고 처리 시작");
         AudioManager.Instance.PlayRearrangementAudio();
+        
+        // 실험 차량 속도 80으로
+        float targetSpeedMS = CarUtils.ConvertKmHToMS(80);
+        playerCarController.SetDriveMode(PlayerCarController.DrivingMode.Autonomous);
+        Vector3 angles = playerCarController.transform.eulerAngles;
+        angles.y = 0f;
+        playerCarController.transform.eulerAngles = angles;
+        Rigidbody rb = playerCarController.transform.GetComponent<Rigidbody>();
+        Vector3 pos1 = transform.position;
+        pos1.x = 0f;
+        transform.position = pos1;
+        rb.constraints |= RigidbodyConstraints.FreezePositionX;
+        rb.constraints |= RigidbodyConstraints.FreezeRotationX;
+        rb.constraints |= RigidbodyConstraints.FreezeRotationY;
+        rb.constraints |= RigidbodyConstraints.FreezeRotationZ;
+
+        StartCoroutine(playerCarController.AccelerateToTargetSpeed(targetSpeedMS-2, 5));
+        
+        // 선두 차량 정렬
         StartCoroutine(LeadCarRearrangeRoutine(5, 80));
         yield return new WaitForSeconds(5);
         
+        // 실험 차량 정렬
+        StartCoroutine(playerCarController.AlignTestCarToSpeedAndGap(targetSpeedMS, 35, 5));
+        yield return new WaitForSeconds(5);
+        rb.constraints &= ~RigidbodyConstraints.FreezePositionX;
+        rb.constraints &= ~RigidbodyConstraints.FreezeRotationX;
+        rb.constraints &= ~RigidbodyConstraints.FreezeRotationY;
+        rb.constraints &= ~RigidbodyConstraints.FreezeRotationZ;
+        
         Debug.Log("사고 처리 종료");
         BrakePatternManager.Instance.RequestResume();
-        
+        playerCarController.SetDriveMode(PlayerCarController.DrivingMode.BrakeControl);
+
         currentState = DistanceState.normal;
     }
     
