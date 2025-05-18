@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 
 // FSM 상태용 enum
@@ -74,6 +75,27 @@ public class LeadCarStateMachine : MonoBehaviour
         StartCoroutine(LeadCarStartRoutine());
     }
 
+    public BrakeStep GetBehaviourEffect(BrakeStep brakeStep)
+    {
+        var behaviourEffect = brakeStep;
+
+        if (GetCurrentDistance() < closeThreshold)
+        {
+            behaviourEffect.action = BrakeAction.Accelerate;
+            behaviourEffect.magnitude = 2;
+        }else if (GetCurrentDistance() > farThreshold)
+        {
+            behaviourEffect.action = BrakeAction.Brake;
+            behaviourEffect.magnitude = -2;
+        }
+        else
+        {
+            behaviourEffect.action = BrakeAction.Maintain;
+        }
+        
+        return behaviourEffect;
+    }
+    
     public void SetCanStartRoutine(bool canStart)
     {
         canStartRoutine = canStart;

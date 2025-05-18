@@ -20,7 +20,8 @@ public enum BrakeAction
 {
     Brake,      // 제동
     Maintain,   // 속도 유지
-    Accelerate  // 감속
+    Accelerate,  // 가속
+    BehaviourEffect // 운전자 행동에 따른 효과(가까우면 가속, 멀면 감속)
 }
 
 [Serializable]

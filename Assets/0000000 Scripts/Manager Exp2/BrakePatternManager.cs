@@ -125,7 +125,15 @@ public class BrakePatternManager : MonoBehaviour
                 var step = stepQueue.Dequeue();
                 try
                 {
-                    StartCoroutine(ApplyStep(step));
+                    if (step.action == BrakeAction.BehaviourEffect)
+                    {
+                        // 거리에 따른 로직 처리
+                        StartCoroutine(ApplyStep(LeadCarStateMachine.Instance.GetBehaviourEffect(step)));
+                    }
+                    else
+                    {
+                        StartCoroutine(ApplyStep(step));
+                    }
                 }
                 catch (Exception e)
                 {
@@ -136,7 +144,9 @@ public class BrakePatternManager : MonoBehaviour
                 // duration 만큼 대기
                 yield return new WaitForSeconds(step.duration);
                 
-                // Pause 요청 처리
+                // TODO: 기존 Pasue 처리를 충돌 처리 로직으로 대체
+                // 로직에서 FSM 제거 
+                /*// Pause 요청 처리
                 if (pauseRequested)
                 {
                     Debug.Log("BrakePatternManager: 일시정지 대기 중...");
@@ -147,7 +157,7 @@ public class BrakePatternManager : MonoBehaviour
                     LeadCarStateMachine.Instance.SetCanStartRoutine(false);
                     pauseRequested = false;
                     resumeRequested = false;
-                }
+                }*/
             }
             Debug.Log("패턴 소진 완료");
 
