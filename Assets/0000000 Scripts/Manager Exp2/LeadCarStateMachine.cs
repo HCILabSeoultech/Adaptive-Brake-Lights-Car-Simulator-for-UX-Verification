@@ -160,7 +160,7 @@ public class LeadCarStateMachine : MonoBehaviour
     {
         float dist = GetCurrentDistance();
 
-        if (dist < collisionThreshold || dist > 70 - closeThreshold) {
+        if (dist < collisionThreshold || dist > 70 - collisionThreshold) {
             distanceText.text = "Distance: " + dist.ToString("0.00") + " Collision!";
             Rigidbody rb = playerCarController.transform.GetComponent<Rigidbody>();
             rb.constraints |= RigidbodyConstraints.FreezePositionX;
