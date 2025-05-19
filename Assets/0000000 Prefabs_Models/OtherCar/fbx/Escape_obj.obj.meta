@@ -1,0 +1,366 @@
+fileFormatVersion: 2
+guid: 02e1507582ce7b64db35d4672294361d
+ModelImporter:
+  serializedVersion: 21300
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: amberMat
+    second: {fileID: 2100000, guid: 1df1185b807f2fa40ae444ad7a0760e8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: basetrimMat
+    second: {fileID: 2100000, guid: f67e28fc79a4c3b478dd482d957a7f34, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: bkcapMat
+    second: {fileID: 2100000, guid: c7103499d04341c4980d98cfcffc224a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: bkopenMat
+    second: {fileID: 2100000, guid: 6e65a1e78d32a8944ae0751f5dd85afb, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: bkrim1Mat
+    second: {fileID: 2100000, guid: 80e6e954cbe9a2d41a3cb9dbfd6c3c9b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: bkrim2Mat
+    second: {fileID: 2100000, guid: 4fefcc5e156d10d42b49c60f45b6c57c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: bktireMat
+    second: {fileID: 2100000, guid: 1691d3eb2ed42144db095302bbf03df7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: blackMat
+    second: {fileID: 2100000, guid: 0ef100c93e166704ca02fa339cece727, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: blueMat
+    second: {fileID: 2100000, guid: 0c5720830a7214e4d999ab7ff5fc2805, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: blutelgapsMat
+    second: {fileID: 2100000, guid: 1516656d7cfd94b4ea14170f9d247e66, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: bodyMat
+    second: {fileID: 2100000, guid: f43ce1fe01148444781a02bde2acebe7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: brakeMat
+    second: {fileID: 2100000, guid: 50d5083389f4dab4e879cdc8585637dd, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: chromeMat
+    second: {fileID: 2100000, guid: 36d3d779bea9eae4ab9cce4d22d219c9, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: cowlingMat
+    second: {fileID: 2100000, guid: 9a11456e4f63bc84fbe16e31688de1e0, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: flblckgapsMat
+    second: {fileID: 2100000, guid: 418bade644eb6644db72723437fb124b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: foglightMat
+    second: {fileID: 2100000, guid: 88db91152e797024896beb6a95e0345f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: gascapMat
+    second: {fileID: 2100000, guid: bb793958316f16044877ee175f135bcb, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: glassMat
+    second: {fileID: 2100000, guid: 71d90fba70e0b924386895c8f1bf6b43, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: grillMat
+    second: {fileID: 2100000, guid: 1286e6fa5f5f49040b5fea9d099da3e4, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: handlMat
+    second: {fileID: 2100000, guid: bb69d7dc8a83bec4188ec224542108c7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: handlkeyMat
+    second: {fileID: 2100000, guid: 518ca5e5cf6722e4e8185b03a2a7f8c8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: hingeMat
+    second: {fileID: 2100000, guid: bf907006d788e584f8ed73b994add200, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: lfcapMat
+    second: {fileID: 2100000, guid: 58a708e0634f527479cd5a5f6722eac3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: lfopenMat
+    second: {fileID: 2100000, guid: 07a305c468fcdbb4eaeb541dea9c8597, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: lfrim2Mat
+    second: {fileID: 2100000, guid: e5f1746e7ff15d7458f639d7a9657ff0, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: lfrimMat
+    second: {fileID: 2100000, guid: 33de72995bde5bb4484b2d3469da1bd0, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: lftireMat
+    second: {fileID: 2100000, guid: 0441571095eeb61489d43764e818c339, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: lightMat
+    second: {fileID: 2100000, guid: ef2e93b6ed4859f4e8b001cf32147cb5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: mirMat
+    second: {fileID: 2100000, guid: 92bfe9a3c8c0ab348a803a7e539d3632, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: mirglassMat
+    second: {fileID: 2100000, guid: 5fea659df85c0ad4bb8ac18ec8850ffe, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: mirrgapMat
+    second: {fileID: 2100000, guid: b60aba6081a486a45af21f7101b6d359, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: openMat
+    second: {fileID: 2100000, guid: 6a61d25b60039ec469e004ed5c88d092, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: rackMat
+    second: {fileID: 2100000, guid: 563b7ac2ec2321f4e84588a32b5a04f8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: rdrstripMat
+    second: {fileID: 2100000, guid: 224ce8527507e1c4299321824a06a906, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: rearhndlMat
+    second: {fileID: 2100000, guid: aeebd6b74e287104f8ab0085e681e7ae, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: rearwiprMat
+    second: {fileID: 2100000, guid: 6cbf176486176b8488b35e0a1d58a73a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: reflectvMat
+    second: {fileID: 2100000, guid: a7c92f01b7eca2c40aa2ba4b078ae1ac, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: rfcapMat
+    second: {fileID: 2100000, guid: 27c8ba8902359ee438aecfc597532e8c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: rfopenMat
+    second: {fileID: 2100000, guid: 610f1617a16d7594691b2987ec316830, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: rfrim2Mat
+    second: {fileID: 2100000, guid: b6c48a38f788fc54393ba0e27e9453f9, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: rfrimMat
+    second: {fileID: 2100000, guid: 87805da6da7f2a8499dd5fcbf5657a84, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: rftireMat
+    second: {fileID: 2100000, guid: de26d42aec9a3ac42af6213eb9e46340, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: rubstripMat
+    second: {fileID: 2100000, guid: cdec2328f80af8e4e865b2647496b507, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: rwinliftMat
+    second: {fileID: 2100000, guid: 3d49f6da91b1a8a42a800c250a30081f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: sealMat
+    second: {fileID: 2100000, guid: 3b6930215c1d8ec4bb4b4c56b6ed14ff, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: stepMat
+    second: {fileID: 2100000, guid: 691fe28d8863f7a4ebda91853a1d8785, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: stepmntMat
+    second: {fileID: 2100000, guid: a60beecc9b168cd49bf774e2fa6f21be, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: underMat
+    second: {fileID: 2100000, guid: 79c6a327be0fa034fb131ae384653455, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: whitlghtMat
+    second: {fileID: 2100000, guid: 3257eadb0d70b324f9ce577b51063f96, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: whlwellsMat
+    second: {fileID: 2100000, guid: 26b07e4c06f40b5408163de912b51f07, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: winpanelMat
+    second: {fileID: 2100000, guid: 422f96990704aa84bbc0472cd5972757, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wipersMat
+    second: {fileID: 2100000, guid: e4ce005556d62fa4d8936f6aa7bf98eb, type: 2}
+  materials:
+    materialImportMode: 2
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    removeConstantScaleCurves: 1
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 0
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    nodeNameCollisionStrategy: 1
+    fileIdsGeneration: 2
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    keepQuads: 0
+    weldVertices: 1
+    bakeAxisConversion: 0
+    preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    optimizeBones: 1
+    meshOptimizationFlags: -1
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVMarginMethod: 1
+    secondaryUVMinLightmapResolution: 40
+    secondaryUVMinObjectScale: 1
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  referencedClips: []
+  importAnimation: 1
+  humanDescription:
+    serializedVersion: 3
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    globalScale: 1
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  autoGenerateAvatarMappingIfUnspecified: 1
+  animationType: 2
+  humanoidOversampling: 1
+  avatarSetup: 0
+  addHumanoidExtraRootOnlyWhenUsingAvatar: 1
+  remapMaterialsIfMaterialImportModeIsNone: 0
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
