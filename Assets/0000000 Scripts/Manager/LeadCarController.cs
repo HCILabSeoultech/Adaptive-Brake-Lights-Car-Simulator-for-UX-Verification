@@ -261,4 +261,35 @@ public class LeadCarController : MonoBehaviour
             yield return null;
         }
     }
+
+    public GameObject virtualWall;
+    public IEnumerator MoveSecondLine()
+    {
+        Debug.Log("2차선 속도 유지");
+        Coroutine routine = StartCoroutine(MaintainSpeed());
+        virtualWall.SetActive(true);
+        Debug.Log("2차선 이동 시작");
+        rb.constraints &= ~RigidbodyConstraints.FreezePositionX;
+        Vector3 angles = transform.eulerAngles;
+        angles.y = 5f;
+        transform.eulerAngles = angles;
+        
+        // 1) 목표 X 좌표
+        float targetX    = 3.5f;
+        // 2) 허용 오차 (얼마나 ‘근접’했을 때 멈출지)
+        float tolerance  = 0.2f;
+        // 3) targetX ± tolerance 범위에 들어올 때까지 대기
+        yield return new WaitUntil(() =>
+            Mathf.Abs(transform.position.x - targetX) <= tolerance
+        );
+        Debug.Log("2차선 목표 지점 근접! x = " + transform.position.x);
+        StopCoroutine(routine);
+        
+        Vector3 angles2 = transform.eulerAngles;
+        angles2.y = 0f;
+        transform.eulerAngles = angles2;
+        rb.constraints |= RigidbodyConstraints.FreezePositionX;
+        Debug.Log("2차선 이동 완료");
+        virtualWall.SetActive(false);
+    }
 }

@@ -11,7 +11,8 @@ public enum DistanceState
     Collision,  // 사고 발생
     tooClose,   // 잘 따라옴
     normal,     // 평범
-    tooFar      // 못 따라옴
+    tooFar,      // 못 따라옴
+    changeLine  // 차선 변경 이벤트
 }
 public class LeadCarStateMachine : MonoBehaviour
 {
@@ -30,6 +31,8 @@ public class LeadCarStateMachine : MonoBehaviour
     public float stateChangeDelay = 10f;
     // 후보 상태와 그 지속 시간
     [SerializeField] private float stateTimer = 0f;
+    private float changeLineTimer = 0f;
+    private bool changeLine = false;
     // public float recentSwitchedTime = 0f;
     
     [Header("현재 상태, 후보 상태")]
@@ -63,7 +66,8 @@ public class LeadCarStateMachine : MonoBehaviour
             { DistanceState.tooClose, TooCloseRoutine },
             { DistanceState.normal, NormalRoutine },
             { DistanceState.tooFar, TooFarRoutine },
-            { DistanceState.Collision, CollisonRoutine }
+            { DistanceState.Collision, CollisonRoutine },
+            { DistanceState.changeLine, ChangeLine2Routine }
         };
         
         // 처음의 후보 상태를 현재 상태로 초기화
@@ -153,6 +157,14 @@ public class LeadCarStateMachine : MonoBehaviour
             {
                 SwitchState(candidateState);
             }
+        }
+
+        // 차선 변경 3분에 1회만 실시
+        changeLineTimer += Time.deltaTime;
+        if (changeLineTimer >= 15 && !changeLine)
+        {
+            SwitchState(DistanceState.changeLine);
+            changeLine = true;
         }
     }
 
@@ -287,6 +299,18 @@ public class LeadCarStateMachine : MonoBehaviour
         BrakePatternManager.Instance.RequestResume();
         playerCarController.SetDriveMode(PlayerCarController.DrivingMode.BrakeControl);
 
+        currentState = DistanceState.normal;
+    }
+
+    IEnumerator ChangeLine2Routine()
+    {
+        yield return new WaitUntil(() => canStartRoutine);
+        float targetSpeedMS = CarUtils.ConvertKmHToMS(100);
+        yield return StartCoroutine(leadCarController.AccelerateToTargetSpeed(targetSpeedMS, 3));
+        yield return StartCoroutine(leadCarController.MoveSecondLine());
+        BrakePatternManager.Instance.RequestResume();
+        
+        // 간격 줄인 다음 Normal 상태로 초기화
         currentState = DistanceState.normal;
     }
     

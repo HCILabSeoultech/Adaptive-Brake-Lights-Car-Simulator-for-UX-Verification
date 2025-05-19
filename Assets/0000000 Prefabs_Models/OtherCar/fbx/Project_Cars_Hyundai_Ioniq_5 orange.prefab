@@ -511,6 +511,7 @@ GameObject:
   - component: {fileID: 4377711469153126414}
   - component: {fileID: 823906902274049963}
   - component: {fileID: 3209920567047713633}
+  - component: {fileID: 6089111251817707607}
   m_Layer: 0
   m_Name: Project_Cars_Hyundai_Ioniq_5 orange
   m_TagString: Untagged
@@ -596,6 +597,18 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &6089111251817707607
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4002312276797739700}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1651f04268e4db74e85215343936c4a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5712648200241313899
 GameObject:
   m_ObjectHideFlags: 0

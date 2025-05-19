@@ -316,7 +316,7 @@ public class Controller : MonoBehaviour
     {
         steeringReduction = 1 - Mathf.Min(Mathf.Abs(velocity.Value) / 30f, 0.85f);
         userSteeringInput.Value = rawSteeringInput * steeringReduction;
-        Debug.Log(rawSteeringInput + ", " + userSteeringInput.Value);
+        // Debug.Log(rawSteeringInput + ", " + userSteeringInput.Value);
         #region Wheel torques
 
         if (parkInput > 0)
