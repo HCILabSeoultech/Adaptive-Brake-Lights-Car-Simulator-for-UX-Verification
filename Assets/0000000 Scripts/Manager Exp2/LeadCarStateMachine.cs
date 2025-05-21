@@ -20,6 +20,7 @@ public class LeadCarStateMachine : MonoBehaviour
     [Header("차량 제어기")]
     public Controller playerCarController;
     public LeadCarController leadCarController;
+    public TrafficManager trafficManager; 
     
     [Header("거리 임계값 설정")]
     public float collisionThreshold = 4.5f;
@@ -281,7 +282,7 @@ public class LeadCarStateMachine : MonoBehaviour
         rb.constraints |= RigidbodyConstraints.FreezeRotationY;
         rb.constraints |= RigidbodyConstraints.FreezeRotationZ;
 
-        StartCoroutine(playerCarController.AccelerateToTargetSpeed(targetSpeedMS-2, 5));
+        StartCoroutine(playerCarController.AccelerateToTargetSpeed(targetSpeedMS-1, 5));
         
         // 선두 차량 정렬
         StartCoroutine(LeadCarRearrangeRoutine(5, 80));
@@ -304,12 +305,17 @@ public class LeadCarStateMachine : MonoBehaviour
 
     IEnumerator ChangeLine2Routine()
     {
+        yield return StartCoroutine(leadCarController.AccelerateToTargetSpeed(CarUtils.ConvertKmHToMS(80), 3));
         yield return new WaitUntil(() => canStartRoutine);
+        trafficManager.PauseSpawnAndPushBack(20);
+        yield return new WaitUntil(() =>
+            leadCarController.transform.position.z > trafficManager.aheadVehicleTransform.position.z);
+        
         float targetSpeedMS = CarUtils.ConvertKmHToMS(100);
         yield return StartCoroutine(leadCarController.AccelerateToTargetSpeed(targetSpeedMS, 3));
         yield return StartCoroutine(leadCarController.MoveSecondLine());
         BrakePatternManager.Instance.RequestResume();
-        
+        trafficManager.ResumeSpawn();
         // 간격 줄인 다음 Normal 상태로 초기화
         currentState = DistanceState.normal;
     }

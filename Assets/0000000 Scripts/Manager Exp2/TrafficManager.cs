@@ -5,13 +5,16 @@ using System.Collections.Generic;
 
 public class TrafficManager : MonoBehaviour
 {
+    // SpawnLoop 제어용 플래그
+    private bool spawningEnabled = true;
+    
     [Header("Player Reference")]
     public Transform player;
 
     [Header("Prefabs & Pooling")]
     public List<GameObject> vehiclePrefabs;
     public int initialPoolSize = 10;
-
+    public Transform aheadVehicleTransform;
     [Header("Spawn Settings")]
     public float spawnDistanceAhead    = 100f;
     public float despawnDistanceBehind = 50f;
@@ -26,8 +29,7 @@ public class TrafficManager : MonoBehaviour
     public float[] laneXPositions;
 
     [Header("Lane Gap Settings")]
-    public float minLaneGap = 10f;
-    public float maxLaneGap = 20f;
+    public float laneGap = 10f;
 
     // 풀 & 활성 차량 목록
     private Queue<GameObject> pool = new Queue<GameObject>();
@@ -63,14 +65,48 @@ public class TrafficManager : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(Random.Range(minSpawnInterval, maxSpawnInterval));
-            SpawnVehicle();
+
+            if (spawningEnabled)  // 스폰이 활성화된 경우에만
+                SpawnVehicle();
         }
     }
 
+    /// <summary>
+    /// 호출 시 차량 스폰을 중지하고,
+    /// activeVehicles에 있는 모든 차량을 뒤로 밀고 속도를 깎는다.
+    /// </summary>
+    /// <param name="speedReductionKmh">감소시킬 속도(km/h)</param>
+    public void PauseSpawnAndPushBack(float speedReductionKmh)
+    {
+        Debug.Log("다른 차선 차량 스폰 중지, 속도 감소");
+        // 1) 더 이상 스폰하지 않는다
+        spawningEnabled = false;
+
+        // 2) 모든 활성 차량에 동일한 효과 적용
+        foreach (var vehObj in activeVehicles)
+        {
+            // 속도 감소
+            var tv = vehObj.GetComponent<TrafficVehicle>();
+            if (tv != null)
+            {
+                float newSpeed = tv.GetSpeed() - speedReductionKmh;
+                tv.SetSpeed(Mathf.Max(0f, newSpeed)); // 음수 속도 방지
+            }
+        }
+    }
+
+    /// <summary>
+    /// 호출 시 다시 스폰을 재개한다.
+    /// </summary>
+    public void ResumeSpawn()
+    {
+        spawningEnabled = true;
+    }
+
+
     private void SpawnVehicle()
     {
-        // 1) 랜덤 차선 선택
-        int lane = Random.Range(0, laneXPositions.Length);
+        int lane = player.position.x < 2 ? 1 : 0; 
         float x = laneXPositions[lane];
 
         // 2) 해당 차선에서 가장 앞에 있는 활성 차량의 Z 위치 계산
@@ -86,14 +122,12 @@ public class TrafficManager : MonoBehaviour
         }
 
         // 3) 스폰 기준 Z 계산 (플레이어 앞 spawnDistanceAhead vs. 앞차 + minLaneGap)
-        // float playerZBase = player.position.z + spawnDistanceAhead;
-        float laneBaseZ   = leadingVehicleZ + minLaneGap;
-        // float baseZ       = Mathf.Max(playerZBase, laneBaseZ);
-
-        // 4) 추가 랜덤 갭
-        // float extraGap = Random.Range(0f, maxLaneGap - minLaneGap);
-        float z        = laneBaseZ;
-
+        float playerZBase = player.position.z + spawnDistanceAhead;
+        float laneBaseZ   = leadingVehicleZ + spawnDistanceAhead;
+        float baseZ       = Mathf.Max(playerZBase, laneBaseZ);
+        float z        = baseZ;
+        if(100 <  z - player.position.z) return;
+        
         // 5) 풀에서 차량 가져오기 또는 새 인스턴스 생성
         GameObject vehObj;
         if (pool.Count > 0)
@@ -108,6 +142,7 @@ public class TrafficManager : MonoBehaviour
 
         // 6) 위치·회전 초기화
         vehObj.transform.position = new Vector3(x, vehObj.transform.position.y, z);
+        aheadVehicleTransform = vehObj.transform; 
         // vehObj.transform.rotation = Quaternion.identity;
 
         // 7) TrafficVehicle 컴포넌트 세팅
@@ -120,7 +155,7 @@ public class TrafficManager : MonoBehaviour
         {
             maxAllowed = Mathf.Min(maxAllowed, frontTv.GetSpeed() * 1.1f);
         }
-        float speed = Random.Range(minSpeedKmh, maxAllowed);
+        float speed = maxAllowed;
         tv.SetSpeed(speed);
 
         // 9) 관리 컬렉션 업데이트

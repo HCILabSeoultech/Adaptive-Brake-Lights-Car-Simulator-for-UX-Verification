@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class TrafficVehicle : MonoBehaviour
 {
-    private float speedKmh;
+    public float speedKmh;
     public int laneIndex { get; private set; }
 
     /// <summary>
