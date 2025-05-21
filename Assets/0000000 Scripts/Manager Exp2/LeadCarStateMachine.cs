@@ -47,6 +47,8 @@ public class LeadCarStateMachine : MonoBehaviour
     [SerializeField]
     private float tooFarDistanceOffset = 30f;    // tooFar 상태일 때 다가갈 거리 (m)
 
+    [Header("차선 변경 타이밍 (초)")]
+    public float lineChangeTime;
 
     private Dictionary<DistanceState, Func<IEnumerator>> stateRoutines;
     private Coroutine stateCoroutine;
@@ -162,7 +164,7 @@ public class LeadCarStateMachine : MonoBehaviour
 
         // 차선 변경 3분에 1회만 실시
         changeLineTimer += Time.deltaTime;
-        if (changeLineTimer >= 15 && !changeLine)
+        if (changeLineTimer >= lineChangeTime && !changeLine)
         {
             SwitchState(DistanceState.changeLine);
             changeLine = true;
