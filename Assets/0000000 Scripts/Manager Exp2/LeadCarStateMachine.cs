@@ -297,6 +297,7 @@ public class LeadCarStateMachine : MonoBehaviour
         rb.constraints &= ~RigidbodyConstraints.FreezeRotationZ;
         
         Debug.Log("사고 처리 종료");
+        AudioManager.Instance.PlayRearrangeFinishmentAudio();
         BrakePatternManager.Instance.RequestResume();
         playerCarController.SetDriveMode(PlayerCarController.DrivingMode.BrakeControl);
 

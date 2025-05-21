@@ -15,6 +15,7 @@ public class AudioManager : MonoBehaviour
     [SerializeField] public AudioClip startDrivingAudioClip;
     [SerializeField] public AudioClip endDrivingAudioClip;
     [SerializeField] public AudioClip rearrangementAudioClip;
+    [SerializeField] public AudioClip rearrangementFinishAudioClip;
 
     public void PlayStartDrivingAudio()
     {
@@ -29,6 +30,11 @@ public class AudioManager : MonoBehaviour
     public void PlayRearrangementAudio()
     {
         audioSource.clip = rearrangementAudioClip;
+        audioSource.Play();
+    }
+    public void PlayRearrangeFinishmentAudio()
+    {
+        audioSource.clip = rearrangementFinishAudioClip;
         audioSource.Play();
     }
 }
