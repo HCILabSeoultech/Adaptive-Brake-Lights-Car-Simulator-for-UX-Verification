@@ -142,9 +142,17 @@ public class BrakePatternManager : MonoBehaviour
                 }
                 
                 // duration 만큼 대기
-                yield return new WaitForSeconds(step.duration);
+                // yield return new WaitForSeconds(step.duration); // 기존 코드
                 
-                // TODO: 기존 Pasue 처리를 충돌 처리 로직으로 대체
+                // 상태 변화를 감지하며 대기
+                float elapsedTime = 0f;
+                while (elapsedTime < step.duration && !pauseRequested && !resumeRequested)
+                {
+                    elapsedTime += Time.deltaTime;
+                    yield return null;
+                }
+                Debug.Log($"브레이크 스탭 소진: {step.action}, {step.duration}초");
+
                 if (pauseRequested)
                 {
                     Debug.Log("BrakePatternManager: 일시정지 대기 중...");
@@ -155,6 +163,7 @@ public class BrakePatternManager : MonoBehaviour
                     pauseRequested = false;
                     resumeRequested = false;
                 }
+                // resumeRequested가 true가 되면 대기 루프를 빠져나오므로, 여기서 추가 처리는 필요 없음.
             }
             Debug.Log("패턴 소진 완료");
 
@@ -168,7 +177,25 @@ public class BrakePatternManager : MonoBehaviour
             
             // 3) 다음 패턴 재생까지 랜덤 대기 시간
             StartCoroutine(LeadCarStateMachine.Instance.LeadCarRearrangeRoutine(3));
-            yield return new WaitForSeconds(Random.Range(3, 7));
+            
+            // yield return new WaitForSeconds(Random.Range(3, 7)); // 기존 코드
+
+            // 상태 변화를 감지하며 랜덤 대기
+            float randomWaitTime = Random.Range(3.0f, 7.0f);
+            float waitElapsedTime = 0f;
+            while (waitElapsedTime < randomWaitTime && !pauseRequested && !resumeRequested)
+            {
+                waitElapsedTime += Time.deltaTime;
+                yield return null;
+            }
+            
+            // 대기 중 Resume 요청이 들어왔으면 처리 후 다음 패턴으로 바로 진행
+            if (resumeRequested)
+            {
+                Debug.Log("BrakePatternManager: 대기 중 Resume 요청 감지, 다음 패턴 진행");
+                resumeRequested = false; // 요청 처리 완료
+            }
+            // pauseRequested는 step duration 대기에서 이미 처리됨
         }
     }
 

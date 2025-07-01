@@ -284,7 +284,7 @@ public class LeadCarStateMachine : MonoBehaviour
         rb.constraints |= RigidbodyConstraints.FreezeRotationY;
         rb.constraints |= RigidbodyConstraints.FreezeRotationZ;
 
-        StartCoroutine(playerCarController.AccelerateToTargetSpeed(targetSpeedMS-1, 5));
+        StartCoroutine(playerCarController.AccelerateToTargetSpeed(targetSpeedMS-0.5f, 5));
         
         // 선두 차량 정렬
         StartCoroutine(LeadCarRearrangeRoutine(5, 80));

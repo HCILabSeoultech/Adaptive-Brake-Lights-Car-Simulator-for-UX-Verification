@@ -15,7 +15,7 @@ public class TimerController : MonoBehaviour
     public bool isBlinking = false;
     void Start()
     {
-        timeRemaining = 240f; // timeLimit;
+        timeRemaining = timeLimit;
         UpdateTimerText();
     }
 
