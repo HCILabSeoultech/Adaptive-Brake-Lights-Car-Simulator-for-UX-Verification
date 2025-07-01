@@ -54,7 +54,7 @@ public class LeadCarStateMachine : MonoBehaviour
     private Coroutine stateCoroutine;
     public Coroutine otherCarCoroutine_MaintainTargetSpeed;
     public bool canStartRoutine = false;
-    
+    public SpeedAndGearUIManager speedAndGearUIManager;
     private void Awake()
     {
         Init();
@@ -204,7 +204,7 @@ public class LeadCarStateMachine : MonoBehaviour
     /// <summary>
     /// 거리 값으로 즉시 상태만 판단해서 반환
     /// </summary>
-    float GetCurrentDistance()
+    public float GetCurrentDistance()
     {
         return Vector3.Distance(leadCarController.transform.position, playerCarController.transform.position);
     }
@@ -284,15 +284,50 @@ public class LeadCarStateMachine : MonoBehaviour
         rb.constraints |= RigidbodyConstraints.FreezeRotationY;
         rb.constraints |= RigidbodyConstraints.FreezeRotationZ;
 
-        StartCoroutine(playerCarController.AccelerateToTargetSpeed(targetSpeedMS-0.5f, 5));
         
-        // 선두 차량 정렬
-        StartCoroutine(LeadCarRearrangeRoutine(5, 80));
-        yield return new WaitForSeconds(5);
+        float dist = GetCurrentDistance();
+
+        if (otherCarCoroutine_MaintainTargetSpeed != null)
+        {
+            StopCoroutine(otherCarCoroutine_MaintainTargetSpeed);
+            otherCarCoroutine_MaintainTargetSpeed = null;  // 참조 해제
+        }
+        // 전방 추돌
+        if (dist < 20) {
+            Debug.Log($"전방 충돌: 실험 차량. 속도 1/2 {speedAndGearUIManager.playerCarSpeed / 2}로 줄이기");
+            StartCoroutine(playerCarController.AccelerateToTargetSpeed(CarUtils.ConvertKmHToMS(speedAndGearUIManager.playerCarSpeed - 20), 5));
         
-        // 실험 차량 정렬
-        StartCoroutine(playerCarController.AlignTestCarToSpeedAndGap(targetSpeedMS, 35, 5));
-        yield return new WaitForSeconds(5);
+            // 선두 차량 정렬
+            StartCoroutine(LeadCarRearrangeRoutine(5, 80));
+            yield return new WaitForSeconds(5);
+        
+            // 실험 차량 정렬
+            StartCoroutine(playerCarController.AlignTestCarToSpeedAndGap(targetSpeedMS, 35, 5));
+            yield return new WaitForSeconds(5);
+
+        }
+        // 후방 추돌
+        else if(dist > 50){
+            Debug.Log($"후방 충돌: 전후방 차량. 속도 1/2 {speedAndGearUIManager.aheadCarSpeed / 2}로 줄이기");
+            StartCoroutine(LeadCarRearrangeRoutine(2, speedAndGearUIManager.aheadCarSpeed / 2));            
+            StartCoroutine(playerCarController.AccelerateToTargetSpeed(CarUtils.ConvertKmHToMS(speedAndGearUIManager.playerCarSpeed + 20), 2));
+            yield return new WaitForSeconds(2);
+
+            Debug.Log("후방 충돌: 전후방, 실험 차량 속도 증가");
+            // 실험 차량 정렬
+            StartCoroutine(playerCarController.AccelerateToTargetSpeed(targetSpeedMS-0.5f, 3));
+
+            // 선두 차량, 후방 차량 속도 낮추기
+            StartCoroutine(LeadCarRearrangeRoutine(3, 80));
+            yield return new WaitForSeconds(3);
+        
+            Debug.Log("후방 충돌: 전후방, 실험 차량 속도 증가 완료, 실험 차량 정렬 시작");
+            // 선두 차량 정렬
+            StartCoroutine(playerCarController.AlignTestCarToSpeedAndGap(targetSpeedMS, 35, 5));
+            yield return new WaitForSeconds(5);
+            Debug.Log("후방 충돌: 전후방, 실험 차량 정렬 완료");
+        }
+        
         rb.constraints &= ~RigidbodyConstraints.FreezePositionX;
         rb.constraints &= ~RigidbodyConstraints.FreezeRotationX;
         rb.constraints &= ~RigidbodyConstraints.FreezeRotationY;
