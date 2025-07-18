@@ -181,7 +181,7 @@ public class BrakePatternManager : MonoBehaviour
             // yield return new WaitForSeconds(Random.Range(3, 7)); // 기존 코드
 
             // 상태 변화를 감지하며 랜덤 대기
-            float randomWaitTime = Random.Range(3.0f, 7.0f);
+            float randomWaitTime = 7;
             float waitElapsedTime = 0f;
             while (waitElapsedTime < randomWaitTime && !pauseRequested && !resumeRequested)
             {
