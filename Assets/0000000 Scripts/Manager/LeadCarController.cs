@@ -267,7 +267,8 @@ public class LeadCarController : MonoBehaviour
     {
         Debug.Log("2차선 속도 유지");
         Coroutine routine = StartCoroutine(MaintainSpeed());
-        virtualWall.SetActive(true);
+        if (virtualWall != null) { virtualWall.SetActive(true); }
+        
         Debug.Log("2차선 이동 시작");
         rb.constraints &= ~RigidbodyConstraints.FreezePositionX;
         Vector3 angles = transform.eulerAngles;
@@ -290,6 +291,6 @@ public class LeadCarController : MonoBehaviour
         transform.eulerAngles = angles2;
         rb.constraints |= RigidbodyConstraints.FreezePositionX;
         Debug.Log("2차선 이동 완료");
-        virtualWall.SetActive(false);
+        if (virtualWall != null) { virtualWall.SetActive(false); }        
     }
 }

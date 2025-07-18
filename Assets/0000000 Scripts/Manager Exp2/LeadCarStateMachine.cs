@@ -85,21 +85,39 @@ public class LeadCarStateMachine : MonoBehaviour
     public BrakeStep GetBehaviourEffect(BrakeStep brakeStep)
     {
         var behaviourEffect = brakeStep;
-
-        if (GetCurrentDistance() < closeThreshold)
+        float dist = GetCurrentDistance();
+        if (dist < 30)
         {
             behaviourEffect.action = BrakeAction.Accelerate;
             behaviourEffect.magnitude = 2;
-        }else if (GetCurrentDistance() > farThreshold)
+        }
+        else if (dist > 50)
         {
             behaviourEffect.action = BrakeAction.Brake;
             behaviourEffect.magnitude = -2;
         }
         else
-        {
-            behaviourEffect.action = BrakeAction.Maintain;
+        {            
         }
-        
+
+        //    if (GetCurrentDistance() < closeThreshold) // 30이하 
+        //{
+        //    //behaviourEffect.action = BrakeAction.Accelerate;
+        //    //behaviourEffect.magnitude = 2;
+        //    behaviourEffect.action = BrakeAction.Maintain;
+        //}
+        //else if (GetCurrentDistance() > farThreshold) // 50이상
+        //{
+        //    behaviourEffect.action = BrakeAction.Brake;
+        //    behaviourEffect.magnitude = -2;
+        //}
+        //else // 30~50 안전거리 유지
+        //{
+        //    //behaviourEffect.action = BrakeAction.Maintain;
+        //    behaviourEffect.action = BrakeAction.Accelerate;
+        //    behaviourEffect.magnitude = 2;
+        //}
+
         return behaviourEffect;
     }
     
