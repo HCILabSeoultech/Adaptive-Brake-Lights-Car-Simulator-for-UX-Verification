@@ -86,7 +86,8 @@ public class Controller : MonoBehaviour
     public float sterrForce = 1.54f;
     public string status = "off"; // 주행모드 선택 디폴트 off
 
-
+    public float currentAccelcation;
+    private float previousVelocityZ;
     public GameObject Timer;
 
     private void Start()
@@ -120,9 +121,14 @@ public class Controller : MonoBehaviour
             driveMode = mode;
         }
     }
-
+    public float GetPlayerCarAcceleration()
+    {
+        return currentAccelcation;
+    }
     private void FixedUpdate()
     {
+        currentAccelcation = (rb.velocity.z - previousVelocityZ) / Time.fixedDeltaTime;
+        previousVelocityZ = rb.velocity.z;
         /*LogitechGSDK.DIJOYSTATE2ENGINES rec;
         rec = LogitechGSDK.LogiGetStateUnity(0);*/
 
@@ -174,7 +180,26 @@ public class Controller : MonoBehaviour
             
         }
     }
+    public float GetForwardInput0to1()
+    {
+        // Debug.Log(rawForwardInput); (-1 ~ 1) -> (0 ~ 1)
+        if (rawForwardInput < 0)
+        {
+            return 0;
+        }
+        return rawForwardInput; // + 1) * 0.5f; // newValue = (originalValue - x) / (y - x)
+    }
 
+    public float GetBrakeInput0to1()
+    {
+        // Debug.Log(parkInput);
+        if (parkInput < 0)
+        {
+            return 0;
+        }
+
+        return parkInput;  // ( + 1) * 0.5f; // newValue = (originalValue - x) / (y - x)
+    }
     public Rigidbody rb;
 
     /// <summary>

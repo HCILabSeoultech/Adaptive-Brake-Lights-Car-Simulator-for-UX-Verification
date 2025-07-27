@@ -15,7 +15,7 @@ public enum Gender
     여자
 }
 
-/// <summary>운전 레벨 (주행 난이도)</summary>
+/// <summary>운전 경력</summary>
 public enum DrivingLevel
 {
     OneToTwo,

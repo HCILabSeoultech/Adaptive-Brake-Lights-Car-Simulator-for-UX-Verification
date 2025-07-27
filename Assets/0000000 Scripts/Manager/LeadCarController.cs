@@ -10,6 +10,18 @@ public class LeadCarController : MonoBehaviour
     public Rigidbody rb; // Rigidbody 참조
     public float targetAcceleration; // 목표 가속도 (m/s²)
     private Coroutine currentCoroutine; // 현재 실행 중인 코루틴 저장
+    public float currentAccelcation;
+    private float previousVelocityZ;
+    public float GetLeadCarAcceleration()
+    {
+        return currentAccelcation;
+    }
+
+    private void FixedUpdate()
+    {
+        currentAccelcation = (rb.velocity.z - previousVelocityZ) / Time.fixedDeltaTime;
+        previousVelocityZ = rb.velocity.z;
+    }
 
     // Exp1에서 사용한 메서드 (더이상 사용하지 않음)
     #region Legacy
