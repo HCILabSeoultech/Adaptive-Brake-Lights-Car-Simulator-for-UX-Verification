@@ -21,6 +21,7 @@ public class DistanceTracker : MonoBehaviour
     // 누적 이동 거리 (km)
     private float distanceKm = 0f;
 
+    public GameObject gameOverUI;
     void Start()
     {
         distanceKm = 0f;
@@ -38,7 +39,11 @@ public class DistanceTracker : MonoBehaviour
     {
         // 거리 계산: speed (km/h) × 시간(h)
         distanceKm += speedKmh * (Time.deltaTime / 3600f);
-
+        if (distanceKm >= targetDistance)
+        {
+            GameOver();
+            return;
+        }
         // 슬라이더 업데이트
         if (distanceSlider != null)
             distanceSlider.value = Mathf.Min(distanceKm, targetDistance);
@@ -58,5 +63,12 @@ public class DistanceTracker : MonoBehaviour
     public float GetDistance()
     {
         return distanceKm;
+    }
+
+    void GameOver()
+    {
+        gameOverUI.SetActive(true);
+        DrivingDataManager.Instance.gameOver = true;
+        AudioManager.Instance.PlayEndDrivingAudio();
     }
 }

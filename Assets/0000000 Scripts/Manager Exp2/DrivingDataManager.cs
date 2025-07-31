@@ -28,6 +28,7 @@ public class DrivingDataManager : MonoBehaviour
     private bool canWrite = false;
     private float canWriteStartTime; // CanWrite이 true가 된 시간
     public SpeedAndGearUIManager speedAndGearUIManager;
+    public bool gameOver = false;
     public bool CanWrite
     {
         get => canWrite;
@@ -52,7 +53,10 @@ public class DrivingDataManager : MonoBehaviour
 
     private void FixedUpdate()
     {
-        WriteCsvRow();
+        if (!gameOver)
+        {
+            WriteCsvRow();
+        }
     }
 
     public void SetCanWrite(bool can)
