@@ -39,7 +39,7 @@ public class DistanceTracker : MonoBehaviour
     {
         // 거리 계산: speed (km/h) × 시간(h)
         distanceKm += speedKmh * (Time.deltaTime / 3600f);
-        if (distanceKm >= targetDistance)
+        if (distanceKm >= targetDistance && (!DrivingDataManager.Instance.gameOver))
         {
             GameOver();
             return;

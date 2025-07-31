@@ -70,7 +70,7 @@ public class LeadCarController : MonoBehaviour
         float previousVelocityZ = initialVelocity.z; // 이전 속도 저장
         float measuredAcceleration = 0f; // 실제 측정된 가속도
 
-        Debug.Log($"🚀 목표 속도 설정: {targetSpeed} m/s | 목표 시간: {duration}s | 계산된 가속도: {calculatedAcceleration}");
+        Debug.Log($"전방차량 목표 속도 설정: {targetSpeed} m/s | 목표 시간: {duration}s"); // | 계산된 가속도: {calculatedAcceleration}");
         int count = 0;
         List<float> accelerations = new List<float>();
         while (elapsedTime < duration)
@@ -92,8 +92,7 @@ public class LeadCarController : MonoBehaviour
 
         float averageAcceleration = accelerations.Sum() / accelerations.Count;
         rb.velocity = targetVelocity; // 최종 속도 보정
-        Debug.Log(
-            $"✅ 목표 속도 도달: {rb.velocity.z} m/s, 계산된 가속도: {calculatedAcceleration}, 평균 가속도 : {averageAcceleration}, 가속도 오차: {Math.Abs(calculatedAcceleration - averageAcceleration) / calculatedAcceleration * 100:F2}% ");
+        Debug.Log($"전방차량 목표 속도 도달: {rb.velocity.z} m/s, 계산된 가속도: {calculatedAcceleration}, 평균 가속도 : {averageAcceleration}, 가속도 오차: {Math.Abs(calculatedAcceleration - averageAcceleration) / calculatedAcceleration * 100:F2}% ");
     }
 
     /// <summary>
@@ -208,7 +207,7 @@ public class LeadCarController : MonoBehaviour
         Vector3 initialVelocity = rb.velocity;
         Vector3 targetVelocity = initialVelocity + new Vector3(0, 0, targetAcceleration * duration); // v = v0 + at
 
-        Debug.Log($"선두 차량 가속, 목표 가속도: {targetAcceleration} m/s² | 목표 시간: {duration}s | 목표 속도: {targetVelocity}m/s");
+        Debug.Log($"전방차량 가속, 목표 가속도: {targetAcceleration} m/s² | 목표 시간: {duration}s | 목표 속도: {targetVelocity}m/s");
 
         float previousVelocityZ = initialVelocity.z; // 이전 속도 저장
         float measuredAcceleration = 0f; // 실제 측정된 가속도
@@ -235,7 +234,7 @@ public class LeadCarController : MonoBehaviour
         float averageAcceleration = accelerations.Sum() / accelerations.Count;
         rb.velocity = targetVelocity;
         Debug.Log(
-            $"✅ 목표 가속도 적용 완료. 최종 속도: {rb.velocity.z} m/s, 목표 가속도: {targetAcceleration}, 평균 가속도 : {averageAcceleration}, 가속도 오차: {Math.Abs(targetAcceleration - averageAcceleration) / targetAcceleration * 100:F2}% ");
+            $"전방차량 목표 가속도 적용 완료. 최종 속도: {rb.velocity.z} m/s, 목표 가속도: {targetAcceleration}, 평균 가속도 : {averageAcceleration}, 가속도 오차: {Math.Abs(targetAcceleration - averageAcceleration) / targetAcceleration * 100:F2}% ");
     }
 
     /// <summary>
@@ -246,7 +245,7 @@ public class LeadCarController : MonoBehaviour
         float elapsedTime = 0f;
         Vector3 constantVelocity = rb.velocity; // 현재 속도 저장
 
-        Debug.Log($"⏳ {waitTime}s 동안 속도 유지: {constantVelocity.z:F3} m/s");
+        Debug.Log($"{waitTime}s 동안 속도 유지: {constantVelocity.z:F3} m/s");
 
         while (elapsedTime < waitTime)
         {
@@ -255,7 +254,7 @@ public class LeadCarController : MonoBehaviour
             yield return null;
         }
 
-        Debug.Log($"✅ {waitTime}s 대기 완료. 속도 유지 후 다음 동작 진행.");
+        Debug.Log($"{waitTime}s 대기 완료. 속도 유지 후 다음 동작 진행.");
     }
 
     /// <summary>
@@ -265,7 +264,7 @@ public class LeadCarController : MonoBehaviour
     {
         Vector3 constantVelocity = rb.velocity; // 현재 속도 저장
 
-        Debug.Log($"현재 속도를 유지한 채 대기. {constantVelocity.z:F3} m/s");
+        Debug.Log($"전방차량 현재 속도를 유지한 채 대기. {constantVelocity.z:F3} m/s");
         while (true)
         {
             // Debug.Log("현재 속도 유지 중...");

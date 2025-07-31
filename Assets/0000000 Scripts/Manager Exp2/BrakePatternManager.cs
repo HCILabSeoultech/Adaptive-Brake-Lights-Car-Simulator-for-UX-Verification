@@ -141,17 +141,20 @@ public class BrakePatternManager : MonoBehaviour
                     throw;
                 }
                 
-                // duration 만큼 대기
-                // yield return new WaitForSeconds(step.duration); // 기존 코드
                 
                 // 상태 변화를 감지하며 대기
                 float elapsedTime = 0f;
-                while (elapsedTime < step.duration && !pauseRequested && !resumeRequested)
+                while (elapsedTime < step.duration)
                 {
                     elapsedTime += Time.deltaTime;
+                    if (pauseRequested || resumeRequested)
+                    {
+                        Debug.Log("Pause, Resume 요청들어옴... 아직 대기");
+                    }
                     yield return null;
                 }
-                Debug.Log($"브레이크 스탭 소진: {step.action}, {step.duration}초");
+                
+                // Debug.Log($"브레이크 스탭 소진: {step.action}, {step.duration}초");
 
                 if (pauseRequested)
                 {
@@ -165,7 +168,7 @@ public class BrakePatternManager : MonoBehaviour
                 }
                 // resumeRequested가 true가 되면 대기 루프를 빠져나오므로, 여기서 추가 처리는 필요 없음.
             }
-            Debug.Log("패턴 소진 완료");
+            Debug.Log("패턴 소진 완료, 다음 패턴 로드 중...");
 
             // 2) 다음 패턴 로드
             LoadNextPattern();
@@ -175,7 +178,8 @@ public class BrakePatternManager : MonoBehaviour
                 yield break;
             }
             
-            // 3) 다음 패턴 재생까지 랜덤 대기 시간
+            // 3) 다음 패턴 재생까지 대기 시간
+            Debug.Log("전방 차량 속도 100으로 올림..");
             StartCoroutine(LeadCarStateMachine.Instance.LeadCarRearrangeRoutine(3));
             
             // yield return new WaitForSeconds(Random.Range(3, 7)); // 기존 코드
@@ -183,6 +187,7 @@ public class BrakePatternManager : MonoBehaviour
             // 상태 변화를 감지하며 랜덤 대기
             float randomWaitTime = 7;
             float waitElapsedTime = 0f;
+            Debug.Log($"다음 패턴 시작까지 {randomWaitTime} 대기...");
             while (waitElapsedTime < randomWaitTime && !pauseRequested && !resumeRequested)
             {
                 waitElapsedTime += Time.deltaTime;

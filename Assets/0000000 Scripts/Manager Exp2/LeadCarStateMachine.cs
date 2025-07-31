@@ -313,7 +313,9 @@ public class LeadCarStateMachine : MonoBehaviour
         // 전방 추돌
         if (dist < 20) {
             Debug.Log($"전방 충돌: 실험 차량. 속도 1/2 {speedAndGearUIManager.playerCarSpeed / 2}로 줄이기");
-            StartCoroutine(playerCarController.AccelerateToTargetSpeed(CarUtils.ConvertKmHToMS(speedAndGearUIManager.playerCarSpeed - 20), 5));
+            float value = speedAndGearUIManager.playerCarSpeed / 2f;
+            if(value < 50f) value = 50f;
+            StartCoroutine(playerCarController.AccelerateToTargetSpeed(CarUtils.ConvertKmHToMS(value), 5));
         
             // 선두 차량 정렬
             StartCoroutine(LeadCarRearrangeRoutine(5, 80));
@@ -327,15 +329,15 @@ public class LeadCarStateMachine : MonoBehaviour
         // 후방 추돌
         else if(dist > 50){
             Debug.Log($"후방 충돌: 전후방 차량. 속도 1/2 {speedAndGearUIManager.aheadCarSpeed / 2}로 줄이기");
-            StartCoroutine(LeadCarRearrangeRoutine(2, speedAndGearUIManager.aheadCarSpeed / 2));            
+            StartCoroutine(LeadCarRearrangeRoutine(2, speedAndGearUIManager.aheadCarSpeed / 2.0f));
+            Debug.Log("후방 충돌: 전후방, 실험 차량 속도 증가");
             StartCoroutine(playerCarController.AccelerateToTargetSpeed(CarUtils.ConvertKmHToMS(speedAndGearUIManager.playerCarSpeed + 20), 2));
             yield return new WaitForSeconds(2);
-
-            Debug.Log("후방 충돌: 전후방, 실험 차량 속도 증가");
+            
             // 실험 차량 정렬
-            StartCoroutine(playerCarController.AccelerateToTargetSpeed(targetSpeedMS-0.5f, 3));
+            StartCoroutine(playerCarController.AccelerateToTargetSpeed(targetSpeedMS + 1f, 3));
 
-            // 선두 차량, 후방 차량 속도 낮추기
+            // 선두 차량, 후방 차량 속도 80으로
             StartCoroutine(LeadCarRearrangeRoutine(3, 80));
             yield return new WaitForSeconds(3);
         
