@@ -69,7 +69,7 @@ public class Controller : MonoBehaviour
     private VolvoCars.Data.Value.Public.LampGeneral
         lampValue = new VolvoCars.Data.Value.Public.LampGeneral(); // This is the value type used by lights/lamps
 
-    private float totalTorque; // The total torque requested by the user, will be split between the four wheels
+    public float totalTorque; // The total torque requested by the user, will be split between the four wheels
     private float steeringReduction; // Used to make it easier to drive with keyboard in higher speeds
     public const float MAX_BRAKE_TORQUE = 6000; // [Nm] 초기값 8000
     private bool brakeLightIsOn = false;
@@ -365,7 +365,7 @@ public class Controller : MonoBehaviour
             if (rawForwardInput >= 0 && velocity.Value > -1.5f)
             {
                 totalTorque = Mathf.Min(availableForwardTorque.Evaluate(Mathf.Abs(velocity.Value)),
-                    -1800 + 7900 * rawForwardInput - 9500 * rawForwardInput * rawForwardInput +
+                    -1200 + 7900 * rawForwardInput - 9500 * rawForwardInput * rawForwardInput +
                     9200 * rawForwardInput * rawForwardInput * rawForwardInput);
             }
             else

@@ -94,7 +94,7 @@ public class LeadCarStateMachine : MonoBehaviour
         else if (dist > 50)
         {
             behaviourEffect.action = BrakeAction.Brake;
-            behaviourEffect.magnitude = -2;
+            behaviourEffect.magnitude = -1;
         }
         else
         {            
