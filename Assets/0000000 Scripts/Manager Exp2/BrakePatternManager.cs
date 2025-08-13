@@ -175,7 +175,7 @@ public class BrakePatternManager : MonoBehaviour
             if (stepQueue == null || stepQueue.Count == 0)
             {
                 Debug.LogWarning("다음 브레이크 패턴(조합)이 없습니다. 루프 종료");
-                yield break;
+                break;
             }
             
             // 3) 다음 패턴 재생까지 대기 시간
@@ -202,6 +202,9 @@ public class BrakePatternManager : MonoBehaviour
             }
             // pauseRequested는 step duration 대기에서 이미 처리됨
         }
+        float targetSpeedMS = CarUtils.ConvertKmHToMS(80);
+        yield return LeadCarStateMachine.Instance.leadCarController.AccelerateToTargetSpeed(targetSpeedMS, 5);
+        StartCoroutine(LeadCarStateMachine.Instance.leadCarController.MaintainSpeed());
     }
 
     private IEnumerator ApplyStep(BrakeStep step)
