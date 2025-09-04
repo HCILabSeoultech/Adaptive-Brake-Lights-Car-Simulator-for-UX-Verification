@@ -1,0 +1,1 @@
+timestamp,date,time,time(ms),GSR,SCR,PPG,Angry,Disgust,Fear,Happy,Neutral,Sad,Surprise,Emotion,Leye_X,Leye_Y,Reye_X,Reye_Y,Leye_open,Reye_open,Left_eye_h,Right_eye_h,Left_brow_h1,Right_brow_h1,Left_brow_h2,Right_brow_h2,Between_brows,Left_chin_length,Right_chin_length,Mouth_width,Mouth_inner_height,Mouth_outer_height
